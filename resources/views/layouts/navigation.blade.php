@@ -44,17 +44,42 @@
 
             <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="{{ __('Main') }}">
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" @click="sidebarOpen = false">
-                    {{ __('Dashboard') }}
+                    <span class="inline-flex items-center gap-2">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M3 11.25L12 4l9 7.25M5.25 10.5V20h13.5v-9.5" />
+                        </svg>
+                        <span>{{ __('Dashboard') }}</span>
+                    </span>
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('investments.index')" :active="request()->routeIs('investments.*')" @click="sidebarOpen = false">
-                    {{ __('Portfolio') }}
+                    <span class="inline-flex items-center gap-2">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M3 7.5A1.5 1.5 0 014.5 6h15A1.5 1.5 0 0121 7.5v9A1.5 1.5 0 0119.5 18h-15A1.5 1.5 0 013 16.5v-9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10.5h18" />
+                        </svg>
+                        <span>{{ __('Portfolio') }}</span>
+                    </span>
                 </x-responsive-nav-link>
                 @if (Auth::user()->isAdmin())
                     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" @click="sidebarOpen = false">
-                        {{ __('Users') }}
+                        <span class="inline-flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M15 19.5a6.75 6.75 0 00-12 0M9 12a3.75 3.75 0 100-7.5A3.75 3.75 0 009 12zm10.5 7.5v-1.5a4.5 4.5 0 00-4.5-4.5h-1.125" />
+                            </svg>
+                            <span>{{ __('Users') }}</span>
+                        </span>
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.investments.index')" :active="request()->routeIs('admin.investments.*')" @click="sidebarOpen = false">
-                        {{ __('Investments') }}
+                        <span class="inline-flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M4.5 6.75h15m-15 5.25h15m-15 5.25h9.75M4.5 4.5h15A1.5 1.5 0 0121 6v12a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18V6a1.5 1.5 0 011.5-1.5z" />
+                            </svg>
+                            <span>{{ __('Investments') }}</span>
+                        </span>
                     </x-responsive-nav-link>
                 @endif
             </nav>

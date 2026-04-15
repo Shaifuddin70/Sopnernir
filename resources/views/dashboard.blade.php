@@ -5,11 +5,10 @@
         </h2>
     </x-slot>
 
-    <div class="mx-auto max-w-7xl space-y-8 p-2 sm:space-y-10 sm:p-8">
+    <div class="mx-auto space-y-6 p-2 sm:p-8">
         {{-- Welcome --}}
         <div
-            class="rounded-2xl border border-gray-200 bg-white px-5 py-8 shadow-sm ring-1 ring-gray-900/5 sm:px-8 sm:py-10"
-        >
+            class="rounded-2xl border border-gray-200 bg-white px-5 py-8 shadow-sm ring-1 ring-gray-900/5 sm:px-8 sm:py-10">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -23,11 +22,8 @@
                     </p>
                 </div>
                 <div class="shrink-0">
-                    <x-action-button
-                        :href="route('investments.index')"
-                        variant="secondary"
-                        class="px-4 py-2.5 text-sm font-semibold"
-                    >{{ __('Open portfolio') }}</x-action-button>
+                    <x-action-button :href="route('investments.index')" variant="secondary"
+                        class="px-4 py-2.5 text-sm font-semibold">{{ __('Open portfolio') }}</x-action-button>
                 </div>
             </div>
         </div>
@@ -35,8 +31,7 @@
         @if ($platform !== null)
             <section
                 class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-                aria-labelledby="platform-overview-heading"
-            >
+                aria-labelledby="platform-overview-heading">
                 <div class="border-b border-gray-100 bg-gray-50 px-5 py-4 sm:px-6">
                     <h2 id="platform-overview-heading" class="text-base font-semibold text-gray-900">
                         {{ __('Platform overview') }}
@@ -58,15 +53,10 @@
                             </div>
                             <span
                                 class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100"
-                                aria-hidden="true"
-                            >
+                                aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.75"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                    />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
                             </span>
                         </div>
@@ -86,15 +76,10 @@
                             </div>
                             <span
                                 class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
-                                aria-hidden="true"
-                            >
+                                aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.75"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </span>
                         </div>
@@ -112,15 +97,10 @@
                             </div>
                             <span
                                 class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 ring-1 ring-violet-100"
-                                aria-hidden="true"
-                            >
+                                aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.75"
-                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                                    />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             </span>
                         </div>
@@ -132,11 +112,10 @@
             </section>
         @endif
 
-        <section
-            class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-            aria-labelledby="portfolio-heading"
-        >
-            <div class="flex flex-col gap-4 border-b border-gray-100 bg-gray-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <section class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
+            aria-labelledby="portfolio-heading">
+            <div
+                class="flex flex-col gap-4 border-b border-gray-100 bg-gray-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div>
                     <h2 id="portfolio-heading" class="text-base font-semibold text-gray-900">
                         {{ __('Your portfolio') }}
@@ -154,8 +133,7 @@
             <div class="p-5 sm:p-6">
                 <div class="grid gap-4 sm:grid-cols-3">
                     <div
-                        class="rounded-xl border border-gray-100 bg-gray-50/50 p-5 ring-1 ring-gray-900/5 transition hover:border-gray-200 hover:bg-white"
-                    >
+                        class="rounded-xl border border-gray-100 bg-gray-50/50 p-5 ring-1 ring-gray-900/5 transition hover:border-gray-200 hover:bg-white">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             {{ __('Your investments') }}
                         </p>
@@ -164,8 +142,7 @@
                         </p>
                     </div>
                     <div
-                        class="rounded-xl border border-emerald-100/80 bg-emerald-50/40 p-5 ring-1 ring-emerald-900/5 transition hover:border-emerald-200/80 hover:bg-emerald-50/60"
-                    >
+                        class="rounded-xl border border-emerald-100/80 bg-emerald-50/40 p-5 ring-1 ring-emerald-900/5 transition hover:border-emerald-200/80 hover:bg-emerald-50/60">
                         <p class="text-xs font-semibold uppercase tracking-wide text-emerald-800/80">
                             {{ __('Your tagged capital') }}
                         </p>
@@ -174,8 +151,7 @@
                         </p>
                     </div>
                     <div
-                        class="rounded-xl border border-indigo-100/80 bg-indigo-50/40 p-5 ring-1 ring-indigo-900/5 transition hover:border-indigo-200/80 hover:bg-indigo-50/60"
-                    >
+                        class="rounded-xl border border-indigo-100/80 bg-indigo-50/40 p-5 ring-1 ring-indigo-900/5 transition hover:border-indigo-200/80 hover:bg-indigo-50/60">
                         <p class="text-xs font-semibold uppercase tracking-wide text-indigo-800/80">
                             {{ __('Your profit received') }}
                         </p>
@@ -187,10 +163,8 @@
             </div>
         </section>
 
-        <section
-            class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-            aria-labelledby="top-investors-heading"
-        >
+        <section class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
+            aria-labelledby="top-investors-heading">
             <div class="border-b border-gray-100 bg-gray-50 px-5 py-4 sm:px-6">
                 <h2 id="top-investors-heading" class="text-base font-semibold text-gray-900">
                     {{ __('Top investors') }}
@@ -206,18 +180,10 @@
                 @endif
             </div>
             <div class="p-5 sm:p-6">
-                <x-ajax-table-region
-                    :fetch-url="route('dashboard')"
-                    target-id="dashboard-top-investors-fragment"
-                    ajax-fragment="top_investors"
-                >
-                    <x-table-search
-                        class="mb-4"
-                        :fetch-url="route('dashboard')"
-                        target-id="dashboard-top-investors-fragment"
-                        ajax-fragment="top_investors"
-                        :placeholder="__('Search investors by name or email…')"
-                    />
+                <x-ajax-table-region :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment"
+                    ajax-fragment="top_investors">
+                    <x-table-search class="mb-4" :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment"
+                        ajax-fragment="top_investors" :placeholder="__('Search investors by name or email…')" />
                     <div id="dashboard-top-investors-fragment">
                         @include('dashboard.partials.top-investors-fragment', compact('topInvestors'))
                     </div>
