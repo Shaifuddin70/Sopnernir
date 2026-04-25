@@ -1,23 +1,26 @@
-<table class="min-w-full text-sm">
+<div class="overflow-x-auto">
+<table class="min-w-full text-xs sm:text-sm">
     <thead>
-        <tr class="border-b text-left">
-            <th class="py-2 pr-4">{{ __('Title') }}</th>
-            <th class="py-2 pr-4">{{ __('Status') }}</th>
-            <th class="py-2 pr-4">{{ __('Created') }}</th>
-            <th class="py-2 pr-4">{{ __('My contribution') }}</th>
-            <th class="py-2 pr-4 text-right">{{ __('My profit (total)') }}</th>
-            <th class="py-2"></th>
+        <tr class="border-b border-gray-200 bg-gray-50 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:text-xs">
+            <th class="py-2 pr-3">{{ __('Title') }}</th>
+            <th class="py-2 pr-3">{{ __('Status') }}</th>
+            <th class="py-2 pr-3">{{ __('Created') }}</th>
+            <th class="py-2 pr-3 text-right">{{ __('Capital') }}</th>
+            <th class="py-2 pr-3 text-right">{{ __('Profit') }}</th>
+            <th class="py-2 text-right">{{ __('Action') }}</th>
         </tr>
     </thead>
     <tbody>
         @forelse ($investments as $inv)
             <tr class="border-b border-gray-100">
-                <td class="py-2 pr-4">{{ $inv->title }}</td>
-                <td class="py-2 pr-4">{{ $inv->status }}</td>
-                <td class="py-2 pr-4 tabular-nums">{{ $inv->created_at?->format('Y-m-d') ?? '—' }}</td>
-                <td class="py-2 pr-4 tabular-nums">{{ number_format((float) ($inv->my_contribution ?? 0), 2, '.', '') }}</td>
-                <td class="py-2 pr-4 text-right tabular-nums">{{ number_format((float) ($inv->my_profit ?? 0), 2, '.', '') }}</td>
-                <td class="py-2">
+                <td class="py-2.5 pr-3 font-medium text-gray-900">{{ $inv->title }}</td>
+                <td class="py-2.5 pr-3">
+                    <span class="inline-flex rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">{{ $inv->status }}</span>
+                </td>
+                <td class="py-2.5 pr-3 tabular-nums text-gray-600">{{ $inv->created_at?->format('Y-m-d') ?? '—' }}</td>
+                <td class="py-2.5 pr-3 text-right tabular-nums">{{ number_format((float) ($inv->my_contribution ?? 0), 2, '.', '') }}</td>
+                <td class="py-2.5 pr-3 text-right tabular-nums">{{ number_format((float) ($inv->my_profit ?? 0), 2, '.', '') }}</td>
+                <td class="py-2.5 text-right">
                     <x-action-button :href="route('investments.show', $inv)">{{ __('View') }}</x-action-button>
                 </td>
             </tr>
@@ -34,8 +37,9 @@
         @endforelse
     </tbody>
 </table>
+</div>
 @if ($investments->total() > 0)
-    <p class="mt-4 text-sm text-gray-700">
+    <p class="mt-3 text-sm text-gray-700">
         <span class="font-medium">{{ __('Total profit (all your pools)') }}:</span>
         <span class="tabular-nums">{{ number_format($portfolioProfitTotal, 2, '.', '') }}</span>
     </p>

@@ -21,28 +21,29 @@ class DashboardMetricsService
      *     investments_active: int,
      *     total_contributions: string,
      *     total_profit_distributed: string,
+     *     total_amount: string,
      *     accrual_periods: int,
      *     participant_rows: int,
      * }
      */
     public function platformSummary(): array
     {
+        $contributionSum = InvestmentParticipant::query()
+            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
+            ->sum('contribution_amount');
+        $profitDistributed = InvestmentPeriod::query()
+            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
+            ->sum('profit_amount');
+
         return [
             'investments_total' => (int) Investment::query()->count(),
             'investments_active' => (int) Investment::query()
                 ->where('status', Investment::STATUS_ACTIVE)
                 ->where('is_active', true)
                 ->count(),
-            'total_contributions' => $this->decimalString(
-                InvestmentParticipant::query()
-                    ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-                    ->sum('contribution_amount')
-            ),
-            'total_profit_distributed' => $this->decimalString(
-                InvestmentPeriod::query()
-                    ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-                    ->sum('profit_amount')
-            ),
+            'total_contributions' => $this->decimalString($contributionSum),
+            'total_profit_distributed' => $this->decimalString($profitDistributed),
+            'total_amount' => $this->decimalString($contributionSum + $profitDistributed),
             'accrual_periods' => (int) InvestmentPeriod::query()
                 ->whereHas('investment', fn ($q) => $q->where('is_active', true))
                 ->count(),
@@ -57,6 +58,7 @@ class DashboardMetricsService
      *     investments_count: int,
      *     total_contribution: string,
      *     total_profit: string,
+     *     total_amount: string,
      *     return_on_tagged_capital_pct: string|null,
      * }
      */
@@ -80,6 +82,7 @@ class DashboardMetricsService
                 ->count(),
             'total_contribution' => $this->decimalString($contributionSum),
             'total_profit' => $this->decimalString($profitSum),
+            'total_amount' => $this->decimalString($contributionSum + $profitSum),
             'return_on_tagged_capital_pct' => $contrib > 0
                 ? number_format(($profit / $contrib) * 100, 2, '.', '')
                 : null,

@@ -9,13 +9,17 @@
     </x-slot>
 
 
-    <div class="mx-auto p-2 sm:p-8">
+    <div class="mx-auto space-y-3 p-2 sm:p-6">
         @if (session('status'))
             <p class="mb-4 text-sm text-green-600">{{ session('status') }}</p>
         @endif
 
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 overflow-x-auto">
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="border-b border-gray-100 bg-gray-50 px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Investments list') }}</p>
+                <p class="text-xs text-gray-500">{{ __('Compact view with quick actions') }}</p>
+            </div>
+            <div class="p-3 text-gray-900 sm:p-4">
                 <x-ajax-table-region :fetch-url="route('admin.investments.index')" target-id="investments-table-fragment">
                     <x-table-search :fetch-url="route('admin.investments.index')" target-id="investments-table-fragment" :placeholder="__('Search by title, notes, or status…')" />
                     <div id="investments-table-fragment">

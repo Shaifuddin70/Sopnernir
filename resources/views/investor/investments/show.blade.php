@@ -6,7 +6,7 @@
         </div>
     </x-slot>
 
-    <div class="mx-auto space-y-6 p-2 sm:p-8">
+    <div class="mx-auto space-y-6 p-1 sm:p-6">
         <div class="bg-white shadow-sm sm:rounded-lg p-6 text-sm text-gray-700 space-y-1">
             <p><span class="font-medium">{{ __('Status') }}:</span> {{ $investment->status }}</p>
             <p><span class="font-medium">{{ __('My contribution') }}:</span>

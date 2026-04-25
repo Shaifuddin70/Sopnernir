@@ -3,27 +3,27 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('My investments') }}</h2>
     </x-slot>
 
-    <div class="mx-auto space-y-6 p-2 sm:p-8">
+    <div class="mx-auto space-y-4 p-1 sm:p-5">
         @if ($investments->total() > 0 || $totalTaggedCapital > 0 || $portfolioProfitTotal > 0)
-            <div class="rounded-lg border border-indigo-100 bg-indigo-50/60 p-5 text-sm text-gray-800 shadow-sm">
-                <h3 class="text-base font-semibold text-gray-900">{{ __('Your totals across all pools') }}</h3>
+            <div class="rounded-lg border border-indigo-100 bg-indigo-50/60 p-3 text-sm text-gray-800 shadow-sm sm:p-4">
+                <h3 class="text-sm font-semibold text-gray-900 sm:text-base">{{ __('Your totals across all pools') }}</h3>
                 <dl class="mt-3 grid gap-3 sm:grid-cols-3">
                     <div>
                         <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">{{ __('Tagged capital') }}
                         </dt>
-                        <dd class="mt-1 text-lg font-semibold tabular-nums text-gray-900">
+                        <dd class="mt-1 text-base font-semibold tabular-nums text-gray-900 sm:text-lg">
                             {{ number_format($totalTaggedCapital, 2, '.', '') }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">
                             {{ __('Your profit received') }}</dt>
-                        <dd class="mt-1 text-lg font-semibold tabular-nums text-gray-900">
+                        <dd class="mt-1 text-base font-semibold tabular-nums text-gray-900 sm:text-lg">
                             {{ number_format($portfolioProfitTotal, 2, '.', '') }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">
                             {{ __('Return on tagged capital') }}</dt>
-                        <dd class="mt-1 text-lg font-semibold tabular-nums text-gray-900">
+                        <dd class="mt-1 text-base font-semibold tabular-nums text-gray-900 sm:text-lg">
                             @if ($returnOnTaggedCapitalPct !== null)
                                 {{ $returnOnTaggedCapitalPct }}%
                             @else
@@ -42,8 +42,11 @@
             </div>
         @endif
 
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 overflow-x-auto">
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="border-b border-gray-100 bg-gray-50 px-4 py-3">
+                <h3 class="text-sm font-semibold text-gray-900">{{ __('Pools') }}</h3>
+            </div>
+            <div class="p-3 text-gray-900 sm:p-4">
                 <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools">
                     <x-table-search :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools"
                         :placeholder="__('Search pools by title…')" />
@@ -56,10 +59,10 @@
             </div>
         </div>
 
-        <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Profit by month') }}</h3>
-                <p class="text-sm text-gray-600 mb-4">
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="p-3 text-gray-900 sm:p-4">
+                <h3 class="mb-1 text-base font-semibold text-gray-900">{{ __('Profit by month') }}</h3>
+                <p class="mb-3 text-xs text-gray-600 sm:text-sm">
                     {{ __('Every tagged investor receives a share each month on each pool they are on, from the pool’s first month through the current month.') }}
                 </p>
                 <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" ajax-fragment="profit">

@@ -8,22 +8,22 @@
     </p>
 @else
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="min-w-full text-xs sm:text-sm">
             <thead>
-                <tr class="border-b text-left">
-                    <th class="py-2 pr-4">{{ __('Month') }}</th>
-                    <th class="py-2 pr-4">{{ __('Investment') }}</th>
-                    <th class="py-2 pr-4">{{ __('Recorded') }}</th>
+                <tr class="border-b border-gray-200 bg-gray-50 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:text-xs">
+                    <th class="py-2 pr-3">{{ __('Month') }}</th>
+                    <th class="py-2 pr-3">{{ __('Investment') }}</th>
+                    <th class="py-2 pr-3">{{ __('Recorded') }}</th>
                     <th class="py-2 text-right">{{ __('My profit') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($profitByMonth as $row)
                     <tr class="border-b border-gray-100">
-                        <td class="py-2 pr-4 tabular-nums">{{ $row->period->month->translatedFormat('F Y') }}</td>
-                        <td class="py-2 pr-4">{{ $row->period->investment->title }}</td>
-                        <td class="py-2 pr-4 tabular-nums">{{ $row->created_at?->format('Y-m-d') ?? '—' }}</td>
-                        <td class="py-2 text-right tabular-nums">{{ number_format((float) $row->profit_share, 2, '.', '') }}</td>
+                        <td class="py-2.5 pr-3 tabular-nums">{{ $row->period->month->translatedFormat('F Y') }}</td>
+                        <td class="py-2.5 pr-3 font-medium text-gray-900">{{ $row->period->investment->title }}</td>
+                        <td class="py-2.5 pr-3 tabular-nums text-gray-600">{{ $row->created_at?->format('Y-m-d') ?? '—' }}</td>
+                        <td class="py-2.5 text-right tabular-nums">{{ number_format((float) $row->profit_share, 2, '.', '') }}</td>
                     </tr>
                 @endforeach
             </tbody>

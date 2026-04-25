@@ -5,28 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="mx-auto space-y-6 p-2 sm:p-8">
-        {{-- Welcome --}}
-        <div
-            class="rounded-2xl border border-gray-200 bg-white px-5 py-8 shadow-sm ring-1 ring-gray-900/5 sm:px-8 sm:py-10">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        {{ config('app.name') }}
-                    </p>
-                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                        {{ auth()->user()->name }}
-                    </h1>
-                    <p class="mt-2 max-w-xl text-sm leading-relaxed text-gray-600">
-                        {{ auth()->user()->email }}
-                    </p>
-                </div>
-                <div class="shrink-0">
-                    <x-action-button :href="route('investments.index')" variant="secondary"
-                        class="px-4 py-2.5 text-sm font-semibold">{{ __('Open portfolio') }}</x-action-button>
-                </div>
-            </div>
-        </div>
+    <div class="mx-auto space-y-6 p-1 sm:p-6">
 
         @if ($platform !== null)
             <section
@@ -83,6 +62,9 @@
                                 </svg>
                             </span>
                         </div>
+                        <p class="mt-2 text-xs font-medium text-emerald-900/80">
+                            {{ __('Total amount: :amount', ['amount' => $platform['total_amount']]) }}
+                        </p>
                         <p class="mt-3 text-sm text-gray-600">{{ __('Sum of all participant contributions.') }}</p>
                     </article>
                     <article class="bg-white p-5 sm:p-6">
@@ -148,6 +130,9 @@
                         </p>
                         <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-emerald-950">
                             {{ $personal['total_contribution'] }}
+                        </p>
+                        <p class="mt-2 text-xs font-medium text-emerald-900/80">
+                            {{ __('Total amount: :amount', ['amount' => $personal['total_amount']]) }}
                         </p>
                     </div>
                     <div

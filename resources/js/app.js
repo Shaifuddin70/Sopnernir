@@ -1,6 +1,69 @@
 import './bootstrap';
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.css';
 
 import Alpine from 'alpinejs';
+
+const SEARCHABLE_SELECT_MARKER = 'searchableSelectReady';
+
+function initSearchableSelects(root = document) {
+    const selects = root.querySelectorAll('select');
+    selects.forEach((select) => {
+        if (!(select instanceof HTMLSelectElement)) {
+            return;
+        }
+
+        if (select.dataset.searchIgnore === 'true') {
+            return;
+        }
+
+        if (select.dataset[SEARCHABLE_SELECT_MARKER] === 'true') {
+            return;
+        }
+
+        new TomSelect(select, {
+            create: false,
+            allowEmptyOption: true,
+            maxOptions: 500,
+            searchField: ['text'],
+            placeholder: select.getAttribute('placeholder') || 'Search...',
+            sortField: [
+                { field: '$score' },
+                { field: '$order' },
+            ],
+        });
+
+        select.dataset[SEARCHABLE_SELECT_MARKER] = 'true';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSearchableSelects(document);
+});
+
+const searchableSelectObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (!(node instanceof HTMLElement)) {
+                return;
+            }
+
+            if (node.matches('select')) {
+                initSearchableSelects(node.parentElement || document);
+                return;
+            }
+
+            if (node.querySelector('select')) {
+                initSearchableSelects(node);
+            }
+        });
+    });
+});
+
+searchableSelectObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+});
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('liveSearchAjax', (config) => ({

@@ -7,7 +7,7 @@
         </div>
     </x-slot>
 
-    <div class="mx-auto space-y-6 p-2 sm:p-8">
+    <div class="mx-auto space-y-6 p-1 sm:p-6">
         @if (session('status'))
             <p class="text-sm text-green-600">{{ session('status') }}</p>
         @endif

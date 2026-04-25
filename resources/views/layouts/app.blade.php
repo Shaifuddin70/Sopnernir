@@ -31,7 +31,7 @@
             <div class="flex min-h-0 min-w-0 flex-1 flex-col lg:pt-14">
                 @isset($header)
                     <header class="border-b border-gray-200 bg-white shadow-sm">
-                        <div class="mx-auto space-y-6 p-2 sm:p-8">
+                        <div class="mx-auto space-y-6 p-1 sm:p-6">
                             {{ $header }}
                         </div>
                     </header>
