@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Shopnonir') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,13 +22,7 @@
         <div class="w-full sm:max-w-md flex justify-end px-6 mb-2">
             <x-language-switcher />
         </div>
-        <div>
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </div>
-
-        <div class="mt-6 w-full max-w-6xl px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+        <div class="mt-4 w-full px-6">
             {{ $slot }}
         </div>
     </div>

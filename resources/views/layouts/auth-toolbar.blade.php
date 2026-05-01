@@ -3,7 +3,7 @@
     $avatarInitial = strtoupper(\Illuminate\Support\Str::substr($authUser->name ?: $authUser->email ?: '?', 0, 1));
 @endphp
 
-<div class="flex min-w-0 items-center gap-2 sm:gap-3">
+<div class="flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
     <div class="hidden shrink-0 lg:block">
         <x-language-switcher />
     </div>
@@ -11,7 +11,7 @@
         <x-slot name="trigger">
             <button
                 type="button"
-                class="inline-flex max-w-full min-w-0 items-center gap-2 rounded-md border border-transparent py-1.5 ps-1 pe-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-md border border-transparent py-1 ps-1 pe-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
                 @if ($authUser->image)
                     <img
@@ -25,7 +25,8 @@
                         aria-hidden="true"
                     >{{ $avatarInitial }}</span>
                 @endif
-                <span class="max-w-[10rem] truncate sm:max-w-[14rem]">{{ $authUser->name }}</span>
+                <span class="sr-only">{{ $authUser->name }}</span>
+                <span class="hidden max-w-[9rem] truncate md:inline lg:max-w-[12rem]">{{ $authUser->name }}</span>
                 <span class="shrink-0 text-gray-400" aria-hidden="true">
                     <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />

@@ -12,7 +12,7 @@
                 </svg>
             </button>
             <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-2 text-gray-900">
-                <x-application-logo class="block h-8 w-auto shrink-0 fill-current" />
+                <x-application-logo compact class="block h-8 w-8 shrink-0 fill-current" />
             </a>
         </div>
         @include('layouts.auth-toolbar')
@@ -28,7 +28,7 @@
             class="fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] flex-col border-r border-gray-200 bg-white shadow-xl transition-transform duration-200 ease-in-out lg:inset-y-0 lg:left-0 lg:z-40 lg:max-w-none lg:w-64 lg:!translate-x-0 lg:border-r lg:border-gray-200 lg:bg-white lg:shadow-none">
             <div
                 class="flex h-14 shrink-0 items-center justify-between border-b border-gray-100 px-4 lg:h-auto lg:py-4">
-                <a href="{{ route('dashboard') }}" class="hidden items-center lg:flex" @click="sidebarOpen = false">
+                <a href="{{ route('dashboard') }}" class="hidden items-center gap-2 lg:flex" @click="sidebarOpen = false">
                     <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                 </a>
                 <span class="text-sm font-semibold text-gray-900 lg:hidden">{{ config('app.name') }}</span>
