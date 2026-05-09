@@ -10,10 +10,6 @@
 
 
     <div class="mx-auto space-y-3 p-2 sm:p-6">
-        @if (session('status'))
-            <p class="mb-4 text-sm text-green-600">{{ session('status') }}</p>
-        @endif
-
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="border-b border-gray-100 bg-gray-50 px-4 py-3">
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Investments list') }}</p>

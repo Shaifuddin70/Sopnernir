@@ -13,10 +13,6 @@
 
 
     <div class="mx-auto space-y-6 p-1 sm:p-6">
-        @if (session('status'))
-            <p class="text-sm text-green-600">{{ session('status') }}</p>
-        @endif
-
         <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border border-gray-200">
             <div class="border-b border-gray-100 bg-gray-50/90 px-6 py-4">
                 <h3 class="text-base font-semibold text-gray-900">{{ __('Pool overview') }}</h3>
@@ -255,8 +251,39 @@
                 <div>
                     <x-input-label for="contribution_amount" :value="__('Contribution')" />
                     <x-text-input id="contribution_amount" name="contribution_amount" type="text"
-                        class="mt-1 block w-full" placeholder="1000.00" required />
+                        class="mt-1 block w-full" placeholder="1000.00" value="{{ old('contribution_amount') }}" required />
                     <x-input-error :messages="$errors->get('contribution_amount')" class="mt-2" />
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
+                    <input type="hidden" name="include_previous_profit" value="0" />
+                    <label class="inline-flex items-start gap-2 cursor-pointer">
+                        <input
+                            id="include_previous_profit"
+                            type="checkbox"
+                            name="include_previous_profit"
+                            value="1"
+                            class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                            @checked(old('include_previous_profit'))
+                        />
+                        <span class="text-sm text-gray-600">
+                            {{ __('Add this user’s cumulative posted profit from other pools (since the month below, or app default in .env) to the contribution.') }}
+                        </span>
+                    </label>
+                    <x-input-error :messages="$errors->get('include_previous_profit')" class="mt-2" />
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
+                    <x-input-label for="profit_carry_since_month_single" :value="__('Count profit from month (optional)')" />
+                    <input
+                        id="profit_carry_since_month_single"
+                        name="profit_carry_since_month"
+                        type="month"
+                        class="mt-1 block w-full max-w-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        value="{{ old('profit_carry_since_month') }}"
+                    />
+                    <p class="mt-1 text-xs text-gray-500">
+                        {{ __('Inclusive—sums every posted profit share from this month onward on other pools. Leave blank to use INVESTMENT_PROFIT_CARRY_SINCE_MONTH from .env, or all posted months if that is unset.') }}
+                    </p>
+                    <x-input-error :messages="$errors->get('profit_carry_since_month')" class="mt-2" />
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <x-primary-button type="submit">{{ __('Add or update participant') }}</x-primary-button>
@@ -266,7 +293,7 @@
             <div class="mb-8 rounded-md border border-gray-200 bg-gray-50 p-4">
                 <h4 class="text-sm font-medium text-gray-900 mb-2">{{ __('Tag all investors at once') }}</h4>
                 <p class="text-xs text-gray-600 mb-4">
-                    {{ __('Adds every investor who is not already tagged, using the same contribution for each. You can edit individual amounts below.') }}
+                    {{ __('Adds every investor who is not already tagged. Each contribution is the entered amount plus that user’s cumulative posted profit from other pools from the cutoff month onward (same rules as single tag).') }}
                 </p>
                 <form method="post" action="{{ route('admin.investments.participants.tag-all', $investment) }}"
                     class="flex flex-wrap items-end gap-4">
@@ -277,6 +304,17 @@
                             class="mt-1 block w-full sm:w-40" placeholder="1000.00"
                             value="{{ old('bulk_contribution_amount') }}" required />
                         <x-input-error :messages="$errors->get('bulk_contribution_amount')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="profit_carry_since_month_bulk" :value="__('Count profit from month (optional)')" />
+                        <input
+                            id="profit_carry_since_month_bulk"
+                            name="profit_carry_since_month"
+                            type="month"
+                            class="mt-1 block w-full sm:w-40 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            value="{{ old('profit_carry_since_month') }}"
+                        />
+                        <x-input-error :messages="$errors->get('profit_carry_since_month')" class="mt-2" />
                     </div>
                     <x-primary-button type="submit">{{ __('Tag all investors') }}</x-primary-button>
                 </form>

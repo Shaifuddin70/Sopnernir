@@ -167,4 +167,40 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
             $this->assertTrue($period->periodUsers->every(fn ($row) => (string) $row->profit_share === '75.00'));
         }
     }
+
+    public function test_removing_last_participant_clears_posted_accruals(): void
+    {
+        Config::set('investment.auto_accrue_on_save', true);
+        Carbon::setTestNow(Carbon::parse('2026-04-15 12:00:00', config('app.timezone')));
+
+        $admin = User::factory()->admin()->create();
+        $investor = User::factory()->create();
+
+        $investment = Investment::create([
+            'title' => 'Single investor pool',
+            'default_monthly_rate_pct' => '1.5',
+            'status' => Investment::STATUS_ACTIVE,
+            'created_by' => $admin->id,
+            'period_start' => '2026-03-01',
+        ]);
+
+        $participant = InvestmentParticipant::create([
+            'investment_id' => $investment->id,
+            'user_id' => $investor->id,
+            'contribution_amount' => '5000.00',
+        ]);
+
+        $investment->refresh();
+        app(\App\Services\InvestmentAccrualService::class)->syncMonthsThrough($investment, Investment::accrualThroughInclusive());
+        $this->assertGreaterThan(0, $investment->periods()->count());
+
+        $this->actingAs($admin)
+            ->delete(route('admin.investments.participants.destroy', [$investment, $participant]))
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        $investment->refresh();
+        $this->assertSame(0, $investment->participants()->count());
+        $this->assertSame(0, $investment->periods()->count());
+    }
 }

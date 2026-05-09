@@ -8,6 +8,8 @@
 
     <title>{{ config('app.name', 'Shopnonir') }}</title>
 
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +20,7 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
+    <x-status-banner />
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
         <div class="w-full sm:max-w-md flex justify-end px-6 mb-2">
             <x-language-switcher />

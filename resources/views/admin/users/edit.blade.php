@@ -8,9 +8,6 @@
     </x-slot>
 
     <div class="mx-auto p-2 sm:p-8">
-        @if (session('status'))
-            <p class="mb-4 text-sm text-green-600">{{ session('status') }}</p>
-        @endif
         @if ($errors->has('active'))
             <p class="mb-4 text-sm text-red-600">{{ $errors->first('active') }}</p>
         @endif

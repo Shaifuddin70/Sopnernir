@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
+use App\Models\InvestmentPeriodUser;
 use App\Models\User;
 use App\Services\InvestmentAccrualService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +22,17 @@ class InvestmentParticipantController extends Controller
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
             'contribution_amount' => ['required', 'numeric', 'min:0.01'],
+            'include_previous_profit' => ['nullable', 'boolean'],
+            'profit_carry_since_month' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
         ]);
+
+        $sinceMonth = $this->resolveProfitCarrySinceMonth($validated['profit_carry_since_month'] ?? null);
+
+        $carryForwardProfit = $request->boolean('include_previous_profit')
+            ? $this->cumulativeProfitShareForUser((int) $validated['user_id'], $investment->id, $sinceMonth)
+            : 0.0;
+
+        $finalContribution = (float) $validated['contribution_amount'] + $carryForwardProfit;
 
         InvestmentParticipant::updateOrCreate(
             [
@@ -28,14 +40,20 @@ class InvestmentParticipantController extends Controller
                 'user_id' => $validated['user_id'],
             ],
             [
-                'contribution_amount' => $validated['contribution_amount'],
+                'contribution_amount' => number_format($finalContribution, 2, '.', ''),
             ]
         );
 
         $this->activateInvestmentIfDraft($investment);
         $this->syncAccrualsIfEligible($investment);
 
-        return back()->with('status', 'Participant saved.');
+        $status = $carryForwardProfit > 0
+            ? __('Participant saved. Added cumulative rolled-in profit :amount to contribution.', [
+                'amount' => number_format($carryForwardProfit, 2, '.', ''),
+            ])
+            : __('Participant saved.');
+
+        return back()->with('status', $status);
     }
 
     public function tagAllInvestors(Request $request, Investment $investment): RedirectResponse
@@ -44,7 +62,10 @@ class InvestmentParticipantController extends Controller
 
         $validated = $request->validate([
             'bulk_contribution_amount' => ['required', 'numeric', 'min:0.01'],
+            'profit_carry_since_month' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
         ]);
+
+        $sinceMonth = $this->resolveProfitCarrySinceMonth($validated['profit_carry_since_month'] ?? null);
 
         $alreadyTaggedIds = $investment->participants()->pluck('user_id')->all();
 
@@ -59,14 +80,17 @@ class InvestmentParticipantController extends Controller
             return back()->with('status', __('No additional investors to tag. Everyone is already on this investment.'));
         }
 
-        $amount = $validated['bulk_contribution_amount'];
+        $baseAmount = (float) $validated['bulk_contribution_amount'];
 
-        DB::transaction(function () use ($investment, $investorIds, $amount): void {
+        DB::transaction(function () use ($investment, $investorIds, $baseAmount, $sinceMonth): void {
             foreach ($investorIds as $userId) {
+                $carryForwardProfit = $this->cumulativeProfitShareForUser((int) $userId, $investment->id, $sinceMonth);
+                $finalContribution = $baseAmount + $carryForwardProfit;
+
                 InvestmentParticipant::create([
                     'investment_id' => $investment->id,
                     'user_id' => $userId,
-                    'contribution_amount' => $amount,
+                    'contribution_amount' => number_format($finalContribution, 2, '.', ''),
                 ]);
             }
         });
@@ -106,6 +130,17 @@ class InvestmentParticipantController extends Controller
 
         $participant->delete();
 
+        $investment->refresh();
+        if ($investment->participants()->doesntExist()) {
+            // No tagged investors means the pool has no principal, so posted accrual
+            // snapshots are stale and should be cleared.
+            $investment->periods()->delete();
+
+            return back()->with('status', 'Participant removed. Cleared posted accruals because no investors remain.');
+        }
+
+        $this->syncAccrualsIfEligible($investment);
+
         return back()->with('status', 'Participant removed.');
     }
 
@@ -142,5 +177,39 @@ class InvestmentParticipantController extends Controller
         }
 
         app(InvestmentAccrualService::class)->syncMonthsThrough($investment, Investment::accrualThroughInclusive());
+    }
+
+    private function resolveProfitCarrySinceMonth(?string $requestMonth): ?Carbon
+    {
+        $raw = $requestMonth ?: config('investment.profit_carry_since_month');
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        return Carbon::createFromFormat('Y-m', $raw)->startOfMonth();
+    }
+
+    /**
+     * Sum of posted profit shares for this user on other investments from $sinceMonth
+     * (inclusive). When $sinceMonth is null, all posted months on other investments count.
+     */
+    private function cumulativeProfitShareForUser(int $userId, int $excludeInvestmentId, ?Carbon $sinceMonth): float
+    {
+        $onlyActive = (bool) config('investment.profit_carry_only_active_investments', true);
+
+        $sum = InvestmentPeriodUser::query()
+            ->where('user_id', $userId)
+            ->whereHas('period', function ($q) use ($excludeInvestmentId, $sinceMonth, $onlyActive): void {
+                $q->where('investment_id', '!=', $excludeInvestmentId);
+                if ($sinceMonth !== null) {
+                    $q->whereDate('month', '>=', $sinceMonth);
+                }
+                if ($onlyActive) {
+                    $q->whereHas('investment', fn ($inv) => $inv->where('is_active', true));
+                }
+            })
+            ->sum('profit_share');
+
+        return (float) $sum;
     }
 }
