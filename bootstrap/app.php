@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'phone.access' => \App\Http\Middleware\EnsurePhoneAccessSession::class,
         ]);
 
         $middleware->web(append: [

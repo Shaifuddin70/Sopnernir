@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController
 use App\Http\Controllers\Admin\InvestmentDocumentController;
 use App\Http\Controllers\Admin\InvestmentParticipantController;
 use App\Http\Controllers\Investor\InvestmentController as InvestorInvestmentController;
+use App\Http\Controllers\PhoneAccess\InvestmentLookupController as PhoneAccessInvestmentLookupController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/portfolio/{investment}/documents/{document}/download', [InvestmentDocumentController::class, 'download'])
         ->name('investments.documents.download');
     Route::get('/portfolio/{investment}', [InvestorInvestmentController::class, 'show'])->name('investments.show');
+});
+
+Route::middleware(['guest'])->group(function () {
+    Route::post('/phone-access', [PhoneAccessInvestmentLookupController::class, 'store'])->name('phone-access.store');
+});
+
+Route::middleware('phone.access')->prefix('phone-access')->name('phone-access.')->group(function () {
+    Route::get('/investments', [PhoneAccessInvestmentLookupController::class, 'index'])->name('investments.index');
+    Route::get('/investments/{investment}', [PhoneAccessInvestmentLookupController::class, 'show'])->name('investments.show');
+    Route::post('/logout', [PhoneAccessInvestmentLookupController::class, 'destroy'])->name('logout');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

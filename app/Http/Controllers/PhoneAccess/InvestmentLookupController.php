@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Http\Controllers\PhoneAccess;
+
+use App\Http\Controllers\Controller;
+use App\Models\Investment;
+use App\Models\InvestmentParticipant;
+use App\Models\InvestmentPeriodUser;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+
+class InvestmentLookupController extends Controller
+{
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'max:32'],
+        ]);
+
+        $user = User::query()
+            ->where('phone', $validated['phone'])
+            ->where('is_active', true)
+            ->first();
+
+        if (! $user) {
+            return back()->withErrors([
+                'phone' => __('No active user found with that phone number.'),
+            ])->onlyInput('phone');
+        }
+
+        $request->session()->put('phone_access_user_id', $user->id);
+
+        return redirect()->route('phone-access.investments.index');
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->session()->forget('phone_access_user_id');
+
+        return redirect()->route('login')->with('status', __('Phone access session ended.'));
+    }
+
+    public function index(Request $request): View
+    {
+        $user = $this->phoneAccessUser($request);
+        $userId = $user->id;
+
+        $investments = Investment::query()
+            ->where('is_active', true)
+            ->whereHas('participants', fn ($q) => $q->where('user_id', $userId))
+            ->withSum(['participants as my_contribution' => fn ($q) => $q->where('user_id', $userId)], 'contribution_amount')
+            ->withSum(['periodUserShares as my_profit' => function ($q) use ($userId): void {
+                $q->where('investment_period_users.user_id', $userId)
+                    ->whereHas('period', fn ($p) => $p->whereHas('investment', fn ($inv) => $inv->where('is_active', true)));
+            }], 'profit_share')
+            ->latest()
+            ->get();
+
+        $totalInvestmentCount = $investments->count();
+
+        $totalTaggedCapital = (float) InvestmentParticipant::query()
+            ->where('user_id', $userId)
+            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
+            ->sum('contribution_amount');
+
+        $portfolioProfitTotal = (float) InvestmentPeriodUser::query()
+            ->where('user_id', $userId)
+            ->whereHas('period', fn ($q) => $q->whereHas('investment', fn ($inv) => $inv->where('is_active', true)))
+            ->sum('profit_share');
+
+        $balance = $totalTaggedCapital + $portfolioProfitTotal;
+
+        return view('phone-access.investments.index', compact(
+            'user',
+            'investments',
+            'totalInvestmentCount',
+            'totalTaggedCapital',
+            'portfolioProfitTotal',
+            'balance',
+        ));
+    }
+
+    public function show(Request $request, Investment $investment): View
+    {
+        $user = $this->phoneAccessUser($request);
+        $userId = $user->id;
+
+        $isTagged = InvestmentParticipant::query()
+            ->where('investment_id', $investment->id)
+            ->where('user_id', $userId)
+            ->exists();
+
+        abort_unless($isTagged, 404);
+
+        $myParticipant = InvestmentParticipant::query()
+            ->where('investment_id', $investment->id)
+            ->where('user_id', $userId)
+            ->first();
+
+        $myTotalProfit = (float) InvestmentPeriodUser::query()
+            ->where('user_id', $userId)
+            ->whereHas('period', fn ($q) => $q->where('investment_id', $investment->id))
+            ->sum('profit_share');
+
+        $myProfitByMonth = InvestmentPeriodUser::query()
+            ->where('user_id', $userId)
+            ->whereHas('period', fn ($q) => $q->where('investment_id', $investment->id))
+            ->join('investment_periods', 'investment_period_users.investment_period_id', '=', 'investment_periods.id')
+            ->orderByDesc('investment_periods.month')
+            ->select('investment_period_users.*')
+            ->with('period')
+            ->get();
+
+        return view('phone-access.investments.show', compact(
+            'user',
+            'investment',
+            'myParticipant',
+            'myTotalProfit',
+            'myProfitByMonth',
+        ));
+    }
+
+    private function phoneAccessUser(Request $request): User
+    {
+        $user = User::query()
+            ->where('id', $request->session()->get('phone_access_user_id'))
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        return $user;
+    }
+}
