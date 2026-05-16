@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\PublicMediaUrl;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -45,12 +46,19 @@ class User extends Authenticatable
     {
         static::deleting(function (User $user): void {
             if ($user->image) {
+                Storage::disk('web_public')->delete($user->image);
                 Storage::disk('public')->delete($user->image);
             }
             if ($user->nominee?->image) {
+                Storage::disk('web_public')->delete($user->nominee->image);
                 Storage::disk('public')->delete($user->nominee->image);
             }
         });
+    }
+
+    public function profileImageUrl(): ?string
+    {
+        return PublicMediaUrl::forPath($this->image);
     }
 
     public function isAdmin(): bool

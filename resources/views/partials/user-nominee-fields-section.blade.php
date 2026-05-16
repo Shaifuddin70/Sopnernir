@@ -36,9 +36,9 @@
 
     <div>
         <x-input-label for="nominee_image" :value="__('Nominee photo')" />
-        @if ($nominee?->image)
+        @if ($nominee && $nominee->profileImageUrl())
             <div class="mt-2 mb-2">
-                <img src="{{ asset('storage/'.$nominee->image) }}" alt="" class="h-20 w-20 rounded-md object-cover border border-gray-200" />
+                <img src="{{ $nominee->profileImageUrl() }}" alt="" class="h-20 w-20 rounded-md object-cover border border-gray-200" />
             </div>
         @endif
         <input id="nominee_image" name="nominee[image]" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100" />

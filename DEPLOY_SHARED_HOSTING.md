@@ -97,6 +97,7 @@ If you use Git pull on server, these folders are usually ignored and must be upl
 Using File Manager permissions:
 - `storage/` -> writable
 - `bootstrap/cache/` -> writable
+- `public/media/` -> writable (profile and nominee photos)
 
 Typical baseline:
 - folders: `755`

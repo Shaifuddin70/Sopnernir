@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PublicMediaUrl;
 use Database\Factories\NomineeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,5 +24,10 @@ class Nominee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function profileImageUrl(): ?string
+    {
+        return PublicMediaUrl::forPath($this->image);
     }
 }

@@ -516,6 +516,7 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
         'App\\Services\\UserCsvImportService' => __DIR__ . '/../..' . '/app/Services/UserCsvImportService.php',
         'App\\Services\\UserMediaService' => __DIR__ . '/../..' . '/app/Services/UserMediaService.php',
         'App\\Support\\PaginationPerPage' => __DIR__ . '/../..' . '/app/Support/PaginationPerPage.php',
+        'App\\Support\\PublicMediaUrl' => __DIR__ . '/../..' . '/app/Support/PublicMediaUrl.php',
         'App\\Support\\SqlLike' => __DIR__ . '/../..' . '/app/Support/SqlLike.php',
         'App\\View\\Components\\AppLayout' => __DIR__ . '/../..' . '/app/View/Components/AppLayout.php',
         'App\\View\\Components\\GuestLayout' => __DIR__ . '/../..' . '/app/View/Components/GuestLayout.php',

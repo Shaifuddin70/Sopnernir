@@ -13,9 +13,9 @@
                 type="button"
                 class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-md border border-transparent py-1 ps-1 pe-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-                @if ($authUser->image)
+                @if ($authUser->profileImageUrl())
                     <img
-                        src="{{ asset('storage/'.$authUser->image) }}"
+                        src="{{ $authUser->profileImageUrl() }}"
                         alt=""
                         class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-gray-200"
                     />

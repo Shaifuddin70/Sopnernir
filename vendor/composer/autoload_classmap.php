@@ -53,6 +53,7 @@ return array(
     'App\\Services\\UserCsvImportService' => $baseDir . '/app/Services/UserCsvImportService.php',
     'App\\Services\\UserMediaService' => $baseDir . '/app/Services/UserMediaService.php',
     'App\\Support\\PaginationPerPage' => $baseDir . '/app/Support/PaginationPerPage.php',
+    'App\\Support\\PublicMediaUrl' => $baseDir . '/app/Support/PublicMediaUrl.php',
     'App\\Support\\SqlLike' => $baseDir . '/app/Support/SqlLike.php',
     'App\\View\\Components\\AppLayout' => $baseDir . '/app/View/Components/AppLayout.php',
     'App\\View\\Components\\GuestLayout' => $baseDir . '/app/View/Components/GuestLayout.php',

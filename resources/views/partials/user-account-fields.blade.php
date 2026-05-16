@@ -38,9 +38,9 @@
 
     <div>
         <x-input-label for="image" :value="__('Profile photo')" />
-        @if ($user?->image)
+        @if ($user && $user->profileImageUrl())
             <div class="mt-2 mb-2">
-                <img src="{{ asset('storage/'.$user->image) }}" alt="" class="h-20 w-20 rounded-md object-cover border border-gray-200" />
+                <img src="{{ $user->profileImageUrl() }}" alt="" class="h-20 w-20 rounded-md object-cover border border-gray-200" />
             </div>
         @endif
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100" />

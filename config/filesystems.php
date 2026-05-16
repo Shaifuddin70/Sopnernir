@@ -47,6 +47,19 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Web-visible uploads (profile photos). Lives under public/media so URLs work without
+         * running `storage:link`. Legacy files may still resolve via /storage/... if symlink exists.
+         */
+        'web_public' => [
+            'driver' => 'local',
+            'root' => public_path('media'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/media',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
