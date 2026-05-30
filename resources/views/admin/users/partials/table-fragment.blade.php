@@ -17,7 +17,9 @@
     <tbody>
         @forelse ($users as $u)
             <tr>
-                <td class="font-medium">{{ $u->name }}</td>
+                <td>
+                    <x-user-identity :user="$u" />
+                </td>
                 <td class="text-foreground-muted">{{ $u->email }}</td>
                 <td class="text-foreground-muted">{{ $u->phone ?? '—' }}</td>
                 <td class="tabular-nums text-foreground-muted">{{ $u->created_at?->format('Y-m-d') ?? '—' }}</td>

@@ -1,11 +1,11 @@
 <x-guest-layout>
     <div class="mx-auto w-full max-w-4xl space-y-4">
         <div class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 ui-card p-4 shadow-sm">
-            <div>
+            <div class="min-w-0">
                 <h1 class="text-base font-semibold text-foreground">{{ $investment->title }}</h1>
-                <p class="text-xs text-foreground-muted">
-                    {{ __('Phone access for :name', ['name' => $user->name]) }}
-                </p>
+                <div class="mt-2">
+                    <x-user-identity :user="$user" size="md" />
+                </div>
             </div>
             <x-action-button :href="route('phone-access.investments.index')">{{ __('Back') }}</x-action-button>
         </div>

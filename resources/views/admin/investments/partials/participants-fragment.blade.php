@@ -12,7 +12,9 @@
             @forelse ($participants as $p)
                 @php($formId = 'participant-update-'.$p->id)
                 <tr>
-                    <td class="py-2 pr-4 align-middle font-medium text-foreground">{{ $p->user->name }}</td>
+                    <td class="py-2 pr-4 align-middle">
+                        <x-user-identity :user="$p->user" />
+                    </td>
                     <td class="py-2 pr-4 align-middle tabular-nums">{{ $p->created_at?->format('Y-m-d') ?? '—' }}</td>
                     <td class="py-2 pr-4 align-middle">
                         <x-text-input

@@ -231,7 +231,9 @@
                                 <tbody>
                                     @foreach ($investment->participants as $p)
                                         <tr>
-                                            <td class="py-2 pr-4 font-medium text-foreground">{{ $p->user->name }}</td>
+                                            <td class="py-2 pr-4">
+                                                <x-user-identity :user="$p->user" />
+                                            </td>
                                             <td class="py-2 text-right tabular-nums">{{ $p->contribution_amount }}</td>
                                         </tr>
                                     @endforeach

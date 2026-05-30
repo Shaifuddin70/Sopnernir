@@ -1,6 +1,5 @@
 @php
     $authUser = Auth::user();
-    $avatarInitial = strtoupper(\Illuminate\Support\Str::substr($authUser->name ?: $authUser->email ?: '?', 0, 1));
 @endphp
 
 <div class="flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
@@ -13,18 +12,7 @@
                 type="button"
                 class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-lg border border-line bg-surface-card py-1 ps-1 pe-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface"
             >
-                @if ($authUser->profileImageUrl())
-                    <img
-                        src="{{ $authUser->profileImageUrl() }}"
-                        alt=""
-                        class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line"
-                    />
-                @else
-                    <span
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-muted text-xs font-semibold text-primary ring-1 ring-primary/30"
-                        aria-hidden="true"
-                    >{{ $avatarInitial }}</span>
-                @endif
+                <x-user-avatar :user="$authUser" />
                 <span class="sr-only">{{ $authUser->name }}</span>
                 <span class="hidden max-w-[9rem] truncate md:inline lg:max-w-[12rem]">{{ $authUser->name }}</span>
                 <span class="shrink-0 text-foreground-muted" aria-hidden="true">

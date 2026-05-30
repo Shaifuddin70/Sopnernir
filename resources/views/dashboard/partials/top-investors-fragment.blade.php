@@ -44,8 +44,11 @@
                             {{ $topInvestors->firstItem() + $loop->index }}
                         </td>
                         <td class="px-4 py-3.5">
-                            <span class="font-medium text-foreground">{{ $row->name }}</span>
-                            <span class="mt-0.5 block text-xs text-foreground-muted">{{ $row->email }}</span>
+                            <x-user-identity
+                                :name="$row->name"
+                                :image-url="$row->profile_image_url"
+                                :subtitle="$row->email"
+                            />
                         </td>
                         <td class="whitespace-nowrap px-4 py-3.5 tabular-nums text-foreground">
                             {{ $row->last_payout_month ? \Carbon\Carbon::parse($row->last_payout_month)->translatedFormat('F Y') : '—' }}

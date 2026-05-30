@@ -7,6 +7,7 @@ use App\Models\InvestmentParticipant;
 use App\Models\InvestmentPeriod;
 use App\Models\InvestmentPeriodUser;
 use App\Models\User;
+use App\Support\PublicMediaUrl;
 use App\Support\SqlLike;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
@@ -108,7 +109,7 @@ class DashboardMetricsService
                         ->orWhere('u.email', 'like', $like);
                 });
             })
-            ->selectRaw('ipu.user_id, u.name, u.email, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
+            ->selectRaw('ipu.user_id, u.name, u.email, MAX(u.image) as image, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
             ->groupBy('ipu.user_id', 'u.name', 'u.email')
             ->orderByDesc('total_profit')
             ->paginate($perPage, ['*'], 'top_investors_page')
@@ -157,7 +158,7 @@ class DashboardMetricsService
                         ->orWhere('u.email', 'like', $like);
                 });
             })
-            ->selectRaw('ipu.user_id, u.name, u.email, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
+            ->selectRaw('ipu.user_id, u.name, u.email, MAX(u.image) as image, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
             ->groupBy('ipu.user_id', 'u.name', 'u.email')
             ->orderByDesc('total_profit')
             ->paginate($perPage, ['*'], 'top_investors_page')
@@ -204,6 +205,7 @@ class DashboardMetricsService
                 'user_id' => $tid,
                 'name' => (string) $row->name,
                 'email' => (string) $row->email,
+                'profile_image_url' => PublicMediaUrl::forPath($row->image ?? null),
                 'total_profit' => $this->decimalString($row->total_profit ?? 0),
                 'total_contribution' => $this->decimalString($contrib[$tid] ?? 0),
                 'last_payout_month' => $row->last_payout_month,

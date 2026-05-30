@@ -2,11 +2,11 @@
     <div class="mx-auto w-full max-w-5xl">
         <div class="mb-4 rounded-lg border border-line bg-surface-secondary p-4 text-sm text-foreground">
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
+                <div class="min-w-0">
                     <h1 class="text-base font-semibold text-foreground">{{ __('Investment overview') }}</h1>
-                    <p class="text-xs text-foreground-muted">
-                        {{ __('Phone access for :name (:phone)', ['name' => $user->name, 'phone' => $user->phone]) }}
-                    </p>
+                    <div class="mt-2">
+                        <x-user-identity :user="$user" :subtitle="$user->phone" size="md" />
+                    </div>
                 </div>
                 <form method="POST" action="{{ route('phone-access.logout') }}">
                     @csrf
