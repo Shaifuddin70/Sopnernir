@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Serve Vite build files through Laravel
+    |--------------------------------------------------------------------------
+    |
+    | On cPanel, public_html often has a stale or missing /build folder while the
+    | app lives elsewhere. When true, CSS/JS URLs use /_vite/... and are always
+    | served from the app's public/build directory via Laravel.
+    |
+    */
+
+    'serve_vite_via_application' => (bool) env('SERVE_VITE_VIA_APPLICATION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

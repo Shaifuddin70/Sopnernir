@@ -84,6 +84,20 @@
         @apply truncate text-lg font-medium tracking-tight text-foreground sm:text-xl;
     }
 
+    .ui-user-identity {
+        @apply flex min-w-0 items-center;
+    }
+
+    .ui-user-identity__avatar {
+        margin-inline-end: 0.75rem;
+        flex-shrink: 0;
+        display: inline-flex;
+    }
+
+    .ui-user-identity__avatar--compact {
+        margin-inline-end: 0.5rem;
+    }
+
     .ui-card {
         @apply rounded-xl bg-surface-card shadow-elevation-2;
     }

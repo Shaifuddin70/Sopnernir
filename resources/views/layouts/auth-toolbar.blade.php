@@ -12,7 +12,9 @@
                 type="button"
                 class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-lg border border-line bg-surface-card py-1 ps-1 pe-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface"
             >
-                <x-user-avatar :user="$authUser" />
+                <span class="ui-user-identity__avatar ui-user-identity__avatar--compact">
+                    <x-user-avatar :user="$authUser" />
+                </span>
                 <span class="sr-only">{{ $authUser->name }}</span>
                 <span class="hidden max-w-[9rem] truncate md:inline lg:max-w-[12rem]">{{ $authUser->name }}</span>
                 <span class="shrink-0 text-foreground-muted" aria-hidden="true">

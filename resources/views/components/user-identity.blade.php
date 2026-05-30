@@ -10,8 +10,10 @@
     $displayName = $name ?? $user?->name ?? '';
 @endphp
 
-<div {{ $attributes->merge(['class' => 'flex min-w-0 items-center gap-2.5']) }}>
-    <x-user-avatar :user="$user" :name="$displayName" :image-url="$imageUrl" :size="$size" />
+<div {{ $attributes->merge(['class' => 'ui-user-identity']) }}>
+    <span class="ui-user-identity__avatar">
+        <x-user-avatar :user="$user" :name="$displayName" :image-url="$imageUrl" :size="$size" />
+    </span>
     <div class="min-w-0">
         @if ($displayName !== '')
             <span class="block truncate font-medium text-foreground">{{ $displayName }}</span>

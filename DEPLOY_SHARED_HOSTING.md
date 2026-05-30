@@ -88,6 +88,41 @@ php artisan route:clear
 php artisan route:cache
 ```
 
+**Option D (recommended on cPanel): serve CSS/JS only through Laravel**
+
+A stale `public_html/build` folder is the most common cause of “broken CSS” (Apache serves old files and never hits Laravel). In `.env` on the server:
+
+```env
+SERVE_VITE_VIA_APPLICATION=true
+```
+
+Then clear config/route cache:
+
+```bash
+cd ~/repositories/sopnernir
+php artisan config:clear
+php artisan config:cache
+php artisan route:cache
+```
+
+Pages will load assets from `/_vite/assets/...` (always from `public/build/` in the app). You can remove `public_html/build` entirely.
+
+### CSS broken after deploy — quick checks
+
+1. **View page source** — find the `<link rel="stylesheet" href="...">` URL.
+2. **Open that URL in the browser** — must return **200** and `Content-Type: text/css`.
+3. **On the server**, confirm files exist:
+
+```bash
+cat ~/repositories/sopnernir/public/build/manifest.json
+ls -la ~/repositories/sopnernir/public/build/assets/
+```
+
+The CSS filename in the HTML must match a file listed in `manifest.json` under `public/build/assets/`.
+
+4. **After `git pull`**, either symlink/rsync `build` (options A/B) or use option D above.
+5. Run `php artisan route:cache` after pulls that change `routes/web.php`.
+
 ### Profile photos (required when using public_html)
 
 Uploads are stored on disk under `public/media`, but the browser loads `/media/...` from **public_html**. Without fixing this, profile photos look broken.

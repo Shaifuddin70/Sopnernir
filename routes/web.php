@@ -17,6 +17,10 @@ Route::get('/build/{path}', [ViteBuildAssetController::class, 'show'])
     ->where('path', '.*')
     ->name('vite-build-asset');
 
+Route::get('/_vite/{path}', [ViteBuildAssetController::class, 'show'])
+    ->where('path', '.*')
+    ->name('vite-build-asset-app');
+
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::redirect('/', '/dashboard');
