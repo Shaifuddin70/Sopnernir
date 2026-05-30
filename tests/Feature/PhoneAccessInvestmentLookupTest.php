@@ -68,7 +68,10 @@ class PhoneAccessInvestmentLookupTest extends TestCase
             ->assertOk()
             ->assertSeeText('My Pool')
             ->assertDontSeeText('Other Pool')
+            ->assertSeeText('Platform total amount')
+            ->assertSeeText('9075.00')
             ->assertSeeText('5075.00')
+            ->assertSeeText('5000.00')
             ->assertSeeText('1');
 
         $this->get(route('phone-access.investments.show', $myInvestment))

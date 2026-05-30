@@ -7,6 +7,7 @@ use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Models\InvestmentPeriodUser;
 use App\Models\User;
+use App\Services\DashboardMetricsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,7 +71,8 @@ class InvestmentLookupController extends Controller
             ->whereHas('period', fn ($q) => $q->whereHas('investment', fn ($inv) => $inv->where('is_active', true)))
             ->sum('profit_share');
 
-        $balance = $totalTaggedCapital + $portfolioProfitTotal;
+        $totalAmount = $totalTaggedCapital + $portfolioProfitTotal;
+        $platform = app(DashboardMetricsService::class)->platformSummary();
 
         return view('phone-access.investments.index', compact(
             'user',
@@ -78,7 +80,8 @@ class InvestmentLookupController extends Controller
             'totalInvestmentCount',
             'totalTaggedCapital',
             'portfolioProfitTotal',
-            'balance',
+            'totalAmount',
+            'platform',
         ));
     }
 

@@ -15,27 +15,44 @@
             </div>
         </div>
 
-        <div class="mb-4 grid gap-3 sm:grid-cols-3">
-            <div class="ui-card p-4">
-                <p class="text-xs uppercase tracking-wide text-foreground-muted">{{ __('Total investments') }}</p>
-                <p class="mt-1 text-xl font-semibold text-foreground tabular-nums">{{ $totalInvestmentCount }}</p>
-            </div>
-            <div class="ui-card p-4">
-                <p class="text-xs uppercase tracking-wide text-foreground-muted">{{ __('Total profit') }}</p>
-                <p class="mt-1 text-xl font-semibold text-foreground tabular-nums">
-                    {{ number_format($portfolioProfitTotal, 2, '.', '') }}
+        <section class="ui-card mb-4 p-4 text-sm sm:p-5">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-foreground-muted">
+                    {{ __('Platform total amount') }}
+                </p>
+                <p class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-foreground">
+                    {{ $platform['total_amount'] }}
+                </p>
+                <p class="mt-1 text-xs text-foreground-muted">
+                    {{ __('Total tagged capital plus profit distributed across all active pools on the platform.') }}
                 </p>
             </div>
-            <div class="ui-card p-4">
-                <p class="text-xs uppercase tracking-wide text-foreground-muted">{{ __('Balance') }}</p>
-                <p class="mt-1 text-xl font-semibold text-foreground tabular-nums">
-                    {{ number_format($balance, 2, '.', '') }}
-                </p>
-                <p class="mt-1 text-[11px] text-foreground-muted">
-                    {{ __('Balance = tagged capital + total profit') }}
-                </p>
-            </div>
-        </div>
+
+            <dl class="mt-4 grid gap-2 border-t border-line pt-4 sm:grid-cols-2">
+                <div>
+                    <dt class="inline text-foreground-muted">{{ __('Your investments') }}:</dt>
+                    <dd class="ms-1 inline font-semibold tabular-nums text-foreground">{{ $totalInvestmentCount }}</dd>
+                </div>
+                <div>
+                    <dt class="inline text-foreground-muted">{{ __('Your tagged capital') }}:</dt>
+                    <dd class="ms-1 inline font-semibold tabular-nums text-primary">
+                        {{ number_format($totalTaggedCapital, 2, '.', '') }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="inline text-foreground-muted">{{ __('Your profit received') }}:</dt>
+                    <dd class="ms-1 inline font-semibold tabular-nums text-success">
+                        {{ number_format($portfolioProfitTotal, 2, '.', '') }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="inline text-foreground-muted">{{ __('Your total amount') }}:</dt>
+                    <dd class="ms-1 inline font-semibold tabular-nums text-foreground">
+                        {{ number_format($totalAmount, 2, '.', '') }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
 
         <div class="ui-card shadow-sm">
             <div class="border-b border-line bg-surface-secondary px-4 py-3">
