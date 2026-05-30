@@ -1,7 +1,6 @@
 <x-guest-layout>
     <div class="mx-auto w-full max-w-md" x-data="{ tab: '{{ $errors->has('phone') ? 'phone' : 'login' }}' }">
         <div class="ui-auth-card">
-            <div class="ui-auth-card-accent" aria-hidden="true"></div>
             <div class="p-6 sm:p-7">
                 <div class="mb-6">
                     <h1 class="text-2xl font-bold tracking-tight text-foreground">

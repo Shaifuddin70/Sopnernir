@@ -1,59 +1,91 @@
 <x-guest-layout>
     <div class="mx-auto w-full max-w-4xl space-y-4">
-        <div class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 ui-card p-4 shadow-sm">
-            <div class="min-w-0">
-                <h1 class="text-base font-semibold text-foreground">{{ $investment->title }}</h1>
-                <div class="mt-2">
-                    <x-user-identity :user="$user" size="md" />
+        <section class="ui-card min-w-0 overflow-hidden">
+            <div class="ui-card-header">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h1 class="ui-card-header-title">{{ $investment->title }}</h1>
+                        <div class="mt-2">
+                            <x-user-identity :user="$user" size="md" />
+                        </div>
+                    </div>
+                    <x-action-button :href="route('phone-access.investments.index')" variant="secondary" class="shrink-0 text-sm">
+                        {{ __('Back') }}
+                    </x-action-button>
                 </div>
             </div>
-            <x-action-button :href="route('phone-access.investments.index')">{{ __('Back') }}</x-action-button>
-        </div>
+        </section>
 
-        <div class="rounded-lg border border-gray-200 ui-card p-4 shadow-sm text-sm">
-            <p><span class="font-medium">{{ __('Status') }}:</span> {{ $investment->status }}</p>
-            @if ($investment->deed_completion_deadline)
-                <p>
-                    <span class="font-medium">{{ __('Plan completion date') }}:</span>
-                    {{ $investment->deed_completion_deadline->translatedFormat('j F Y') }}
-                </p>
-            @endif
-            <p><span class="font-medium">{{ __('My contribution') }}:</span>
-                {{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}</p>
-            <p><span class="font-medium">{{ __('My total profit') }}:</span>
-                {{ number_format($myTotalProfit, 2, '.', '') }}</p>
-            <p><span class="font-medium">{{ __('My balance on this pool') }}:</span>
-                {{ number_format((float) ($myParticipant?->contribution_amount ?? 0) + $myTotalProfit, 2, '.', '') }}</p>
-        </div>
-
-        <div class="ui-card shadow-sm">
-            <div class="border-b border-line bg-surface-secondary px-4 py-3">
-                <h2 class="text-sm font-semibold text-foreground">{{ __('My profit by month') }}</h2>
+        <section class="ui-card min-w-0 overflow-hidden">
+            <div class="ui-card-header">
+                <h2 class="ui-card-header-title">{{ __('Pool summary') }}</h2>
             </div>
-            <div class="overflow-x-auto">
-                <table class="ui-table min-w-full text-sm">
-                    <thead>
-                        <tr class="border-b text-left text-xs uppercase tracking-wide text-foreground-muted">
-                            <th class="px-4 py-3">{{ __('Month') }}</th>
-                            <th class="px-4 py-3 text-right">{{ __('Profit') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($myProfitByMonth as $row)
-                            <tr class="border-b border-gray-100">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($row->period->month)->format('M Y') }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums">
-                                    {{ number_format((float) $row->profit_share, 2, '.', '') }}
-                                </td>
-                            </tr>
-                        @empty
+            <dl class="grid gap-3 p-3 text-sm sm:grid-cols-2 sm:p-4">
+                <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Status') }}</dt>
+                    <dd class="mt-1 font-medium text-foreground">{{ $investment->status }}</dd>
+                </div>
+                @if ($investment->deed_completion_deadline)
+                    <div>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Plan completion date') }}</dt>
+                        <dd class="mt-1 font-medium text-foreground">
+                            {{ $investment->deed_completion_deadline->translatedFormat('j F Y') }}
+                        </dd>
+                    </div>
+                @endif
+                <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My contribution') }}</dt>
+                    <dd class="mt-1 font-semibold tabular-nums text-foreground">
+                        {{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My total profit') }}</dt>
+                    <dd class="mt-1 font-semibold tabular-nums text-success">
+                        {{ number_format($myTotalProfit, 2, '.', '') }}
+                    </dd>
+                </div>
+                <div class="sm:col-span-2">
+                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My balance on this pool') }}</dt>
+                    <dd class="mt-1 font-semibold tabular-nums text-foreground">
+                        {{ number_format((float) ($myParticipant?->contribution_amount ?? 0) + $myTotalProfit, 2, '.', '') }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="ui-card min-w-0 overflow-hidden">
+            <div class="ui-card-header">
+                <h2 class="ui-card-header-title">{{ __('My profit by month') }}</h2>
+            </div>
+            <div class="p-3 sm:p-4">
+                <div class="overflow-x-auto rounded-lg border border-line">
+                    <table class="ui-table min-w-full text-xs sm:text-sm">
+                        <thead>
                             <tr>
-                                <td colspan="2" class="px-4 py-6 text-center text-foreground-muted">{{ __('No profit history yet.') }}</td>
+                                <th>{{ __('Month') }}</th>
+                                <th class="text-right">{{ __('Profit') }}</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($myProfitByMonth as $row)
+                                <tr>
+                                    <td class="tabular-nums">{{ \Carbon\Carbon::parse($row->period->month)->translatedFormat('F Y') }}</td>
+                                    <td class="text-right tabular-nums text-success">
+                                        {{ number_format((float) $row->profit_share, 2, '.', '') }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="py-6 text-center text-foreground-muted">
+                                        {{ __('No profit history yet.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 </x-guest-layout>
