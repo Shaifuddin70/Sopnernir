@@ -61,6 +61,33 @@ $app = require_once __DIR__.'/../repositories/sopnernir/bootstrap/app.php';
 
 Adjust path depth based on your actual folder structure.
 
+**CSS/JS (Vite `public/build`)**
+
+The browser loads `/build/assets/...` from **public_html**, but Git stores build files under the app’s `public/build/`. If those are missing or out of date in `public_html`, the site looks like plain HTML.
+
+**Option A (recommended): symlink**
+
+```bash
+rm -rf ~/public_html/build
+ln -s ~/repositories/sopnernir/public/build ~/public_html/build
+```
+
+**Option B: copy on each deploy**
+
+```bash
+rsync -av --delete ~/repositories/sopnernir/public/build/ ~/public_html/build/
+```
+
+**Option C: Laravel fallback (no copy)**
+
+If `public_html/build` does **not** exist, missing `/build/...` requests are handled by Laravel and served from `public/build/` in the app (see `ViteBuildAssetController`). Remove a broken `public_html/build` folder if it contains old files:
+
+```bash
+rm -rf ~/public_html/build
+php artisan route:clear
+php artisan route:cache
+```
+
 ### Profile photos (required when using public_html)
 
 Uploads are stored on disk under `public/media`, but the browser loads `/media/...` from **public_html**. Without fixing this, profile photos look broken.

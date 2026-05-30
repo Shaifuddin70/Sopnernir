@@ -42,42 +42,44 @@
             </div>
         @endif
 
-        <section class="ui-card">
-            <div class="ui-card-header">
-                <h3 class="ui-card-header-title">{{ __('Pools') }}</h3>
-            </div>
-            <div class="p-3 sm:p-4">
-                <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools">
-                    <x-table-search :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools"
-                        :placeholder="__('Search pools by title…')" />
-                    <div id="portfolio-pools-fragment">
-                        @include(
-                            'investor.investments.partials.pools-fragment',
-                            compact('investments', 'portfolioProfitTotal'))
-                    </div>
-                </x-ajax-table-region>
-            </div>
-        </section>
+        <div class="grid gap-4 lg:grid-cols-2 lg:items-start">
+            <section class="ui-card min-w-0">
+                <div class="ui-card-header">
+                    <h3 class="ui-card-header-title">{{ __('Pools') }}</h3>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools">
+                        <x-table-search :fetch-url="route('investments.index')" target-id="portfolio-pools-fragment" ajax-fragment="pools"
+                            :placeholder="__('Search pools by title…')" />
+                        <div id="portfolio-pools-fragment">
+                            @include(
+                                'investor.investments.partials.pools-fragment',
+                                compact('investments', 'portfolioProfitTotal'))
+                        </div>
+                    </x-ajax-table-region>
+                </div>
+            </section>
 
-        <section class="ui-card">
-            <div class="ui-card-header">
-                <h3 class="ui-card-header-title">{{ __('Profit by month') }}</h3>
-                <p class="ui-card-header-subtitle">
-                    {{ __('Every tagged investor receives a share each month on each pool they are on, from the pool’s first month through the current month.') }}
-                </p>
-            </div>
-            <div class="p-3 sm:p-4">
-                <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" ajax-fragment="profit">
-                    <x-table-search :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" param="profit_search"
-                        ajax-fragment="profit" :placeholder="__('Search by pool title, month, or amount…')" />
-                    <div id="portfolio-profit-fragment">
-                        @include(
-                            'investor.investments.partials.profit-month-fragment',
-                            compact('profitByMonth'))
-                    </div>
-                </x-ajax-table-region>
-            </div>
-        </section>
+            <section class="ui-card min-w-0">
+                <div class="ui-card-header">
+                    <h3 class="ui-card-header-title">{{ __('Profit by month') }}</h3>
+                    <p class="ui-card-header-subtitle">
+                        {{ __('Every tagged investor receives a share each month on each pool they are on, from the pool’s first month through the current month.') }}
+                    </p>
+                </div>
+                <div class="p-3 sm:p-4">
+                    <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" ajax-fragment="profit">
+                        <x-table-search :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" param="profit_search"
+                            ajax-fragment="profit" :placeholder="__('Search by pool title, month, or amount…')" />
+                        <div id="portfolio-profit-fragment">
+                            @include(
+                                'investor.investments.partials.profit-month-fragment',
+                                compact('profitByMonth'))
+                        </div>
+                    </x-ajax-table-region>
+                </div>
+            </section>
+        </div>
     </div>
 
 </x-app-layout>

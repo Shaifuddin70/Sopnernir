@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ViteBuildAssetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\InvestmentAccrualController;
@@ -11,6 +12,10 @@ use App\Http\Controllers\Investor\InvestmentController as InvestorInvestmentCont
 use App\Http\Controllers\PhoneAccess\InvestmentLookupController as PhoneAccessInvestmentLookupController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/build/{path}', [ViteBuildAssetController::class, 'show'])
+    ->where('path', '.*')
+    ->name('vite-build-asset');
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
