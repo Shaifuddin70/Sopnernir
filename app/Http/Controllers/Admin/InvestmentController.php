@@ -13,6 +13,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class InvestmentController extends Controller
@@ -32,7 +33,8 @@ class InvestmentController extends Controller
                 $q->where(function ($q) use ($like): void {
                     $q->where('title', 'like', $like)
                         ->orWhere('notes', 'like', $like)
-                        ->orWhere('status', 'like', $like);
+                        ->orWhere('status', 'like', $like)
+                        ->orWhere('deed_completion_deadline', 'like', $like);
                 });
             })
             ->latest()
@@ -45,27 +47,24 @@ class InvestmentController extends Controller
             ]);
         }
 
-        return view('admin.investments.index', compact('investments'));
+        $editingInvestment = $this->resolveEditingInvestment($request);
+
+        if ($editingInvestment) {
+            $this->authorize('update', $editingInvestment);
+        }
+
+        return view('admin.investments.index', compact('investments', 'editingInvestment'));
     }
 
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('admin.investments.create');
+        return redirect()->route('admin.investments.index', ['new' => 1]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-            'period_start' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
-            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0', 'max:100'],
-            'status' => ['required', 'in:draft,active,closed'],
-        ]);
+        $validated = $this->validateInvestment($request);
 
-        $validated['period_start'] = ! empty($validated['period_start'])
-            ? Carbon::createFromFormat('Y-m', $validated['period_start'])->startOfMonth()->toDateString()
-            : null;
         $validated['created_by'] = $request->user()->id;
         $validated['is_active'] = $request->boolean('is_active', true);
 
@@ -107,7 +106,9 @@ class InvestmentController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.investments.show', compact('investment', 'investorUsers', 'periods', 'participants'));
+        $editingInvestment = $this->resolveEditingInvestment($request, $investment);
+
+        return view('admin.investments.show', compact('investment', 'investorUsers', 'periods', 'participants', 'editingInvestment'));
     }
 
     private function paginatedPeriodsForShow(Request $request, Investment $investment): LengthAwarePaginator
@@ -149,24 +150,25 @@ class InvestmentController extends Controller
             ->withQueryString();
     }
 
-    public function edit(Investment $investment): View
+    public function edit(Request $request, Investment $investment): RedirectResponse
     {
-        return view('admin.investments.edit', compact('investment'));
+        if ($request->query('return') === 'show') {
+            return redirect()->route('admin.investments.show', [$investment, 'edit' => 1]);
+        }
+
+        return redirect()->route('admin.investments.index', ['edit' => $investment->id]);
     }
 
     public function update(Request $request, Investment $investment): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-            'period_start' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
-            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0', 'max:100'],
-            'status' => ['required', 'in:draft,active,closed'],
-        ]);
+        try {
+            $validated = $this->validateInvestment($request);
+        } catch (ValidationException $e) {
+            return $this->redirectBackToEditForm($request, $investment)
+                ->withInput()
+                ->withErrors($e->errors());
+        }
 
-        $validated['period_start'] = ! empty($validated['period_start'])
-            ? Carbon::createFromFormat('Y-m', $validated['period_start'])->startOfMonth()->toDateString()
-            : null;
         $validated['is_active'] = $request->exists('is_active')
             ? $request->boolean('is_active')
             : $investment->is_active;
@@ -182,7 +184,7 @@ class InvestmentController extends Controller
         if ($investment->status === Investment::STATUS_ACTIVE && $investment->is_active && $investment->participants()->exists()) {
             $syncResult = app(InvestmentAccrualService::class)->syncMonthsThrough(
                 $investment,
-                Investment::accrualThroughInclusive()
+                $investment->lastAccrualMonthInclusive()
             );
             $created = $syncResult['created'];
             $recalculated = $syncResult['recalculated'];
@@ -196,8 +198,80 @@ class InvestmentController extends Controller
             $statusParts[] = __('Recalculated :count posted accrual month(s).', ['count' => $recalculated]);
         }
 
+        if ($request->input('_return') === 'index') {
+            return redirect()->route('admin.investments.index')
+                ->with('status', implode(' ', $statusParts));
+        }
+
         return redirect()->route('admin.investments.show', $investment)
             ->with('status', implode(' ', $statusParts));
+    }
+
+    private function resolveEditingInvestment(Request $request, ?Investment $investment = null): ?Investment
+    {
+        $shouldOpen = $request->filled('edit')
+            || (old('_form') === 'edit-investment' && $request->session()->has('errors'));
+
+        if (! $shouldOpen) {
+            return null;
+        }
+
+        if ($investment !== null) {
+            $editId = (int) (old('_investment_id') ?? $investment->id);
+
+            return $editId === $investment->id ? $investment : null;
+        }
+
+        $editId = old('_investment_id') ?? $request->query('edit');
+
+        if (! $editId) {
+            return null;
+        }
+
+        return Investment::query()->find($editId);
+    }
+
+    private function redirectBackToEditForm(Request $request, Investment $investment): RedirectResponse
+    {
+        if ($request->input('_return') === 'index') {
+            return redirect()->route('admin.investments.index', ['edit' => $investment->id]);
+        }
+
+        return redirect()->route('admin.investments.show', [$investment, 'edit' => 1]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validateInvestment(Request $request): array
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'period_start' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
+            'deed_completion_deadline' => ['required', 'date'],
+            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0', 'max:100'],
+            'status' => ['required', 'in:draft,active,closed'],
+        ]);
+
+        $validated['period_start'] = ! empty($validated['period_start'])
+            ? Carbon::createFromFormat('Y-m', $validated['period_start'])->startOfMonth()->toDateString()
+            : null;
+        $validated['deed_completion_deadline'] = Carbon::parse($validated['deed_completion_deadline'])->toDateString();
+
+        if ($validated['period_start'] !== null) {
+            $firstMonth = Carbon::parse($validated['period_start'])->startOfMonth();
+            $completionMonth = Carbon::parse($validated['deed_completion_deadline'])->startOfMonth();
+            if ($completionMonth->lt($firstMonth)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'deed_completion_deadline' => __('Plan completion must be in or after the first accrual month (:month).', [
+                        'month' => $firstMonth->translatedFormat('F Y'),
+                    ]),
+                ]);
+            }
+        }
+
+        return $validated;
     }
 
     public function toggleActive(Investment $investment): RedirectResponse

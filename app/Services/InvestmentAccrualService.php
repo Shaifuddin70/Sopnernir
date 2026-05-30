@@ -27,7 +27,7 @@ class InvestmentAccrualService
             return 0;
         }
 
-        $through = $through->copy()->startOfMonth();
+        $through = $this->cappedAccrualThrough($investment, $through);
         $poolStart = $investment->firstAccrualMonthStart()->copy()->startOfMonth();
 
         if ($poolStart->gt($through)) {
@@ -75,7 +75,7 @@ class InvestmentAccrualService
             return ['created' => 0, 'recalculated' => 0];
         }
 
-        $through = $through->copy()->startOfMonth();
+        $through = $this->cappedAccrualThrough($investment, $through);
         $poolStart = $investment->firstAccrualMonthStart()->copy()->startOfMonth();
 
         if ($poolStart->gt($through)) {
@@ -144,6 +144,8 @@ class InvestmentAccrualService
                 ['month' => $poolStart->translatedFormat('F Y')]
             ));
         }
+
+        $this->assertMonthWithinPlan($investment, $monthStart);
 
         $participants = $investment->participants()->orderBy('id')->get();
 
@@ -215,6 +217,8 @@ class InvestmentAccrualService
             ));
         }
 
+        $this->assertMonthWithinPlan($investment, $monthStart);
+
         $participants = $investment->participants()->orderBy('id')->get();
         if ($participants->isEmpty()) {
             throw new InvalidArgumentException(__(
@@ -252,6 +256,40 @@ class InvestmentAccrualService
 
             return $period->fresh(['periodUsers']);
         });
+    }
+
+    private function cappedAccrualThrough(Investment $investment, Carbon $through): Carbon
+    {
+        $through = $through->copy()->startOfMonth();
+        $planEndMonth = $investment->planCompletionMonthStart();
+
+        if ($planEndMonth !== null && $planEndMonth->lt($through)) {
+            return $planEndMonth->copy();
+        }
+
+        return $through;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function assertMonthWithinPlan(Investment $investment, Carbon $monthStart): void
+    {
+        $planEndMonth = $investment->planCompletionMonthStart();
+
+        if ($planEndMonth === null) {
+            return;
+        }
+
+        if ($monthStart->gt($planEndMonth)) {
+            throw new InvalidArgumentException(__(
+                'Cannot accrue after the plan completion date (:date). Last allowed month is :month.',
+                [
+                    'date' => $investment->planCompletionDate()->translatedFormat('j F Y'),
+                    'month' => $planEndMonth->translatedFormat('F Y'),
+                ]
+            ));
+        }
     }
 
     /**

@@ -21,6 +21,11 @@ class AccrueMonthlyInvestments extends Command
 
     public function handle(InvestmentAccrualService $accrualService): int
     {
+        $closed = Investment::closePlansPastCompletion();
+        if ($closed > 0) {
+            $this->line("Closed {$closed} pool(s) past plan completion date.");
+        }
+
         $singleMonth = $this->option('month')
             ? Carbon::createFromFormat('Y-m', (string) $this->option('month'))->startOfMonth()
             : null;

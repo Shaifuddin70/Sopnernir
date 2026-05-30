@@ -8,12 +8,12 @@
 
     <title>{{ config('app.name', 'Shopnonir') }}</title>
 
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <x-favicon />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -21,29 +21,40 @@
 
 <body class="font-sans antialiased">
     <x-status-banner />
-    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen bg-gray-100">
+    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen ui-page-bg">
         @include('layouts.navigation')
 
-        <div class="flex min-w-0 flex-1 flex-col pt-14 lg:pt-0 lg:pl-64">
-            <div
-                class="hidden border-b border-gray-200 bg-white lg:fixed lg:left-64 lg:right-0 lg:top-0 lg:z-30 lg:block">
-                <div class="mx-auto flex max-w-7xl items-center justify-end px-4 py-2 sm:px-6 lg:px-8">
+        <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
+            <header class="ui-main-header sticky top-0 z-30 shrink-0">
+                <div class="ui-page-container flex min-h-14 items-center justify-between gap-3">
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <button
+                            type="button"
+                            @click="sidebarOpen = true"
+                            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
+                            aria-expanded="false"
+                            x-bind:aria-expanded="sidebarOpen"
+                        >
+                            <span class="sr-only">{{ __('Open navigation') }}</span>
+                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+
+                        @isset($header)
+                            <div class="min-w-0 flex-1 [&_h2]:ui-page-header-title">
+                                {{ $header }}
+                            </div>
+                        @endisset
+                    </div>
+
                     @include('layouts.auth-toolbar')
                 </div>
-            </div>
-            <div class="flex min-h-0 min-w-0 flex-1 flex-col lg:pt-14">
-                @isset($header)
-                    <header class="border-b border-gray-200 bg-white shadow-sm">
-                        <div class="mx-auto space-y-6 p-1 sm:p-6">
-                            {{ $header }}
-                        </div>
-                    </header>
-                @endisset
+            </header>
 
-                <main class="flex-1">
-                    {{ $slot }}
-                </main>
-            </div>
+            <main class="ui-page-container flex-1 py-4 sm:py-6">
+                {{ $slot }}
+            </main>
         </div>
     </div>
 </body>

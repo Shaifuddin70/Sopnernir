@@ -1,5 +1,5 @@
 @if ($myProfitByMonth->isEmpty())
-    <p class="text-sm text-gray-500">
+    <p class="text-sm text-foreground-muted">
         @if (request()->filled('search'))
             {{ __('No rows match your search.') }}
         @else
@@ -8,7 +8,7 @@
     </p>
 @else
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="ui-table min-w-full text-sm">
             <thead>
                 <tr class="border-b text-left">
                     <th class="py-2 pr-4">{{ __('Month') }}</th>
@@ -27,7 +27,7 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div class="ui-table-footer">
         <x-pagination-per-page
             :paginator="$myProfitByMonth"
             param="pool_profit_per_page"
@@ -36,6 +36,6 @@
             target-id="pool-profit-fragment"
             ajax-fragment="pool_profit"
         />
-        <div class="min-w-0 overflow-x-auto">{{ $myProfitByMonth->links() }}</div>
+        <div class="ui-table-pagination">{{ $myProfitByMonth->links() }}</div>
     </div>
 @endif

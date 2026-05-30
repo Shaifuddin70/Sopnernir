@@ -78,7 +78,7 @@ class InvestmentAccrualController extends Controller
             ]);
         }
 
-        $through = Investment::accrualThroughInclusive();
+        $through = $investment->lastAccrualMonthInclusive();
         $first = $investment->firstAccrualMonthStart()->copy()->startOfMonth();
 
         if ($first->gt($through)) {

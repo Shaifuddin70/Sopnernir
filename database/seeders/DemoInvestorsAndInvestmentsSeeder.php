@@ -47,6 +47,7 @@ class DemoInvestorsAndInvestmentsSeeder extends Seeder
                 'status' => Investment::STATUS_ACTIVE,
                 'created_by' => $admin->id,
                 'period_start' => $periodStart->toDateString(),
+                'deed_completion_deadline' => Carbon::now()->addMonths(12)->toDateString(),
             ]);
 
             for ($j = 0; $j < 3; $j++) {

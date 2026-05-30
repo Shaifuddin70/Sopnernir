@@ -35,6 +35,7 @@ class Investment extends Model
         'title',
         'notes',
         'period_start',
+        'deed_completion_deadline',
         'default_monthly_rate_pct',
         'status',
         'is_active',
@@ -45,9 +46,107 @@ class Investment extends Model
     {
         return [
             'period_start' => 'date',
+            'deed_completion_deadline' => 'date',
             'default_monthly_rate_pct' => 'decimal:4',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Calendar date when this investment plan ends (stored as deed_completion_deadline).
+     */
+    public function planCompletionDate(): ?Carbon
+    {
+        if ($this->deed_completion_deadline === null) {
+            return null;
+        }
+
+        return Carbon::parse($this->deed_completion_deadline)->startOfDay();
+    }
+
+    /**
+     * Last calendar month that may receive profit accruals (month of the plan completion date).
+     */
+    public function planCompletionMonthStart(): ?Carbon
+    {
+        return $this->planCompletionDate()?->copy()->startOfMonth();
+    }
+
+    /**
+     * Latest month automatic accruals may fill for this pool (current month, capped by plan end).
+     */
+    public function lastAccrualMonthInclusive(): Carbon
+    {
+        $through = static::accrualThroughInclusive();
+        $planEndMonth = $this->planCompletionMonthStart();
+
+        if ($planEndMonth !== null && $planEndMonth->lt($through)) {
+            return $planEndMonth->copy();
+        }
+
+        return $through;
+    }
+
+    /**
+     * Whether the plan completion date is before today — accruals stop and the pool is treated as finished.
+     */
+    public function hasPlanCompleted(): bool
+    {
+        $completion = $this->planCompletionDate();
+
+        if ($completion === null) {
+            return false;
+        }
+
+        return $completion->lt(Carbon::today());
+    }
+
+    /** @deprecated Use {@see hasPlanCompleted()} */
+    public function isDeedDeadlinePassed(): bool
+    {
+        return $this->hasPlanCompleted();
+    }
+
+    /**
+     * Signed days until plan completion (negative after completion). Null when no date is set.
+     */
+    public function planCompletionDaysRemaining(): ?int
+    {
+        $completion = $this->planCompletionDate();
+
+        if ($completion === null) {
+            return null;
+        }
+
+        return (int) Carbon::today()->diffInDays($completion, false);
+    }
+
+    /** @deprecated Use {@see planCompletionDaysRemaining()} */
+    public function deedDeadlineDaysRemaining(): ?int
+    {
+        return $this->planCompletionDaysRemaining();
+    }
+
+    public function acceptsNewAccruals(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE
+            && $this->is_active
+            && ! $this->hasPlanCompleted();
+    }
+
+    /**
+     * Close active pools whose plan completion date has passed.
+     */
+    public static function closePlansPastCompletion(): int
+    {
+        return static::query()
+            ->where('status', self::STATUS_ACTIVE)
+            ->whereNotNull('deed_completion_deadline')
+            ->whereDate('deed_completion_deadline', '<', Carbon::today())
+            ->update([
+                'status' => self::STATUS_CLOSED,
+                'is_active' => false,
+            ]);
     }
 
     public function creator(): BelongsTo

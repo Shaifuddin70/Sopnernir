@@ -23,12 +23,12 @@
         role="status"
         aria-live="polite"
     >
-        <div class="flex items-start justify-between gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 shadow-lg">
+        <div class="flex items-start justify-between gap-3 rounded-lg bg-success px-4 py-3 text-sm text-on-primary shadow-elevation-3">
             <p class="leading-5">{{ $message }}</p>
             <button
                 type="button"
                 @click="show = false"
-                class="rounded p-1 text-green-700 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+                class="rounded p-1 text-on-primary/80 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50"
                 aria-label="{{ __('Dismiss') }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="h-4 w-4 fill-current" aria-hidden="true">

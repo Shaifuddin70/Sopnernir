@@ -1,38 +1,45 @@
-<table class="min-w-full text-sm">
+<div class="overflow-x-auto">
+<table class="ui-table min-w-full text-xs sm:text-sm">
     <thead>
-        <tr class="border-b text-left">
-            <th class="py-2 pr-4">{{ __('Name') }}</th>
-            <th class="py-2 pr-4">{{ __('Email') }}</th>
-            <th class="py-2 pr-4">{{ __('Phone') }}</th>
-            <th class="py-2 pr-4">{{ __('Created') }}</th>
-            <th class="py-2 pr-4 text-right">{{ __('Total invested') }}</th>
-            <th class="py-2 pr-4 text-right">{{ __('Total profit') }}</th>
-            <th class="py-2 pr-4">{{ __('Access') }}</th>
-            <th class="py-2 pr-4">{{ __('Account') }}</th>
-            <th class="py-2 pr-4">{{ __('Nominee') }}</th>
-            <th class="py-2"></th>
+        <tr>
+            <th>{{ __('Name') }}</th>
+            <th>{{ __('Email') }}</th>
+            <th>{{ __('Phone') }}</th>
+            <th>{{ __('Created') }}</th>
+            <th class="text-right">{{ __('Total invested') }}</th>
+            <th class="text-right">{{ __('Total profit') }}</th>
+            <th>{{ __('Access') }}</th>
+            <th>{{ __('Account') }}</th>
+            <th>{{ __('Nominee') }}</th>
+            <th class="text-right">{{ __('Actions') }}</th>
         </tr>
     </thead>
     <tbody>
         @forelse ($users as $u)
-            <tr class="border-b border-gray-100">
-                <td class="py-2 pr-4">{{ $u->name }}</td>
-                <td class="py-2 pr-4">{{ $u->email }}</td>
-                <td class="py-2 pr-4">{{ $u->phone ?? '—' }}</td>
-                <td class="py-2 pr-4 tabular-nums">{{ $u->created_at?->format('Y-m-d') ?? '—' }}</td>
-                <td class="py-2 pr-4 text-right tabular-nums">{{ number_format((float) ($u->total_invested ?? 0), 2, '.', '') }}</td>
-                <td class="py-2 pr-4 text-right tabular-nums">{{ number_format((float) ($u->total_profit ?? 0), 2, '.', '') }}</td>
-                <td class="py-2 pr-4">{{ $u->isAdmin() ? __('Admin') : __('Investor') }}</td>
-                <td class="py-2 pr-4">
-                    @if ($u->is_active)
-                        <span class="text-green-700">{{ __('Active') }}</span>
+            <tr>
+                <td class="font-medium">{{ $u->name }}</td>
+                <td class="text-foreground-muted">{{ $u->email }}</td>
+                <td class="text-foreground-muted">{{ $u->phone ?? '—' }}</td>
+                <td class="tabular-nums text-foreground-muted">{{ $u->created_at?->format('Y-m-d') ?? '—' }}</td>
+                <td class="text-right tabular-nums">{{ number_format((float) ($u->total_invested ?? 0), 2, '.', '') }}</td>
+                <td class="text-right tabular-nums text-success">{{ number_format((float) ($u->total_profit ?? 0), 2, '.', '') }}</td>
+                <td>
+                    @if ($u->isAdmin())
+                        <span class="ui-badge-brand">{{ __('Admin') }}</span>
                     @else
-                        <span class="text-gray-500">{{ __('Inactive') }}</span>
+                        <span class="ui-badge-muted">{{ __('Investor') }}</span>
                     @endif
                 </td>
-                <td class="py-2 pr-4">{{ $u->nominee?->name ?? '—' }}</td>
-                <td class="py-2">
-                    <div class="flex flex-wrap items-center gap-3">
+                <td>
+                    @if ($u->is_active)
+                        <span class="ui-badge-success">{{ __('Active') }}</span>
+                    @else
+                        <span class="ui-badge-muted">{{ __('Inactive') }}</span>
+                    @endif
+                </td>
+                <td class="text-foreground-muted">{{ $u->nominee?->name ?? '—' }}</td>
+                <td class="text-right">
+                    <div class="flex flex-wrap items-center justify-end gap-2">
                         <x-action-button :href="route('admin.users.edit', $u)">{{ __('Edit') }}</x-action-button>
                         @if ($u->id !== auth()->id())
                             <form method="post" action="{{ route('admin.users.active', $u) }}" class="inline">
@@ -50,7 +57,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="10" class="py-4 text-sm text-gray-500">
+                <td colspan="10" class="py-4 text-sm text-foreground-muted">
                     @if (request()->filled('search'))
                         {{ __('No users match your search.') }}
                     @else
@@ -61,7 +68,8 @@
         @endforelse
     </tbody>
 </table>
-<div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+</div>
+<div class="ui-table-footer">
     <x-pagination-per-page
         :paginator="$users"
         param="per_page"
@@ -69,5 +77,5 @@
         :fetch-url="route('admin.users.index')"
         target-id="users-table-fragment"
     />
-    <div class="min-w-0 overflow-x-auto">{{ $users->links() }}</div>
+    <div class="ui-table-pagination">{{ $users->links() }}</div>
 </div>

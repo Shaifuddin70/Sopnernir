@@ -6,8 +6,8 @@
 
 <div class="space-y-6">
     <div class="border-b border-gray-200 pb-4">
-        <h3 class="text-md font-medium text-gray-900">{{ __('Nominee') }}</h3>
-        <p class="mt-1 text-sm text-gray-500">{{ __('Person to contact if something happens to your account.') }}</p>
+        <h3 class="text-md font-medium text-foreground">{{ __('Nominee') }}</h3>
+        <p class="mt-1 text-sm text-foreground-muted">{{ __('Person to contact if something happens to your account.') }}</p>
     </div>
 
     <div>
@@ -30,7 +30,7 @@
 
     <div>
         <x-input-label for="nominee_address" :value="__('Nominee address')" />
-        <textarea id="nominee_address" name="nominee[address]" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>{{ old('nominee.address', $nominee?->address) }}</textarea>
+        <textarea id="nominee_address" name="nominee[address]" rows="3" class="mt-1 block w-full ui-input rounded-lg" required>{{ old('nominee.address', $nominee?->address) }}</textarea>
         <x-input-error class="mt-2" :messages="$errors->get('nominee.address')" />
     </div>
 
@@ -41,11 +41,11 @@
                 <img src="{{ $nominee->profileImageUrl() }}" alt="" class="h-20 w-20 rounded-md object-cover border border-gray-200" />
             </div>
         @endif
-        <input id="nominee_image" name="nominee[image]" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100" />
+        <input id="nominee_image" name="nominee[image]" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-foreground-muted file:mr-4 file:rounded-md file:border-0 file:bg-primary-muted file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/25" />
         @if ($user)
-            <p class="mt-1 text-xs text-gray-500">{{ __('JPEG, PNG or WebP, max 2 MB. Leave empty to keep current photo.') }}</p>
+            <p class="mt-1 text-xs text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Leave empty to keep current photo.') }}</p>
         @else
-            <p class="mt-1 text-xs text-gray-500">{{ __('JPEG, PNG or WebP, max 2 MB. Optional.') }}</p>
+            <p class="mt-1 text-xs text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Optional.') }}</p>
         @endif
         <x-input-error class="mt-2" :messages="$errors->get('nominee.image')" />
     </div>

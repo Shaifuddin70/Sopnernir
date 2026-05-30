@@ -1,5 +1,5 @@
 @if ($periods->isEmpty())
-    <p class="text-sm text-gray-500">
+    <p class="text-sm text-foreground-muted">
         @if (request()->filled('periods_search'))
             {{ __('No accrual rows match your search.') }}
         @else
@@ -8,18 +8,18 @@
     </p>
 @else
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="ui-table min-w-full text-sm">
             <thead>
-                <tr class="border-b text-left">
-                    <th class="py-2 pr-4">{{ __('Month') }}</th>
-                    <th class="py-2 pr-4">{{ __('Recorded') }}</th>
-                    <th class="py-2 pr-4 text-right">{{ __('Pool profit') }}</th>
-                    <th class="py-2 text-right">{{ __('Principal at accrual') }}</th>
+                <tr>
+                    <th>{{ __('Month') }}</th>
+                    <th>{{ __('Recorded') }}</th>
+                    <th class="text-right">{{ __('Pool profit') }}</th>
+                    <th class="text-right">{{ __('Principal at accrual') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($periods as $period)
-                    <tr class="border-b border-gray-100">
+                    <tr>
                         <td class="py-2 pr-4 tabular-nums">{{ $period->month->translatedFormat('F Y') }}</td>
                         <td class="py-2 pr-4 tabular-nums">{{ $period->created_at?->format('Y-m-d') ?? '—' }}</td>
                         <td class="py-2 pr-4 text-right tabular-nums">{{ $period->profit_amount }}</td>
@@ -29,7 +29,7 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div class="ui-table-footer">
         <x-pagination-per-page
             :paginator="$periods"
             param="periods_per_page"
@@ -38,6 +38,6 @@
             target-id="periods-table-fragment"
             ajax-fragment="periods"
         />
-        <div class="min-w-0 overflow-x-auto">{{ $periods->links() }}</div>
+        <div class="ui-table-pagination">{{ $periods->links() }}</div>
     </div>
 @endif

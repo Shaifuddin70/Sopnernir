@@ -8,24 +8,24 @@
 
     <title>{{ config('app.name', 'Shopnonir') }}</title>
 
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <x-favicon />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
+<body class="font-sans antialiased">
     <x-status-banner />
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div class="w-full sm:max-w-md flex justify-end px-6 mb-2">
+    <div class="ui-auth-shell flex min-h-screen flex-col items-center justify-center px-4 py-8 sm:px-6">
+        <div class="mb-6 flex w-full max-w-md justify-end">
             <x-language-switcher />
         </div>
-        <div class="mt-4 w-full px-6">
+        <div class="w-full max-w-md">
             {{ $slot }}
         </div>
     </div>

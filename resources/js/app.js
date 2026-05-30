@@ -13,7 +13,7 @@ function initSearchableSelects(root = document) {
             return;
         }
 
-        if (select.dataset.searchIgnore === 'true') {
+        if (select.dataset.searchable !== 'true') {
             return;
         }
 

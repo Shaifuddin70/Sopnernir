@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap justify-between items-center gap-2">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Add user') }}</h2>
+            <h2 class="font-semibold text-xl text-foreground leading-tight">{{ __('Add user') }}</h2>
             <x-action-button :href="route('admin.users.index')" variant="secondary"
                 class="text-sm">{{ __('Back to list') }}</x-action-button>
         </div>
     </x-slot>
 
 
-    <div class="mx-auto p-2 sm:p-8">
+    <div>
         <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
             <form method="post" action="{{ route('admin.users.store') }}" enctype="multipart/form-data"
                 class="max-w-6xl space-y-8">
@@ -44,10 +44,10 @@
                             <input type="hidden" name="is_active" value="0" />
                             <label class="inline-flex items-start gap-2 cursor-pointer">
                                 <input type="checkbox" name="is_active" value="1"
-                                    class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-line bg-surface-secondary text-primary shadow-sm focus:ring-primary"
                                     @checked(old('is_active', true)) />
                                 <span
-                                    class="text-sm text-gray-600">{{ __('When off, this user cannot sign in.') }}</span>
+                                    class="text-sm text-foreground-muted">{{ __('When off, this user cannot sign in.') }}</span>
                             </label>
                             <x-input-error :messages="$errors->get('is_active')" class="mt-1" />
                         </div>
@@ -55,10 +55,10 @@
                             <x-input-label :value="__('Administrator')" />
                             <label class="inline-flex items-start gap-2 cursor-pointer">
                                 <input type="checkbox" name="is_admin" value="1"
-                                    class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-line bg-surface-secondary text-primary shadow-sm focus:ring-primary"
                                     @checked(old('is_admin')) />
                                 <span
-                                    class="text-sm text-gray-600">{{ __('Grant admin access (manage users, investments, and accruals). Admins can still be tagged on investments like any other user.') }}</span>
+                                    class="text-sm text-foreground-muted">{{ __('Grant admin access (manage users, investments, and accruals). Admins can still be tagged on investments like any other user.') }}</span>
                             </label>
                             <x-input-error :messages="$errors->get('is_admin')" class="mt-1" />
                         </div>

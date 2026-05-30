@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Services\InvestmentAccrualService;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::defaultView('vendor.pagination.tailwind');
+
         InvestmentParticipant::saved(function (InvestmentParticipant $participant): void {
             if (! config('investment.auto_accrue_on_save', true)) {
                 return;
@@ -32,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            app(InvestmentAccrualService::class)->syncMonthsThrough($investment, Investment::accrualThroughInclusive());
+            app(InvestmentAccrualService::class)->syncMonthsThrough($investment, $investment->lastAccrualMonthInclusive());
         });
 
         Investment::updated(function (Investment $investment): void {
@@ -50,7 +53,10 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            app(InvestmentAccrualService::class)->syncMonthsThrough($investment->fresh(), Investment::accrualThroughInclusive());
+            app(InvestmentAccrualService::class)->syncMonthsThrough(
+                $investment->fresh(),
+                $investment->fresh()->lastAccrualMonthInclusive()
+            );
         });
     }
 }

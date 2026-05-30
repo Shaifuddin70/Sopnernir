@@ -7,27 +7,27 @@
     <div class="hidden shrink-0 lg:block">
         <x-language-switcher />
     </div>
-    <x-dropdown align="right" width="48">
+    <x-dropdown align="right" width="48" contentClasses="py-1 bg-surface-card border border-line">
         <x-slot name="trigger">
             <button
                 type="button"
-                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-md border border-transparent py-1 ps-1 pe-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-lg border border-line bg-surface-card py-1 ps-1 pe-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface"
             >
                 @if ($authUser->profileImageUrl())
                     <img
                         src="{{ $authUser->profileImageUrl() }}"
                         alt=""
-                        class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-gray-200"
+                        class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line"
                     />
                 @else
                     <span
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-800 ring-1 ring-indigo-200"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-muted text-xs font-semibold text-primary ring-1 ring-primary/30"
                         aria-hidden="true"
                     >{{ $avatarInitial }}</span>
                 @endif
                 <span class="sr-only">{{ $authUser->name }}</span>
                 <span class="hidden max-w-[9rem] truncate md:inline lg:max-w-[12rem]">{{ $authUser->name }}</span>
-                <span class="shrink-0 text-gray-400" aria-hidden="true">
+                <span class="shrink-0 text-foreground-muted" aria-hidden="true">
                     <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>

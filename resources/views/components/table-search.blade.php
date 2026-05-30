@@ -23,7 +23,7 @@
         initialValue: @js(request($param)),
     })"
     @submit.prevent="runFetch()"
-    {{ $attributes->merge(['class' => 'mb-4 flex flex-wrap items-center gap-2']) }}
+    {{ $attributes->merge(['class' => 'ui-table-search-form']) }}
 >
     <label for="ts-{{ $param }}" class="sr-only">{{ __('Search') }}</label>
     <input
@@ -34,16 +34,16 @@
         @input="onInput()"
         placeholder="{{ $placeholder }}"
         autocomplete="off"
-        class="block min-w-[12rem] flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-md text-sm"
+        class="ui-table-search block min-w-[14rem] flex-1 sm:max-w-lg"
         :class="{ 'opacity-60': loading }"
     />
     <x-action-button
         type="button"
         variant="secondary"
-        class="text-sm"
+        class="shrink-0 text-sm"
         x-show="value && value.length"
         x-cloak
         @click="clear()"
     >{{ __('Clear') }}</x-action-button>
-    <span x-show="error" x-cloak class="text-sm text-red-600">{{ __('Could not load results.') }}</span>
+    <span x-show="error" x-cloak class="text-sm text-error">{{ __('Could not load results.') }}</span>
 </form>

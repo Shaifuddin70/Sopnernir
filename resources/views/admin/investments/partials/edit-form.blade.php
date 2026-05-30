@@ -1,0 +1,76 @@
+<form method="post" action="{{ route('admin.investments.update', $investment) }}">
+    @csrf
+    @method('patch')
+    <input type="hidden" name="_form" value="edit-investment">
+    <input type="hidden" name="_investment_id" value="{{ $investment->id }}">
+    <input type="hidden" name="_return" value="{{ $return ?? 'show' }}">
+
+    <div class="space-y-4">
+        <div>
+            <x-input-label for="edit_title" :value="__('Title')" />
+            <x-text-input id="edit_title" name="title" type="text" class="mt-1 block w-full" :value="old('title', $investment->title)" required autofocus />
+            <x-input-error :messages="$errors->get('title')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="edit_notes" :value="__('Notes')" />
+            <textarea id="edit_notes" name="notes" rows="3" class="ui-input mt-1 block w-full rounded-lg">{{ old('notes', $investment->notes) }}</textarea>
+            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="edit_deed_completion_deadline" :value="__('Plan completion date')" />
+            <x-text-input
+                id="edit_deed_completion_deadline"
+                name="deed_completion_deadline"
+                type="date"
+                class="mt-1 block w-full"
+                :value="old('deed_completion_deadline', optional($investment->deed_completion_deadline)?->format('Y-m-d'))"
+                required
+            />
+            <p class="mt-1 text-xs text-foreground-muted">{{ __('Last day of the investment plan. Monthly profit accruals stop after this date and the pool is closed automatically.') }}</p>
+            <x-input-error :messages="$errors->get('deed_completion_deadline')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="edit_period_start" :value="__('First accrual month (optional)')" />
+            <input
+                id="edit_period_start"
+                name="period_start"
+                type="month"
+                class="ui-input mt-1 block w-full rounded-lg"
+                value="{{ old('period_start', optional($investment->period_start)?->format('Y-m')) }}"
+            />
+            <p class="mt-1 text-xs text-foreground-muted">{{ __('Optional: first month this pool pays profit (defaults to the month this record was created).') }}</p>
+            <x-input-error :messages="$errors->get('period_start')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="edit_default_monthly_rate_pct" :value="__('Default monthly rate %')" />
+            <x-text-input id="edit_default_monthly_rate_pct" name="default_monthly_rate_pct" type="text" class="mt-1 block w-full" :value="old('default_monthly_rate_pct', $investment->default_monthly_rate_pct)" required />
+            <x-input-error :messages="$errors->get('default_monthly_rate_pct')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="edit_status" :value="__('Status')" />
+            <select id="edit_status" name="status" class="ui-select mt-1 block w-full text-sm">
+                @foreach (['draft' => __('Draft'), 'active' => __('Active'), 'closed' => __('Closed')] as $val => $label)
+                    <option value="{{ $val }}" @selected(old('status', $investment->status) === $val)>{{ $label }}</option>
+                @endforeach
+            </select>
+            <x-input-error :messages="$errors->get('status')" class="mt-2" />
+        </div>
+        <div class="rounded-lg border border-line bg-surface-secondary p-4 space-y-2">
+            <x-input-label :value="__('Listed for investors')" />
+            <input type="hidden" name="is_active" value="0" />
+            <label class="inline-flex cursor-pointer items-start gap-2">
+                <input type="checkbox" name="is_active" value="1" class="mt-1 rounded border-line bg-surface-card text-primary shadow-sm focus:ring-primary" @checked(old('is_active', $investment->is_active)) />
+                <span class="text-sm text-foreground-muted">{{ __('When off, this pool is hidden from investor portfolios and accruals are paused.') }}</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <x-primary-button>{{ __('Save') }}</x-primary-button>
+        @if (($return ?? 'show') === 'index')
+            <x-action-button :href="route('admin.investments.index')" variant="secondary">{{ __('Cancel') }}</x-action-button>
+        @else
+            <x-action-button :href="route('admin.investments.show', $investment)" variant="secondary">{{ __('Cancel') }}</x-action-button>
+        @endif
+    </div>
+</form>

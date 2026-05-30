@@ -53,7 +53,8 @@ return [
          */
         'web_public' => [
             'driver' => 'local',
-            'root' => public_path('media'),
+            // On cPanel with app outside public_html, set WEB_PUBLIC_ROOT=/home/USER/public_html/media
+            'root' => env('WEB_PUBLIC_ROOT', public_path('media')),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/media',
             'visibility' => 'public',
             'throw' => false,

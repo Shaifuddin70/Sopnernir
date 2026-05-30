@@ -2,60 +2,326 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --color-bg: #f5f7fa;
+    --color-bg-secondary: #ffffff;
+    --color-card: #ffffff;
+    --color-surface-variant: #eef1f6;
+
+    --color-primary: #1976d2;
+    --color-primary-hover: #1565c0;
+    --color-primary-muted: #e3f2fd;
+
+    --color-success: #2e7d32;
+    --color-success-muted: #e8f5e9;
+    --color-warning: #ed6c02;
+    --color-warning-muted: #fff3e0;
+    --color-error: #d32f2f;
+    --color-error-muted: #ffebee;
+
+    --color-text: #1a1c1e;
+    --color-text-muted: #5f6368;
+    --color-border: #e0e0e0;
+
+    --shadow-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --shadow-elevation-2: 0 2px 4px -1px rgb(0 0 0 / 0.06), 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-elevation-3: 0 4px 6px -2px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
 [x-cloak] {
     display: none !important;
 }
 
-/* Global searchable select styling (Tom Select) to match form controls */
+@layer base {
+    body {
+        @apply bg-surface text-foreground antialiased;
+    }
+
+    a:not([class]) {
+        @apply text-primary hover:text-primary-hover;
+    }
+
+    select:not([class]),
+    textarea:not([class]) {
+        @apply ui-input;
+    }
+}
+
+@layer components {
+    .ui-shell-padding {
+        @apply px-2 sm:px-6;
+    }
+
+    .ui-page-container {
+        @apply mx-auto w-full ui-shell-padding;
+    }
+
+    .ui-sidebar-brand {
+        @apply ui-sidebar-brand-border flex min-h-14 shrink-0 items-center justify-between ui-shell-padding;
+    }
+
+    .ui-sidebar-nav {
+        @apply flex-1 space-y-1 overflow-y-auto py-4 ui-shell-padding;
+    }
+
+    .ui-page-bg {
+        @apply bg-surface;
+    }
+
+    .ui-sidebar {
+        @apply border-r border-line bg-surface-secondary text-foreground shadow-elevation-2;
+    }
+
+    .ui-sidebar-brand-border {
+        @apply border-b border-line;
+    }
+
+    .ui-main-header {
+        @apply border-b border-line bg-surface-secondary shadow-elevation-1;
+    }
+
+    .ui-page-header-title {
+        @apply truncate text-lg font-medium tracking-tight text-foreground sm:text-xl;
+    }
+
+    .ui-card {
+        @apply rounded-xl bg-surface-card shadow-elevation-2;
+    }
+
+    .ui-card-header {
+        @apply rounded-t-xl border-b border-line bg-surface-secondary px-4 py-3 sm:px-5 sm:py-4;
+    }
+
+    .ui-table-footer {
+        @apply mt-4 flex flex-col gap-2 overflow-visible sm:flex-row sm:flex-wrap sm:items-center sm:justify-between;
+    }
+
+    .ui-table-pagination {
+        @apply min-w-0 overflow-visible;
+    }
+
+    .ui-card-header-title {
+        @apply text-sm font-medium text-foreground sm:text-base;
+    }
+
+    .ui-card-header-subtitle {
+        @apply mt-0.5 text-xs text-foreground-muted sm:text-sm;
+    }
+
+    .ui-table thead tr {
+        @apply border-b border-line bg-surface-variant text-left text-[11px] font-medium uppercase tracking-wide text-foreground-muted sm:text-xs;
+    }
+
+    .ui-table tbody tr {
+        @apply border-b border-line/80 transition-colors hover:bg-surface-variant/60;
+    }
+
+    .ui-table thead th {
+        @apply px-3 py-2.5;
+    }
+
+    .ui-table tbody td {
+        @apply px-3 py-2.5 text-foreground;
+    }
+
+    .ui-table tbody td.tabular-nums {
+        @apply text-foreground;
+    }
+
+    .ui-pagination {
+        @apply text-sm text-foreground-muted;
+    }
+
+    .ui-pagination-btn {
+        @apply inline-flex items-center border border-line bg-surface-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    }
+
+    .ui-pagination-btn-active {
+        @apply border-primary bg-primary-muted text-primary;
+    }
+
+    .ui-pagination-btn-disabled {
+        @apply cursor-not-allowed text-foreground-muted opacity-50 hover:bg-surface-card;
+    }
+
+    .ui-badge-success {
+        @apply inline-flex rounded-full bg-success-muted px-2.5 py-0.5 text-xs font-medium text-success;
+    }
+
+    .ui-badge-muted {
+        @apply inline-flex rounded-full bg-surface-variant px-2.5 py-0.5 text-xs font-medium text-foreground-muted;
+    }
+
+    .ui-badge-brand {
+        @apply inline-flex rounded-full bg-primary-muted px-2.5 py-0.5 text-xs font-medium text-primary;
+    }
+
+    .ui-badge-warning {
+        @apply inline-flex rounded-full bg-warning-muted px-2.5 py-0.5 text-xs font-medium text-warning;
+    }
+
+    .ui-badge-error {
+        @apply inline-flex rounded-full bg-error-muted px-2.5 py-0.5 text-xs font-medium text-error;
+    }
+
+    .ui-auth-shell {
+        @apply min-h-screen bg-surface;
+    }
+
+    .ui-auth-card {
+        @apply overflow-hidden rounded-2xl bg-surface-card shadow-elevation-3;
+    }
+
+    .ui-auth-card-accent {
+        @apply h-1 bg-primary;
+    }
+
+    .ui-input {
+        @apply block w-full rounded-lg border border-line bg-surface-secondary px-4 py-3 text-sm leading-normal text-foreground shadow-sm placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
+        min-height: 2.75rem;
+    }
+
+    textarea.ui-input {
+        min-height: auto;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .ui-select,
+    select.ui-input {
+        appearance: none;
+        -webkit-appearance: none;
+        color-scheme: light;
+        cursor: pointer;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        min-height: 2.75rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: var(--color-text);
+        background-color: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%235F6368' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+    }
+
+    .ui-select:focus,
+    select.ui-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgb(25 118 210 / 0.2);
+    }
+
+    .ui-select option,
+    select.ui-input option {
+        background-color: var(--color-card);
+        color: var(--color-text);
+    }
+
+    select.ui-select::-ms-expand {
+        display: none;
+    }
+
+    .ui-table-search {
+        @apply rounded-lg border border-line bg-surface-secondary text-foreground shadow-sm placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        min-height: 2.75rem;
+    }
+
+    .ui-table-search-form {
+        @apply mb-4 flex flex-wrap items-center gap-2;
+    }
+
+    .ui-stat-tile {
+        @apply rounded-xl bg-surface-card p-5 shadow-elevation-1 transition hover:shadow-elevation-2 sm:p-6;
+    }
+
+    .ui-stat-tile-profit {
+        @apply rounded-xl border border-success/20 bg-success-muted p-5 shadow-elevation-1 transition hover:shadow-elevation-2 sm:p-6;
+    }
+
+    .ui-stat-tile-capital {
+        @apply rounded-xl border border-primary/20 bg-primary-muted p-5 shadow-elevation-1 transition hover:shadow-elevation-2 sm:p-6;
+    }
+}
+
+/* Tom Select — Material light */
+.ts-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+    padding: 0;
+}
+
+.ts-wrapper > select,
+.ts-wrapper select.tomselected {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    background: none !important;
+    background-image: none !important;
+}
+
 .ts-wrapper.single .ts-control,
 .ts-wrapper.multi .ts-control {
-    min-height: 42px;
-    border: 1px solid rgb(209 213 219);
-    border-radius: 0.375rem;
-    background: #fff;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    padding: 0.5rem 0.75rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-bg-secondary);
+    padding: 0.75rem 1rem;
     transition: border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
 }
 
 .ts-wrapper.focus .ts-control {
-    border-color: rgb(99 102 241);
-    box-shadow: 0 0 0 1px rgb(99 102 241);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgb(25 118 210 / 0.2);
 }
 
 .ts-wrapper.single .ts-control .item,
 .ts-wrapper.multi .ts-control .item,
 .ts-wrapper .ts-control > input {
-    color: rgb(17 24 39);
+    color: var(--color-text);
     font-size: 0.875rem;
     line-height: 1.25rem;
 }
 
 .ts-wrapper .ts-control > input::placeholder {
-    color: rgb(156 163 175);
+    color: var(--color-text-muted);
 }
 
 .ts-dropdown {
     margin-top: 0.25rem;
-    border: 1px solid rgb(229 231 235);
-    border-radius: 0.375rem;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-card);
+    box-shadow: var(--shadow-elevation-3);
     overflow: hidden;
 }
 
 .ts-dropdown .option,
 .ts-dropdown .create {
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 1rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
+    color: var(--color-text);
 }
 
 .ts-dropdown .active {
-    background: rgb(238 242 255);
-    color: rgb(55 48 163);
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
 }
 
 .ts-wrapper.plugin-remove_button .item .remove {
-    border-left: 1px solid rgb(209 213 219);
-    color: rgb(75 85 99);
+    border-left: 1px solid var(--color-border);
+    color: var(--color-text-muted);
 }

@@ -1,39 +1,18 @@
 <div class="relative shrink-0 lg:w-0 lg:flex-shrink-0 lg:overflow-visible">
-    {{-- Mobile top bar --}}
-    <header
-        class="fixed inset-x-0 top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 lg:hidden">
-        <div class="flex min-w-0 flex-1 items-center gap-3">
-            <button type="button" @click="sidebarOpen = true"
-                class="inline-flex shrink-0 items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                aria-expanded="false" x-bind:aria-expanded="sidebarOpen">
-                <span class="sr-only">{{ __('Open navigation') }}</span>
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-2 text-gray-900">
-                <x-application-logo compact class="block h-8 w-8 shrink-0 fill-current" />
-            </a>
-        </div>
-        @include('layouts.auth-toolbar')
-    </header>
-
     {{-- Overlay when mobile menu open --}}
     <div x-show="sidebarOpen" x-transition.opacity x-cloak @click="sidebarOpen = false"
-        class="fixed inset-0 z-40 bg-gray-900/40 lg:hidden" aria-hidden="true"></div>
+        class="fixed inset-0 z-40 bg-black/40 lg:hidden" aria-hidden="true"></div>
 
-    {{-- Sidebar: mobile slide-over; lg fixed to viewport (main scrolls under pl-64) --}}
+    {{-- Sidebar --}}
     <aside class="flex min-h-0 flex-1 flex-col lg:flex-none">
         <div @keydown.escape.window="sidebarOpen = false" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            class="fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] flex-col border-r border-gray-200 bg-white shadow-xl transition-transform duration-200 ease-in-out lg:inset-y-0 lg:left-0 lg:z-40 lg:max-w-none lg:w-64 lg:!translate-x-0 lg:border-r lg:border-gray-200 lg:bg-white lg:shadow-none">
-            <div
-                class="flex h-14 shrink-0 items-center justify-between border-b border-gray-100 px-4 lg:h-auto lg:py-4">
-                <a href="{{ route('dashboard') }}" class="hidden items-center gap-2 lg:flex" @click="sidebarOpen = false">
-                    <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+            class="ui-sidebar fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] flex-col transition-transform duration-200 ease-in-out lg:inset-y-0 lg:left-0 lg:z-40 lg:max-w-none lg:w-64 lg:!translate-x-0">
+            <div class="ui-sidebar-brand">
+                <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center" @click="sidebarOpen = false">
+                    <x-application-logo class="min-w-0" />
                 </a>
-                <span class="text-sm font-semibold text-gray-900 lg:hidden">{{ config('app.name') }}</span>
                 <button type="button" @click="sidebarOpen = false"
-                    class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 lg:hidden">
+                    class="rounded-lg p-2 text-foreground-muted hover:bg-surface-card hover:text-foreground lg:hidden">
                     <span class="sr-only">{{ __('Close navigation') }}</span>
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -42,9 +21,9 @@
                 </button>
             </div>
 
-            <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="{{ __('Main') }}">
+            <nav class="ui-sidebar-nav" aria-label="{{ __('Main') }}">
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" @click="sidebarOpen = false">
-                    <span class="inline-flex items-center gap-2">
+                    <span class="flex items-center gap-2">
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                 d="M3 11.25L12 4l9 7.25M5.25 10.5V20h13.5v-9.5" />
@@ -53,7 +32,7 @@
                     </span>
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('investments.index')" :active="request()->routeIs('investments.*')" @click="sidebarOpen = false">
-                    <span class="inline-flex items-center gap-2">
+                    <span class="flex items-center gap-2">
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                 d="M3 7.5A1.5 1.5 0 014.5 6h15A1.5 1.5 0 0121 7.5v9A1.5 1.5 0 0119.5 18h-15A1.5 1.5 0 013 16.5v-9z" />
@@ -64,7 +43,7 @@
                 </x-responsive-nav-link>
                 @if (Auth::user()->isAdmin())
                     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" @click="sidebarOpen = false">
-                        <span class="inline-flex items-center gap-2">
+                        <span class="flex items-center gap-2">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                     d="M15 19.5a6.75 6.75 0 00-12 0M9 12a3.75 3.75 0 100-7.5A3.75 3.75 0 009 12zm10.5 7.5v-1.5a4.5 4.5 0 00-4.5-4.5h-1.125" />
@@ -73,7 +52,7 @@
                         </span>
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.investments.index')" :active="request()->routeIs('admin.investments.*')" @click="sidebarOpen = false">
-                        <span class="inline-flex items-center gap-2">
+                        <span class="flex items-center gap-2">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                     d="M4.5 6.75h15m-15 5.25h15m-15 5.25h9.75M4.5 4.5h15A1.5 1.5 0 0121 6v12a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18V6a1.5 1.5 0 011.5-1.5z" />
@@ -84,8 +63,8 @@
                 @endif
             </nav>
 
-            <div class="shrink-0 border-t border-gray-100 px-3 py-4 lg:hidden">
-                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">{{ __('Language') }}</p>
+            <div class="shrink-0 border-t border-line py-4 ui-shell-padding lg:hidden">
+                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Language') }}</p>
                 <x-language-switcher />
             </div>
 

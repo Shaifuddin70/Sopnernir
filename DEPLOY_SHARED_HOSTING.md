@@ -61,6 +61,39 @@ $app = require_once __DIR__.'/../repositories/sopnernir/bootstrap/app.php';
 
 Adjust path depth based on your actual folder structure.
 
+### Profile photos (required when using public_html)
+
+Uploads are stored on disk under `public/media`, but the browser loads `/media/...` from **public_html**. Without fixing this, profile photos look broken.
+
+**Option A (recommended): symlink**
+
+```bash
+rm -rf ~/public_html/media
+ln -s ~/repositories/sopnernir/public/media ~/public_html/media
+chmod -R u+rwX ~/repositories/sopnernir/public/media
+```
+
+**Option B: store files directly in public_html**
+
+In `.env`:
+
+```env
+WEB_PUBLIC_ROOT=/home/USERNAME/public_html/media
+```
+
+Then create the folder and make it writable:
+
+```bash
+mkdir -p ~/public_html/media
+chmod -R u+rwX ~/public_html/media
+```
+
+If you already uploaded photos to the app `public/media` folder, copy them once:
+
+```bash
+cp -a ~/repositories/sopnernir/public/media/. ~/public_html/media/
+```
+
 ## 5) Configure `.env` in File Manager
 
 In your app root, create/edit `.env`:
@@ -97,7 +130,7 @@ If you use Git pull on server, these folders are usually ignored and must be upl
 Using File Manager permissions:
 - `storage/` -> writable
 - `bootstrap/cache/` -> writable
-- `public/media/` -> writable (profile and nominee photos)
+- `public/media/` or `public_html/media/` -> writable (profile and nominee photos; see §4)
 
 Typical baseline:
 - folders: `755`

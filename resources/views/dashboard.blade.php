@@ -1,37 +1,33 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <h2>{{ __('Dashboard') }}</h2>
     </x-slot>
 
-    <div class="mx-auto space-y-6 p-1 sm:p-6">
+    <div class="space-y-6">
 
         @if ($platform !== null)
-            <section
-                class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-                aria-labelledby="platform-overview-heading">
-                <div class="border-b border-gray-100 bg-gray-50 px-5 py-4 sm:px-6">
-                    <h2 id="platform-overview-heading" class="text-base font-semibold text-gray-900">
+            <section class="ui-card" aria-labelledby="platform-overview-heading">
+                <div class="ui-card-header">
+                    <h2 id="platform-overview-heading" class="ui-card-header-title">
                         {{ __('Platform overview') }}
                     </h2>
-                    <p class="mt-0.5 text-sm text-gray-500">
+                    <p class="ui-card-header-subtitle">
                         {{ __('Participant rows: :n', ['n' => $platform['participant_rows']]) }}
                     </p>
                 </div>
-                <div class="grid gap-px bg-gray-100 sm:grid-cols-3">
-                    <article class="bg-white p-5 sm:p-6">
+                <div class="grid gap-px bg-line sm:grid-cols-3">
+                    <article class="bg-surface-card p-5 sm:p-6">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
                                     {{ __('Investments') }}
                                 </p>
-                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-gray-900">
+                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                                     {{ $platform['investments_total'] }}
                                 </p>
                             </div>
                             <span
-                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100"
+                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-muted text-primary ring-1 ring-primary/30"
                                 aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -39,22 +35,22 @@
                                 </svg>
                             </span>
                         </div>
-                        <p class="mt-3 text-sm text-gray-600">
+                        <p class="mt-3 text-sm text-foreground-muted">
                             {{ __('Active: :count', ['count' => $platform['investments_active']]) }}
                         </p>
                     </article>
-                    <article class="bg-white p-5 sm:p-6">
+                    <article class="bg-surface-card p-5 sm:p-6">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
                                     {{ __('Total tagged capital') }}
                                 </p>
-                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-gray-900">
+                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                                     {{ $platform['total_contributions'] }}
                                 </p>
                             </div>
                             <span
-                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
+                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success-muted text-success ring-1 ring-success/30"
                                 aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -62,23 +58,23 @@
                                 </svg>
                             </span>
                         </div>
-                        <p class="mt-2 text-xs font-medium text-emerald-900/80">
+                        <p class="mt-2 text-xs font-medium text-success">
                             {{ __('Total amount: :amount', ['amount' => $platform['total_amount']]) }}
                         </p>
-                        <p class="mt-3 text-sm text-gray-600">{{ __('Sum of all participant contributions.') }}</p>
+                        <p class="mt-3 text-sm text-foreground-muted">{{ __('Sum of all participant contributions.') }}</p>
                     </article>
-                    <article class="bg-white p-5 sm:p-6">
+                    <article class="bg-surface-card p-5 sm:p-6">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
                                     {{ __('Total profit distributed') }}
                                 </p>
-                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-gray-900">
+                                <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                                     {{ $platform['total_profit_distributed'] }}
                                 </p>
                             </div>
                             <span
-                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 ring-1 ring-violet-100"
+                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning-muted text-warning ring-1 ring-warning/30"
                                 aria-hidden="true">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -86,7 +82,7 @@
                                 </svg>
                             </span>
                         </div>
-                        <p class="mt-3 text-sm text-gray-600">
+                        <p class="mt-3 text-sm text-foreground-muted">
                             {{ __(':count accrual month(s)', ['count' => $platform['accrual_periods']]) }}
                         </p>
                     </article>
@@ -94,19 +90,17 @@
             </section>
         @endif
 
-        <section class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-            aria-labelledby="portfolio-heading">
-            <div
-                class="flex flex-col gap-4 border-b border-gray-100 bg-gray-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <section class="ui-card" aria-labelledby="portfolio-heading">
+            <div class="ui-card-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 id="portfolio-heading" class="text-base font-semibold text-gray-900">
+                    <h2 id="portfolio-heading" class="ui-card-header-title">
                         {{ __('Your portfolio') }}
                     </h2>
-                    <p class="mt-1 max-w-2xl text-sm leading-relaxed text-gray-500">
+                    <p class="ui-card-header-subtitle max-w-2xl leading-relaxed">
                         @if ($personal['return_on_tagged_capital_pct'] !== null)
-                            <span class="tabular-nums font-medium text-gray-700">{{ __('Return') }}:
+                            <span class="tabular-nums font-medium text-foreground">{{ __('Return') }}:
                                 {{ $personal['return_on_tagged_capital_pct'] }}%</span>
-                            <span class="mx-2 text-gray-300" aria-hidden="true">·</span>
+                            <span class="mx-2 text-line" aria-hidden="true">·</span>
                         @endif
                         {{ __('Profit is your share each month; capital is your total contributions on pools you are on.') }}
                     </p>
@@ -114,33 +108,30 @@
             </div>
             <div class="p-5 sm:p-6">
                 <div class="grid gap-4 sm:grid-cols-3">
-                    <div
-                        class="rounded-xl border border-gray-100 bg-gray-50/50 p-5 ring-1 ring-gray-900/5 transition hover:border-gray-200 hover:bg-white">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <div class="ui-stat-tile">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
                             {{ __('Your investments') }}
                         </p>
-                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-gray-900">
+                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                             {{ $personal['investments_count'] }}
                         </p>
                     </div>
-                    <div
-                        class="rounded-xl border border-emerald-100/80 bg-emerald-50/40 p-5 ring-1 ring-emerald-900/5 transition hover:border-emerald-200/80 hover:bg-emerald-50/60">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-800/80">
+                    <div class="ui-stat-tile-capital">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-success">
                             {{ __('Your tagged capital') }}
                         </p>
-                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-emerald-950">
+                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                             {{ $personal['total_contribution'] }}
                         </p>
-                        <p class="mt-2 text-xs font-medium text-emerald-900/80">
+                        <p class="mt-2 text-xs font-medium text-success">
                             {{ __('Total amount: :amount', ['amount' => $personal['total_amount']]) }}
                         </p>
                     </div>
-                    <div
-                        class="rounded-xl border border-indigo-100/80 bg-indigo-50/40 p-5 ring-1 ring-indigo-900/5 transition hover:border-indigo-200/80 hover:bg-indigo-50/60">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-800/80">
+                    <div class="ui-stat-tile-profit">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-warning">
                             {{ __('Your profit received') }}
                         </p>
-                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-indigo-950">
+                        <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
                             {{ $personal['total_profit'] }}
                         </p>
                     </div>
@@ -148,18 +139,17 @@
             </div>
         </section>
 
-        <section class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm ring-1 ring-gray-900/5"
-            aria-labelledby="top-investors-heading">
-            <div class="border-b border-gray-100 bg-gray-50 px-5 py-4 sm:px-6">
-                <h2 id="top-investors-heading" class="text-base font-semibold text-gray-900">
+        <section class="ui-card" aria-labelledby="top-investors-heading">
+            <div class="ui-card-header">
+                <h2 id="top-investors-heading" class="ui-card-header-title">
                     {{ __('Top investors') }}
                 </h2>
                 @if ($topInvestorsScope === 'global')
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="ui-card-header-subtitle">
                         {{ __('Ranked by total profit share from all accruals.') }}
                     </p>
                 @else
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="ui-card-header-subtitle">
                         {{ __('Ranked by profit share on investments you are tagged on.') }}
                     </p>
                 @endif
@@ -167,7 +157,7 @@
             <div class="p-5 sm:p-6">
                 <x-ajax-table-region :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment"
                     ajax-fragment="top_investors">
-                    <x-table-search class="mb-4" :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment"
+                    <x-table-search :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment"
                         ajax-fragment="top_investors" :placeholder="__('Search investors by name or email…')" />
                     <div id="dashboard-top-investors-fragment">
                         @include('dashboard.partials.top-investors-fragment', compact('topInvestors'))

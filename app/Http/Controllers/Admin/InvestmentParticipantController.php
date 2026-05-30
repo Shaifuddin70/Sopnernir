@@ -176,7 +176,7 @@ class InvestmentParticipantController extends Controller
             return;
         }
 
-        app(InvestmentAccrualService::class)->syncMonthsThrough($investment, Investment::accrualThroughInclusive());
+        app(InvestmentAccrualService::class)->syncMonthsThrough($investment, $investment->lastAccrualMonthInclusive());
     }
 
     private function resolveProfitCarrySinceMonth(?string $requestMonth): ?Carbon
