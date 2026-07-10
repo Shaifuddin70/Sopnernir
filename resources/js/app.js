@@ -5,6 +5,47 @@ import 'tom-select/dist/css/tom-select.css';
 
 import Alpine from 'alpinejs';
 
+/**
+ * Merge a route URL (which may already include query params) with current location
+ * and additional search/pagination parameters.
+ */
+function buildMergedRequestUrl(baseUrl, options = {}) {
+    const {
+        windowSearch = window.location.search,
+        set = {},
+        deleteKeys = [],
+        ajaxFragment = null,
+        includeAjaxFragment = false,
+    } = options;
+
+    const url = new URL(baseUrl, window.location.origin);
+    const windowParams = new URLSearchParams(windowSearch);
+
+    windowParams.forEach((value, key) => {
+        if (key !== 'ajax_fragment') {
+            url.searchParams.set(key, value);
+        }
+    });
+
+    deleteKeys.forEach((key) => url.searchParams.delete(key));
+
+    Object.entries(set).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') {
+            url.searchParams.delete(key);
+        } else {
+            url.searchParams.set(key, String(value));
+        }
+    });
+
+    if (includeAjaxFragment && ajaxFragment) {
+        url.searchParams.set('ajax_fragment', ajaxFragment);
+    } else {
+        url.searchParams.delete('ajax_fragment');
+    }
+
+    return url;
+}
+
 const SEARCHABLE_SELECT_MARKER = 'searchableSelectReady';
 
 function initSearchableSelects(root = document) {
@@ -74,7 +115,7 @@ document.addEventListener('alpine:init', () => {
         param: config.param ? String(config.param) : 'search',
         ajaxFragment: config.ajaxFragment ? String(config.ajaxFragment) : null,
         resetPageKeys: Array.isArray(config.resetPageKeys) ? config.resetPageKeys : [],
-        debounceMs: typeof config.debounceMs === 'number' ? config.debounceMs : 350,
+        debounceMs: typeof config.debounceMs === 'number' ? config.debounceMs : 250,
         initialValue: config.initialValue ?? '',
         value: '',
         timer: null,
@@ -90,42 +131,25 @@ document.addEventListener('alpine:init', () => {
             this.timer = setTimeout(() => this.runFetch(), this.debounceMs);
         },
 
-        buildFetchParams() {
-            const params = new URLSearchParams(window.location.search);
-            this.resetPageKeys.forEach((k) => params.delete(k));
-            const v = this.value.trim();
-            if (v) {
-                params.set(this.param, v);
-            } else {
-                params.delete(this.param);
-            }
-            if (this.ajaxFragment) {
-                params.set('ajax_fragment', this.ajaxFragment);
-            }
+        requestUrl(includeAjaxFragment = true) {
+            const value = this.value.trim();
 
-            return params;
-        },
-
-        buildBarParams() {
-            const params = new URLSearchParams(window.location.search);
-            this.resetPageKeys.forEach((k) => params.delete(k));
-            const v = this.value.trim();
-            if (v) {
-                params.set(this.param, v);
-            } else {
-                params.delete(this.param);
-            }
-            params.delete('ajax_fragment');
-
-            return params;
+            return buildMergedRequestUrl(this.fetchUrl, {
+                deleteKeys: this.resetPageKeys,
+                set: {
+                    [this.param]: value || null,
+                },
+                ajaxFragment: this.ajaxFragment,
+                includeAjaxFragment,
+            });
         },
 
         async runFetch() {
-            const fetchParams = this.buildFetchParams();
+            const url = this.requestUrl(true);
             this.loading = true;
             this.error = false;
             try {
-                const res = await fetch(`${this.fetchUrl}?${fetchParams.toString()}`, {
+                const res = await fetch(url.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         Accept: 'application/json',
@@ -140,9 +164,8 @@ document.addEventListener('alpine:init', () => {
                 if (el && typeof data.html === 'string') {
                     el.innerHTML = data.html;
                 }
-                const barParams = this.buildBarParams();
-                const q = barParams.toString();
-                const next = window.location.pathname + (q ? `?${q}` : '');
+                const barUrl = this.requestUrl(false);
+                const next = barUrl.pathname + barUrl.search;
                 const cur = window.location.pathname + (window.location.search || '');
                 if (next !== cur) {
                     history.replaceState(null, '', next);
@@ -202,17 +225,17 @@ document.addEventListener('alpine:init', () => {
 
             event.preventDefault();
 
-            const params = new URLSearchParams(linkUrl.search);
-            if (this.ajaxFragment) {
-                params.set('ajax_fragment', this.ajaxFragment);
-            }
-
-            const ajaxUrl = `${fetchBase.pathname}?${params.toString()}`;
+            const linkParams = new URLSearchParams(linkUrl.search);
+            const ajaxUrl = buildMergedRequestUrl(this.fetchUrl, {
+                windowSearch: `?${linkParams.toString()}`,
+                ajaxFragment: this.ajaxFragment,
+                includeAjaxFragment: Boolean(this.ajaxFragment),
+            });
 
             this.loading = true;
             this.error = false;
             try {
-                const res = await fetch(ajaxUrl, {
+                const res = await fetch(ajaxUrl.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         Accept: 'application/json',
@@ -227,9 +250,8 @@ document.addEventListener('alpine:init', () => {
                 if (el && typeof data.html === 'string') {
                     el.innerHTML = data.html;
                 }
-                const barParams = new URLSearchParams(linkUrl.search);
-                barParams.delete('ajax_fragment');
-                const barQs = barParams.toString();
+                linkParams.delete('ajax_fragment');
+                const barQs = linkParams.toString();
                 const next = linkUrl.pathname + (barQs ? `?${barQs}` : '');
                 const cur = window.location.pathname + (window.location.search || '');
                 if (next !== cur) {
@@ -261,12 +283,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         buildBarParams() {
-            const p = new URLSearchParams(window.location.search);
-            p.set(this.param, this.value);
-            p.delete(this.resetPageKey);
-            p.delete('ajax_fragment');
-
-            return p;
+            return buildMergedRequestUrl(this.fetchUrl, {
+                deleteKeys: [this.resetPageKey],
+                set: {
+                    [this.param]: this.value,
+                },
+            });
         },
 
         async apply() {
@@ -274,25 +296,24 @@ document.addEventListener('alpine:init', () => {
 
             if (! this.targetId) {
                 const bar = this.buildBarParams();
-                const q = bar.toString();
-                window.location.assign(path + (q ? `?${q}` : ''));
+                window.location.assign(bar.pathname + bar.search);
 
                 return;
             }
 
-            const params = new URLSearchParams(window.location.search);
-            params.set(this.param, this.value);
-            params.delete(this.resetPageKey);
-            if (this.ajaxFragment) {
-                params.set('ajax_fragment', this.ajaxFragment);
-            }
-
-            const ajaxUrl = `${path}?${params.toString()}`;
+            const ajaxUrl = buildMergedRequestUrl(this.fetchUrl, {
+                deleteKeys: [this.resetPageKey],
+                set: {
+                    [this.param]: this.value,
+                },
+                ajaxFragment: this.ajaxFragment,
+                includeAjaxFragment: Boolean(this.ajaxFragment),
+            });
 
             this.loading = true;
             this.error = false;
             try {
-                const res = await fetch(ajaxUrl, {
+                const res = await fetch(ajaxUrl.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         Accept: 'application/json',
@@ -308,8 +329,7 @@ document.addEventListener('alpine:init', () => {
                     el.innerHTML = data.html;
                 }
                 const bar = this.buildBarParams();
-                const barQs = bar.toString();
-                const next = path + (barQs ? `?${barQs}` : '');
+                const next = bar.pathname + bar.search;
                 const cur = window.location.pathname + (window.location.search || '');
                 if (next !== cur) {
                     history.replaceState(null, '', next);

@@ -106,4 +106,44 @@ class MonthlyPaymentTest extends TestCase
             ->get(route('admin.monthly-payments.index'))
             ->assertForbidden();
     }
+
+    public function test_monthly_payments_search_filters_investors(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create(['name' => 'Sakibur Rahman', 'email' => 'sakib@example.com']);
+        User::factory()->create(['name' => 'Other Person', 'email' => 'other@example.com']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.monthly-payments.index', [
+                'month' => '2026-03',
+                'search' => 'Sakibur',
+            ]))
+            ->assertOk()
+            ->assertSee('Sakibur Rahman', false)
+            ->assertDontSee('Other Person', false);
+    }
+
+    public function test_monthly_payments_search_returns_ajax_fragment(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create(['name' => 'Sakibur Rahman', 'email' => 'sakib@example.com']);
+        User::factory()->create(['name' => 'Other Person', 'email' => 'other@example.com']);
+
+        $response = $this->actingAs($admin)
+            ->withHeaders([
+                'X-Requested-With' => 'XMLHttpRequest',
+                'Accept' => 'application/json',
+            ])
+            ->get(route('admin.monthly-payments.index', [
+                'month' => '2026-03',
+                'search' => 'Sakibur',
+            ]));
+
+        $response->assertOk()
+            ->assertJsonStructure(['html']);
+
+        $html = (string) $response->json('html');
+        $this->assertStringContainsString('Sakibur Rahman', $html);
+        $this->assertStringNotContainsString('Other Person', $html);
+    }
 }

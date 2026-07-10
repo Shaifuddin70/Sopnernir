@@ -5,7 +5,7 @@
     'ajaxFragment' => null,
     'placeholder' => null,
     'resetPageKeys' => ['page', 'periods_page', 'participants_page', 'profit_page', 'top_investors_page'],
-    'debounce' => 350,
+    'debounce' => 250,
 ])
 @php
     $placeholder = $placeholder ?? __('Search…');

@@ -38,7 +38,7 @@ class MonthlyPaymentController extends Controller
 
         $filteredCount = $rows->count();
 
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'html' => view('admin.monthly-payments.partials.table-fragment', compact(
                     'rows',
