@@ -11,12 +11,16 @@
             <th class="py-2 pr-3">{{ __('Ends') }}</th>
             <th class="py-2 pr-3 text-right">{{ __('Total amount') }}</th>
             <th class="py-2 pr-3 text-right">{{ __('Profit amount') }}</th>
+            <th class="py-2 pr-3 text-right">{{ __('Profit til today') }}</th>
             <th class="py-2 pr-3">{{ __('Users') }}</th>
             <th class="py-2 text-right">{{ __('Actions') }}</th>
         </tr>
     </thead>
     <tbody>
         @forelse ($investments as $inv)
+            @php
+                $poolDaily = app(\App\Services\InvestmentDailyProfitService::class)->poolProjection($inv);
+            @endphp
             <tr class="align-top">
                 <x-table-serial-cell :paginator="$investments" :index="$loop->index" />
                 <td class="py-2.5 pr-3">
@@ -62,6 +66,9 @@
                 <td class="py-2.5 pr-3 text-right tabular-nums text-success">
                     {{ $inv->total_profit_amount !== null ? number_format((float) $inv->total_profit_amount, 2, '.', '') : '—' }}
                 </td>
+                <td class="py-2.5 pr-3 text-right tabular-nums font-medium text-success">
+                    {{ $poolDaily ? number_format($poolDaily['profit_til_today'], 2, '.', '') : '—' }}
+                </td>
                 <td class="py-2.5 pr-3 tabular-nums">{{ $inv->participants_count }}</td>
                 <td class="py-2.5 text-right">
                     <div class="flex flex-wrap items-center justify-end gap-2">
@@ -81,7 +88,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="11" class="py-4 text-sm text-foreground-muted">
+                <td colspan="12" class="py-4 text-sm text-foreground-muted">
                     @if (request()->filled('search'))
                         {{ __('No investments match your search.') }}
                     @else

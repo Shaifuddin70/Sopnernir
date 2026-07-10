@@ -12,7 +12,7 @@
                 <th>{{ __('Investment') }}</th>
                 <th class="hidden md:table-cell text-right">{{ __('Total') }}</th>
                 <th class="text-right">{{ __('Profit') }}</th>
-                <th class="hidden sm:table-cell text-right">{{ __('Til today') }}</th>
+                <th class="text-right">{{ __('Profit til today') }}</th>
                 <th class="hidden lg:table-cell text-right">{{ __('Per day') }}</th>
                 <th class="w-0"><span class="sr-only">{{ __('Actions') }}</span></th>
             </tr>
@@ -37,9 +37,6 @@
                             <span class="mx-1 hidden sm:inline" aria-hidden="true">·</span>
                             <span class="hidden tabular-nums sm:inline">{{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}</span>
                         </div>
-                        <div class="mt-0.5 text-sm tabular-nums text-foreground-muted sm:hidden">
-                            {{ __('Til today') }}: {{ $row['profit_til_today'] }}
-                        </div>
                     </td>
                     <td class="hidden text-right tabular-nums md:table-cell">
                         {{ $showPoolTotals ? $row['pool_total_amount'] : $row['total_amount'] }}
@@ -47,7 +44,7 @@
                     <td class="text-right tabular-nums font-medium text-success">
                         {{ $showPoolTotals ? $row['pool_profit_amount'] : $row['profit_amount'] }}
                     </td>
-                    <td class="hidden text-right tabular-nums text-success sm:table-cell">{{ $row['profit_til_today'] }}</td>
+                    <td class="text-right tabular-nums font-medium text-success">{{ $row['profit_til_today'] }}</td>
                     <td class="hidden text-right tabular-nums text-foreground-muted lg:table-cell">{{ $row['daily_profit'] }}</td>
                     <td class="text-right">
                         <x-action-button :href="$viewUrl" variant="secondary" class="text-sm">{{ __('View') }}</x-action-button>
