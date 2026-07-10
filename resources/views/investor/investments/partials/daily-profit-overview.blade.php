@@ -19,7 +19,7 @@
             <div class="dashboard-stat-panel__head">
                 <h3 class="dashboard-stat-panel__title">{{ __('Platform overview') }}</h3>
             </div>
-            <dl class="dashboard-stat-grid sm:grid-cols-3 lg:grid-cols-6">
+            <dl class="dashboard-stat-grid dashboard-stat-grid--platform">
                 <div class="dashboard-stat dashboard-stat--capital">
                     <dt>{{ __('Total capital') }}</dt>
                     <dd>{{ $platform['total_capital'] }}</dd>
@@ -83,10 +83,10 @@
             <p class="text-sm text-foreground-muted">{{ __('No active investments with a plan completion date yet.') }}</p>
         </div>
     @else
-        <section class="dashboard-stat-panel min-w-0">
+        <section class="dashboard-stat-panel dashboard-stat-panel--scroll min-w-0">
             <div class="dashboard-stat-panel__head">
                 <h3 class="dashboard-stat-panel__title">{{ __('Your investments') }}</h3>
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     @if ($hasMoreInvestments)
                         <span class="text-sm text-foreground-muted tabular-nums">
                             {{ __(':shown of :total', ['shown' => $previewRows->count(), 'total' => $rowsTotal]) }}

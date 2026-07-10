@@ -1,79 +1,71 @@
-<x-guest-layout>
-    <div class="mx-auto w-full max-w-4xl space-y-4">
-        <section class="ui-card min-w-0 overflow-hidden">
+<x-phone-access-layout>
+    <div class="space-y-4">
+        <section class="phone-access-hero ui-card min-w-0">
             <div class="ui-card-header">
-                <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div class="min-w-0">
                         <h1 class="ui-card-header-title">{{ $investment->title }}</h1>
                         <div class="mt-2">
                             <x-user-identity :user="$user" size="md" />
                         </div>
                     </div>
-                    <x-action-button :href="route('phone-access.investments.index')" variant="secondary" class="shrink-0 text-sm">
+                    <x-action-button :href="route('phone-access.investments.index')" variant="secondary" class="w-full shrink-0 sm:w-auto">
                         {{ __('Back') }}
                     </x-action-button>
                 </div>
             </div>
         </section>
 
-        <section class="ui-card min-w-0 overflow-hidden">
-            <div class="ui-card-header">
-                <h2 class="ui-card-header-title">{{ __('Pool summary') }}</h2>
+        <section class="dashboard-stat-panel min-w-0">
+            <div class="dashboard-stat-panel__head">
+                <h2 class="dashboard-stat-panel__title">{{ __('Pool summary') }}</h2>
             </div>
-            <dl class="grid gap-3 p-3 text-sm sm:grid-cols-2 sm:p-4">
-                <div>
-                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Status') }}</dt>
-                    <dd class="mt-1 font-medium text-foreground">{{ $investment->status }}</dd>
+            <dl class="dashboard-stat-grid sm:grid-cols-2 lg:grid-cols-3">
+                <div class="dashboard-stat">
+                    <dt>{{ __('Status') }}</dt>
+                    <dd class="text-base sm:text-lg">{{ $investment->status }}</dd>
                 </div>
                 @if ($investment->deed_completion_deadline)
-                    <div>
-                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Plan completion date') }}</dt>
-                        <dd class="mt-1 font-medium text-foreground">
-                            {{ $investment->deed_completion_deadline->translatedFormat('j F Y') }}
-                        </dd>
+                    <div class="dashboard-stat">
+                        <dt>{{ __('Plan ends') }}</dt>
+                        <dd class="text-base sm:text-lg">{{ $investment->deed_completion_deadline->translatedFormat('j M Y') }}</dd>
                     </div>
                 @endif
-                <div>
-                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('My contribution') }}</dt>
-                    <dd class="mt-1 font-semibold tabular-nums text-foreground">
-                        {{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}
-                    </dd>
+                <div class="dashboard-stat dashboard-stat--capital">
+                    <dt>{{ __('My contribution') }}</dt>
+                    <dd>{{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}</dd>
                 </div>
                 @if ($myDailyProfit)
-                    <div>
-                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Projected total profit') }}</dt>
-                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['projected_profit'] }}</dd>
+                    <div class="dashboard-stat dashboard-stat--profit">
+                        <dt>{{ __('Projected profit') }}</dt>
+                        <dd>{{ $myDailyProfit['projected_profit'] }}</dd>
                     </div>
-                    <div>
-                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Profit til today') }}</dt>
-                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['profit_til_today'] }}</dd>
+                    <div class="dashboard-stat dashboard-stat--profit">
+                        <dt>{{ __('Profit til today') }}</dt>
+                        <dd>{{ $myDailyProfit['profit_til_today'] }}</dd>
                     </div>
-                    <div>
-                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Daily profit') }}</dt>
-                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['daily_profit'] }}</dd>
+                    <div class="dashboard-stat dashboard-stat--profit">
+                        <dt>{{ __('Daily profit') }}</dt>
+                        <dd>{{ $myDailyProfit['daily_profit'] }}</dd>
                     </div>
                 @endif
-                <div>
-                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
-                    <dd class="mt-1 font-semibold tabular-nums text-success">
-                        {{ number_format($myTotalProfit, 2, '.', '') }}
-                    </dd>
+                <div class="dashboard-stat dashboard-stat--profit">
+                    <dt>{{ __('Posted profit') }}</dt>
+                    <dd>{{ number_format($myTotalProfit, 2, '.', '') }}</dd>
                 </div>
-                <div class="sm:col-span-2">
-                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('My balance on this pool') }}</dt>
-                    <dd class="mt-1 font-semibold tabular-nums text-foreground">
-                        {{ number_format((float) ($myParticipant?->contribution_amount ?? 0) + $myTotalProfit, 2, '.', '') }}
-                    </dd>
+                <div class="dashboard-stat sm:col-span-2 lg:col-span-3">
+                    <dt>{{ __('My balance on this pool') }}</dt>
+                    <dd>{{ number_format((float) ($myParticipant?->contribution_amount ?? 0) + $myTotalProfit, 2, '.', '') }}</dd>
                 </div>
             </dl>
         </section>
 
-        <section class="ui-card min-w-0 overflow-hidden">
-            <div class="ui-card-header">
-                <h2 class="ui-card-header-title">{{ __('My profit by month') }}</h2>
+        <section class="dashboard-stat-panel dashboard-stat-panel--scroll min-w-0">
+            <div class="dashboard-stat-panel__head">
+                <h2 class="dashboard-stat-panel__title">{{ __('My profit by month') }}</h2>
             </div>
             <div class="p-3 sm:p-4">
-                <div class="overflow-x-auto rounded-lg border border-line">
+                <div class="ui-glass-table-wrap overflow-x-auto">
                     <table class="ui-table min-w-full">
                         <thead>
                             <tr>
@@ -87,7 +79,7 @@
                                 <tr>
                                     <x-table-serial-cell :index="$loop->index" />
                                     <td class="tabular-nums">{{ \Carbon\Carbon::parse($row->period->month)->translatedFormat('F Y') }}</td>
-                                    <td class="text-right tabular-nums text-success">
+                                    <td class="text-right tabular-nums font-medium text-success">
                                         {{ number_format((float) $row->profit_share, 2, '.', '') }}
                                     </td>
                                 </tr>
@@ -104,4 +96,4 @@
             </div>
         </section>
     </div>
-</x-guest-layout>
+</x-phone-access-layout>

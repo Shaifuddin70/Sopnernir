@@ -2,10 +2,54 @@
     $viewRoute = $viewRoute ?? null;
     $showPoolTotals = $showPoolTotals ?? false;
     $serialPaginator = $serialPaginator ?? null;
+    $isPhoneAccess = $viewRoute === 'phone-access';
 @endphp
 
-<div class="ui-glass-table-wrap overflow-x-auto">
-    <table class="ui-table min-w-full">
+@if ($isPhoneAccess)
+    <div class="space-y-3 md:hidden">
+        @foreach ($rows as $row)
+            @php
+                $viewUrl = route('phone-access.investments.show', $row['investment_id']);
+                $periodStart = \Carbon\Carbon::parse($row['start_date'])->translatedFormat('j M Y');
+                $periodEnd = \Carbon\Carbon::parse($row['end_date'])->translatedFormat('j M Y');
+            @endphp
+            <article class="phone-access-investment-card">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <a href="{{ $viewUrl }}" class="ui-text-link text-base">{{ $row['title'] }}</a>
+                        <p class="mt-1 text-sm text-foreground-muted">
+                            {{ __('Deed') }} {{ $row['deed_no'] }}
+                        </p>
+                        <p class="mt-0.5 text-sm tabular-nums text-foreground-muted">
+                            {{ $periodStart }} – {{ $periodEnd }}
+                        </p>
+                        <p class="mt-0.5 text-sm tabular-nums text-foreground-muted">
+                            {{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}
+                        </p>
+                    </div>
+                    <x-action-button :href="$viewUrl" variant="secondary" class="shrink-0 text-sm">{{ __('View') }}</x-action-button>
+                </div>
+                <dl class="phone-access-investment-card__metrics">
+                    <div class="phone-access-investment-card__metric">
+                        <dt>{{ __('Total') }}</dt>
+                        <dd>{{ $showPoolTotals ? $row['pool_total_amount'] : $row['total_amount'] }}</dd>
+                    </div>
+                    <div class="phone-access-investment-card__metric phone-access-investment-card__metric--profit">
+                        <dt>{{ __('Profit') }}</dt>
+                        <dd>{{ $showPoolTotals ? $row['pool_profit_amount'] : $row['profit_amount'] }}</dd>
+                    </div>
+                    <div class="phone-access-investment-card__metric phone-access-investment-card__metric--profit sm:col-span-2">
+                        <dt>{{ __('Profit til today') }}</dt>
+                        <dd>{{ $row['profit_til_today'] }}</dd>
+                    </div>
+                </dl>
+            </article>
+        @endforeach
+    </div>
+@endif
+
+<div @class(['ui-glass-table-wrap overflow-x-auto', 'hidden md:block' => $isPhoneAccess])>
+    <table class="ui-table min-w-full @if ($isPhoneAccess) min-w-[40rem] @endif">
         <thead>
             <tr>
                 <x-table-serial-header />
@@ -20,7 +64,7 @@
         <tbody>
             @foreach ($rows as $row)
                 @php
-                    $viewUrl = $viewRoute === 'phone-access'
+                    $viewUrl = $isPhoneAccess
                         ? route('phone-access.investments.show', $row['investment_id'])
                         : route('investments.show', $row['investment_id']);
                     $periodStart = \Carbon\Carbon::parse($row['start_date'])->translatedFormat('j M Y');

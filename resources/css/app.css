@@ -341,11 +341,15 @@
     }
 
     .dashboard-stat-panel {
-        @apply overflow-hidden rounded-xl border border-line bg-surface-card shadow-elevation-1;
+        @apply rounded-xl border border-line bg-surface-card shadow-elevation-1;
+    }
+
+    .dashboard-stat-panel--scroll {
+        @apply overflow-visible;
     }
 
     .dashboard-stat-panel__head {
-        @apply flex items-center justify-between gap-2 border-b border-line bg-surface-variant px-3 py-2.5 sm:px-4;
+        @apply flex flex-col items-start gap-2 border-b border-line bg-surface-variant px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4;
     }
 
     .dashboard-stat-panel__title {
@@ -373,7 +377,116 @@
     }
 
     .dashboard-stat dd {
-        @apply mt-0.5 text-base font-bold tabular-nums tracking-tight text-foreground sm:text-lg;
+        @apply mt-0.5 break-words text-base font-bold tabular-nums tracking-tight text-foreground sm:text-lg;
+    }
+
+    .dashboard-stat-grid--platform {
+        @apply grid-cols-2 md:grid-cols-3 xl:grid-cols-6;
+    }
+
+    .phone-access-page .dashboard-stat-grid--platform {
+        @apply grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6;
+    }
+
+    /* Phone access — Material glass surfaces */
+    .phone-access-page {
+        @apply relative min-h-screen overflow-x-hidden font-sans text-foreground antialiased;
+        background: linear-gradient(165deg, #dbeafe 0%, #f5f7fa 42%, #e8f5e9 100%);
+    }
+
+    .phone-access-page__backdrop {
+        @apply pointer-events-none fixed inset-0 -z-10;
+        background:
+            radial-gradient(ellipse 80% 50% at 10% -10%, rgb(25 118 210 / 0.18), transparent 55%),
+            radial-gradient(ellipse 70% 45% at 95% 5%, rgb(46 125 50 / 0.14), transparent 50%),
+            radial-gradient(ellipse 60% 40% at 50% 100%, rgb(25 118 210 / 0.1), transparent 55%);
+    }
+
+    .phone-access-page__header {
+        @apply sticky top-0 z-30 border-b border-white/50 bg-surface-secondary/75 shadow-elevation-2 backdrop-blur-xl backdrop-saturate-150;
+    }
+
+    .phone-access-page__main {
+        @apply relative z-10;
+    }
+
+    .phone-access-page .ui-card,
+    .phone-access-page .dashboard-stat-panel {
+        @apply overflow-hidden rounded-2xl border border-white/60 bg-surface-card/70 shadow-elevation-2 backdrop-blur-xl backdrop-saturate-150;
+    }
+
+    .phone-access-page .ui-card-header,
+    .phone-access-page .dashboard-stat-panel__head {
+        @apply border-white/50 bg-surface-variant/50 backdrop-blur-md;
+    }
+
+    .phone-access-page .dashboard-stat {
+        @apply rounded-xl border border-white/50 bg-surface-card/60 px-3 py-2.5 shadow-elevation-1 backdrop-blur-md transition duration-200 hover:border-white/70 hover:bg-surface-card/80 hover:shadow-elevation-2;
+    }
+
+    .phone-access-page .dashboard-stat--capital {
+        @apply border-primary/30 bg-primary-muted/70;
+    }
+
+    .phone-access-page .dashboard-stat--profit {
+        @apply border-success/30 bg-success-muted/70;
+    }
+
+    .phone-access-page .dashboard-stat--profit dd {
+        @apply text-success;
+    }
+
+    .phone-access-page .ui-chip {
+        @apply border-white/50 bg-surface-variant/60 shadow-elevation-1 backdrop-blur-md;
+    }
+
+    .phone-access-page .ui-glass-table-wrap {
+        @apply border-white/50 bg-surface-card/75 shadow-elevation-2 ring-white/30 backdrop-blur-xl;
+    }
+
+    .phone-access-page .ui-glass-table-wrap .ui-table thead tr {
+        @apply border-white/40 bg-surface-variant/50 backdrop-blur-md;
+    }
+
+    .phone-access-page .ui-glass-table-wrap .ui-table tbody tr:hover {
+        @apply bg-surface-variant/50;
+    }
+
+    .phone-access-investment-card {
+        @apply rounded-2xl border border-white/60 bg-surface-card/75 p-4 shadow-elevation-2 backdrop-blur-xl backdrop-saturate-150 transition duration-200 hover:border-white/80 hover:bg-surface-card/90 hover:shadow-elevation-3;
+    }
+
+    .phone-access-investment-card__metrics {
+        @apply mt-3 grid grid-cols-2 gap-2 text-sm;
+    }
+
+    .phone-access-investment-card__metric {
+        @apply rounded-xl border border-white/40 bg-surface-variant/50 px-3 py-2 backdrop-blur-sm;
+    }
+
+    .phone-access-page .phone-access-hero {
+        @apply ring-1 ring-primary/15;
+    }
+
+    .phone-access-page .phone-access-hero .ui-card-header-title {
+        @apply text-base font-medium tracking-tight sm:text-lg;
+    }
+
+    .phone-access-page button[class*='border-line'],
+    .phone-access-page a[class*='border-line'] {
+        @apply border-white/60 bg-surface-secondary/80 backdrop-blur-md hover:bg-primary-muted/80;
+    }
+
+    .phone-access-investment-card__metric dt {
+        @apply text-xs font-semibold uppercase tracking-wide text-foreground-muted;
+    }
+
+    .phone-access-investment-card__metric dd {
+        @apply mt-0.5 font-semibold tabular-nums text-foreground;
+    }
+
+    .phone-access-investment-card__metric--profit dd {
+        @apply text-success;
     }
 
     .dashboard-stat p {
