@@ -213,4 +213,97 @@ class InvestmentAccrualTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function test_equal_contribution_partners_receive_same_total_profit_across_months(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $first = User::factory()->create(['email' => 'first@example.com']);
+        $second = User::factory()->create(['email' => 'second@example.com']);
+        $third = User::factory()->create(['email' => 'third@example.com']);
+
+        $investment = Investment::create([
+            'title' => 'Equal partners',
+            'default_monthly_rate_pct' => '1.5000',
+            'status' => Investment::STATUS_ACTIVE,
+            'created_by' => $admin->id,
+            'period_start' => '2026-01-01',
+        ]);
+        $investment->forceFill(['created_at' => Carbon::parse('2026-01-05')])->saveQuietly();
+
+        foreach ([$first, $second, $third] as $user) {
+            InvestmentParticipant::create([
+                'investment_id' => $investment->id,
+                'user_id' => $user->id,
+                'contribution_amount' => '10000.00',
+            ]);
+        }
+
+        $this->actingAs($admin);
+
+        foreach (['2026-01', '2026-02', '2026-03'] as $month) {
+            $this->post(route('admin.investments.accruals.store', $investment), [
+                'month' => $month,
+                'applied_rate_pct' => '1.666667',
+            ])->assertSessionHasNoErrors();
+        }
+
+        $investment->refresh()->load('periods.periodUsers');
+
+        foreach ($investment->periods as $period) {
+            $shares = $period->periodUsers->pluck('profit_share')->unique()->values();
+            $this->assertCount(1, $shares, 'Each month should pay every equal partner the same profit share.');
+        }
+
+        $totals = $investment->periods
+            ->flatMap(fn ($period) => $period->periodUsers)
+            ->groupBy('user_id')
+            ->map(fn ($rows) => $rows->sum(fn ($row) => (float) $row->profit_share));
+
+        $this->assertCount(3, $totals);
+        $this->assertEquals($totals->first(), $totals->get($first->id));
+        $this->assertEquals($totals->first(), $totals->get($second->id));
+        $this->assertEquals($totals->first(), $totals->get($third->id));
+    }
+
+    public function test_unequal_contribution_split_uses_largest_remainder(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $minor = User::factory()->create(['email' => 'minor@example.com']);
+        $major = User::factory()->create(['email' => 'major@example.com']);
+
+        $investment = Investment::create([
+            'title' => 'Weighted pool',
+            'default_monthly_rate_pct' => '1.0000',
+            'status' => Investment::STATUS_ACTIVE,
+            'created_by' => $admin->id,
+            'period_start' => '2026-01-01',
+        ]);
+        $investment->forceFill(['created_at' => Carbon::parse('2026-01-05')])->saveQuietly();
+
+        InvestmentParticipant::create([
+            'investment_id' => $investment->id,
+            'user_id' => $minor->id,
+            'contribution_amount' => '3000.00',
+        ]);
+        InvestmentParticipant::create([
+            'investment_id' => $investment->id,
+            'user_id' => $major->id,
+            'contribution_amount' => '7000.00',
+        ]);
+
+        $this->actingAs($admin);
+
+        $this->post(route('admin.investments.accruals.store', $investment), [
+            'month' => '2026-03',
+            'applied_rate_pct' => '1.0001',
+        ])->assertSessionHasNoErrors();
+
+        $investment->refresh()->load('periods.periodUsers');
+        $period = $investment->periods->first();
+        $byUser = $period->periodUsers->keyBy('user_id');
+
+        $this->assertEquals('100.01', (string) $period->profit_amount);
+        $this->assertEquals('30.00', (string) $byUser->get($minor->id)->profit_share);
+        $this->assertEquals('70.01', (string) $byUser->get($major->id)->profit_share);
+    }
 }

@@ -169,7 +169,9 @@ class InvestmentAccrualService
 
         [$profitCents, $rate] = $this->resolveMonthlyProfit($investment, $principal, $rate, $monthStart);
 
-        $lines = $this->splitProfitCents($participants, $principal, $profitCents);
+        $split = $this->splitProfitCents($participants, $principal, $profitCents);
+        $profitCents = $split['profit_cents'];
+        $lines = $split['lines'];
 
         return DB::transaction(function () use ($investment, $monthStart, $rate, $principal, $profitCents, $lines) {
             $period = InvestmentPeriod::create([
@@ -235,7 +237,9 @@ class InvestmentAccrualService
 
         $rate = (string) $period->applied_rate_pct;
         [$profitCents, $rate] = $this->resolveMonthlyProfit($investment, $principal, $rate, $monthStart);
-        $lines = $this->splitProfitCents($participants, $principal, $profitCents);
+        $split = $this->splitProfitCents($participants, $principal, $profitCents);
+        $profitCents = $split['profit_cents'];
+        $lines = $split['lines'];
 
         return DB::transaction(function () use ($period, $principal, $profitCents, $rate, $lines) {
             $period->update([
@@ -294,30 +298,118 @@ class InvestmentAccrualService
     }
 
     /**
-     * @return list<array{user_id: int, contribution: float, profit_share_cents: int}>
+     * @return array{profit_cents: int, lines: list<array{user_id: int, contribution: float, profit_share_cents: int}>}
      */
     private function splitProfitCents(Collection $participants, float $principal, int $profitCents): array
     {
-        $lines = [];
-        $allocated = 0;
-
-        foreach ($participants as $i => $p) {
-            $contrib = (float) $p->contribution_amount;
-            if ($i === $participants->count() - 1) {
-                $shareCents = max(0, $profitCents - $allocated);
-            } else {
-                $shareCents = (int) floor($profitCents * ($contrib / $principal));
-                $allocated += $shareCents;
-            }
-
-            $lines[] = [
-                'user_id' => (int) $p->user_id,
-                'contribution' => $contrib,
-                'profit_share_cents' => $shareCents,
+        if ($profitCents <= 0) {
+            return [
+                'profit_cents' => 0,
+                'lines' => $participants
+                    ->map(fn (InvestmentParticipant $p) => [
+                        'user_id' => (int) $p->user_id,
+                        'contribution' => (float) $p->contribution_amount,
+                        'profit_share_cents' => 0,
+                    ])
+                    ->values()
+                    ->all(),
             ];
         }
 
-        return $lines;
+        if ($this->participantsShareEqualContributions($participants)) {
+            return $this->splitProfitCentsEqually($participants, $profitCents);
+        }
+
+        return [
+            'profit_cents' => $profitCents,
+            'lines' => $this->splitProfitCentsByLargestRemainder($participants, $principal, $profitCents),
+        ];
+    }
+
+    private function participantsShareEqualContributions(Collection $participants): bool
+    {
+        if ($participants->count() <= 1) {
+            return true;
+        }
+
+        $amounts = $participants
+            ->map(fn (InvestmentParticipant $p) => number_format((float) $p->contribution_amount, 2, '.', ''))
+            ->unique()
+            ->values();
+
+        return $amounts->count() === 1;
+    }
+
+    /**
+     * @return array{profit_cents: int, lines: list<array{user_id: int, contribution: float, profit_share_cents: int}>}
+     */
+    private function splitProfitCentsEqually(Collection $participants, int $profitCents): array
+    {
+        $count = $participants->count();
+        $shareCents = (int) round($profitCents / $count);
+        $adjustedProfitCents = $shareCents * $count;
+
+        return [
+            'profit_cents' => $adjustedProfitCents,
+            'lines' => $participants
+                ->map(fn (InvestmentParticipant $participant) => [
+                    'user_id' => (int) $participant->user_id,
+                    'contribution' => (float) $participant->contribution_amount,
+                    'profit_share_cents' => $shareCents,
+                ])
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return list<array{user_id: int, contribution: float, profit_share_cents: int}>
+     */
+    private function splitProfitCentsByLargestRemainder(Collection $participants, float $principal, int $profitCents): array
+    {
+        $rows = $participants
+            ->values()
+            ->map(function (InvestmentParticipant $participant) use ($principal, $profitCents) {
+                $contrib = (float) $participant->contribution_amount;
+                $exact = $profitCents * ($contrib / $principal);
+                $floor = (int) floor($exact);
+
+                return [
+                    'user_id' => (int) $participant->user_id,
+                    'contribution' => $contrib,
+                    'profit_share_cents' => $floor,
+                    'fraction' => $exact - $floor,
+                ];
+            })
+            ->all();
+
+        $allocated = array_sum(array_column($rows, 'profit_share_cents'));
+        $remainder = $profitCents - $allocated;
+
+        if ($remainder > 0) {
+            usort($rows, function (array $a, array $b): int {
+                if ($a['fraction'] !== $b['fraction']) {
+                    return $b['fraction'] <=> $a['fraction'];
+                }
+
+                return $a['user_id'] <=> $b['user_id'];
+            });
+
+            for ($i = 0; $i < $remainder; $i++) {
+                $rows[$i]['profit_share_cents']++;
+            }
+        }
+
+        $sharesByUserId = collect($rows)->keyBy('user_id');
+
+        return $participants
+            ->map(fn (InvestmentParticipant $participant) => [
+                'user_id' => (int) $participant->user_id,
+                'contribution' => (float) $participant->contribution_amount,
+                'profit_share_cents' => (int) $sharesByUserId[(int) $participant->user_id]['profit_share_cents'],
+            ])
+            ->values()
+            ->all();
     }
 
     /**
