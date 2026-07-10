@@ -1,5 +1,5 @@
 <div class="overflow-x-auto">
-<table class="ui-table min-w-full text-xs sm:text-sm">
+<table class="ui-table min-w-full">
     <thead>
         <tr>
             <x-table-serial-header />
@@ -24,7 +24,7 @@
                         <a href="{{ route('admin.investments.show', $inv) }}" class="ui-text-link">{{ $inv->title }}</a>
                     </p>
                     @if ($inv->notes)
-                        <p class="mt-0.5 line-clamp-1 text-xs text-foreground-muted">{{ $inv->notes }}</p>
+                        <p class="mt-0.5 line-clamp-1 text-sm text-foreground-muted">{{ $inv->notes }}</p>
                     @endif
                 </td>
                 <td class="py-2.5 pr-3">

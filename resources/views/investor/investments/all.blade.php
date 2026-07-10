@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('All investments') }}</h2>
-            <x-action-button :href="route('investments.index')" variant="secondary" class="text-xs">
+            <x-action-button :href="route('investments.index')" variant="secondary" class="text-sm">
                 {{ __('Back to portfolio') }}
             </x-action-button>
         </div>

@@ -30,7 +30,7 @@
                 class="absolute inset-0 flex items-center justify-center bg-foreground/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
                 aria-hidden="true"
             >
-                <span class="px-2 text-center text-[11px] font-semibold leading-tight text-white sm:text-xs">
+                <span class="px-2 text-center text-sm font-semibold leading-tight text-white sm:text-sm">
                     {{ __('Choose file') }}
                 </span>
             </span>
@@ -44,7 +44,7 @@
             />
         </label>
 
-        <h3 class="mt-3 text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ $title }}</h3>
+        <h3 class="mt-3 text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ $title }}</h3>
         <x-input-error class="mt-1" :messages="$errors->get($errorKey)" />
     </div>
 

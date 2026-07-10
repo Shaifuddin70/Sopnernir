@@ -4,14 +4,14 @@
             <h2 class="ui-page-header-title">{{ __('Dashboard') }}</h2>
             <div class="flex flex-wrap gap-2">
                 @if (auth()->user()->isAdmin())
-                    <x-action-button :href="route('admin.investments.index')" variant="secondary" class="text-xs">
+                    <x-action-button :href="route('admin.investments.index')" variant="secondary" class="text-sm">
                         {{ __('Investments') }}
                     </x-action-button>
-                    <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary" class="text-xs">
+                    <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary" class="text-sm">
                         {{ __('Payments') }}
                     </x-action-button>
                 @endif
-                <x-action-button :href="route('investments.index')" variant="secondary" class="text-xs">
+                <x-action-button :href="route('investments.index')" variant="secondary" class="text-sm">
                     {{ __('Portfolio') }}
                 </x-action-button>
             </div>
@@ -135,7 +135,7 @@
         <section class="ui-glass-panel min-w-0">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-surface-variant px-4 py-3 sm:px-5">
                 <h3 class="text-sm font-semibold text-foreground">{{ __('Top investors') }}</h3>
-                <span class="text-xs text-foreground-muted">{{ __('By total profit share') }}</span>
+                <span class="text-sm text-foreground-muted">{{ __('By total profit share') }}</span>
             </div>
             <div class="p-3 sm:p-4">
                 <x-ajax-table-region :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment" ajax-fragment="top_investors">

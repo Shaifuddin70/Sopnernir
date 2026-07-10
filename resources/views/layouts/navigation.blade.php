@@ -74,7 +74,7 @@
             </nav>
 
             <div class="shrink-0 border-t border-line py-4 ui-shell-padding lg:hidden">
-                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Language') }}</p>
+                <p class="mb-2 text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Language') }}</p>
                 <x-language-switcher />
             </div>
 

@@ -19,7 +19,7 @@
             <span class="block truncate font-medium text-foreground">{{ $displayName }}</span>
         @endif
         @if ($subtitle)
-            <span class="block truncate text-xs text-foreground-muted">{{ $subtitle }}</span>
+            <span class="block truncate text-sm text-foreground-muted">{{ $subtitle }}</span>
         @endif
         {{ $slot }}
     </div>

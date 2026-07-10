@@ -22,45 +22,45 @@
             </div>
             <dl class="grid gap-3 p-3 text-sm sm:grid-cols-2 sm:p-4">
                 <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Status') }}</dt>
+                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Status') }}</dt>
                     <dd class="mt-1 font-medium text-foreground">{{ $investment->status }}</dd>
                 </div>
                 @if ($investment->deed_completion_deadline)
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Plan completion date') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Plan completion date') }}</dt>
                         <dd class="mt-1 font-medium text-foreground">
                             {{ $investment->deed_completion_deadline->translatedFormat('j F Y') }}
                         </dd>
                     </div>
                 @endif
                 <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My contribution') }}</dt>
+                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('My contribution') }}</dt>
                     <dd class="mt-1 font-semibold tabular-nums text-foreground">
                         {{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}
                     </dd>
                 </div>
                 @if ($myDailyProfit)
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Projected total profit') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Projected total profit') }}</dt>
                         <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['projected_profit'] }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Profit til today') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Profit til today') }}</dt>
                         <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['profit_til_today'] }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Daily profit') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Daily profit') }}</dt>
                         <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['daily_profit'] }}</dd>
                     </div>
                 @endif
                 <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
+                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
                     <dd class="mt-1 font-semibold tabular-nums text-success">
                         {{ number_format($myTotalProfit, 2, '.', '') }}
                     </dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My balance on this pool') }}</dt>
+                    <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('My balance on this pool') }}</dt>
                     <dd class="mt-1 font-semibold tabular-nums text-foreground">
                         {{ number_format((float) ($myParticipant?->contribution_amount ?? 0) + $myTotalProfit, 2, '.', '') }}
                     </dd>
@@ -74,7 +74,7 @@
             </div>
             <div class="p-3 sm:p-4">
                 <div class="overflow-x-auto rounded-lg border border-line">
-                    <table class="ui-table min-w-full text-xs sm:text-sm">
+                    <table class="ui-table min-w-full">
                         <thead>
                             <tr>
                                 <x-table-serial-header />

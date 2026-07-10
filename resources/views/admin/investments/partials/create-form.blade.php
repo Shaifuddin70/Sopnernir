@@ -30,13 +30,13 @@
         <div>
             <x-input-label for="create_contribution_per_investor" :value="__('Contribution each')" />
             <x-text-input id="create_contribution_per_investor" name="contribution_per_investor" type="text" class="mt-1 block w-full" :value="old('contribution_per_investor')" required />
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('Applied to each investor when they are tagged on this pool.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Applied to each investor when they are tagged on this pool.') }}</p>
             <x-input-error :messages="$errors->get('contribution_per_investor')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="create_default_monthly_rate_pct" :value="__('Profit rate (% per month)')" />
             <x-text-input id="create_default_monthly_rate_pct" name="default_monthly_rate_pct" type="text" class="mt-1 block w-full" :value="old('default_monthly_rate_pct')" required />
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('Total profit is calculated from tagged capital, this rate, and the plan period.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Total profit is calculated from tagged capital, this rate, and the plan period.') }}</p>
             <x-input-error :messages="$errors->get('default_monthly_rate_pct')" class="mt-2" />
         </div>
         <div>
@@ -49,7 +49,7 @@
                 :value="old('period_start')"
                 required
             />
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('First day of the investment plan.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('First day of the investment plan.') }}</p>
             <x-input-error :messages="$errors->get('period_start')" class="mt-2" />
         </div>
         <div>
@@ -62,7 +62,7 @@
                 :value="old('deed_completion_deadline')"
                 required
             />
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('Last day of the plan.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Last day of the plan.') }}</p>
             <x-input-error :messages="$errors->get('deed_completion_deadline')" class="mt-2" />
         </div>
         <div class="sm:col-span-2">
@@ -75,7 +75,7 @@
                 class="ui-input mt-1 block w-full"
                 required
             />
-            <p class="mt-1 text-xs text-foreground-muted">
+            <p class="mt-1 text-sm text-foreground-muted">
                 {{ __('Only investors marked paid for this month on Monthly payments will be tagged automatically.') }}
             </p>
             <x-input-error :messages="$errors->get('payment_month')" class="mt-2" />

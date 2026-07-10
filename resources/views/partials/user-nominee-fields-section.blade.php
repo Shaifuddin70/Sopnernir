@@ -49,9 +49,9 @@
         @endif
         <input id="nominee_image" name="nominee[image]" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-foreground-muted file:mr-4 file:rounded-md file:border-0 file:bg-primary-muted file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/25" />
         @if ($user)
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Leave empty to keep current photo.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Leave empty to keep current photo.') }}</p>
         @else
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Optional.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('JPEG, PNG or WebP, max 2 MB. Optional.') }}</p>
         @endif
         <x-input-error class="mt-2" :messages="$errors->get('nominee.image')" />
     </div>

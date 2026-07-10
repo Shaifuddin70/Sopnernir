@@ -1,5 +1,5 @@
 <div class="overflow-x-auto">
-<table class="ui-table min-w-full text-xs sm:text-sm">
+<table class="ui-table min-w-full">
     <thead>
         <tr>
             <x-table-serial-header />

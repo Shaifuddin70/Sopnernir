@@ -23,7 +23,7 @@
     </div>
 @else
     <div class="ui-glass-table-wrap overflow-x-auto">
-        <table class="ui-table min-w-full text-xs sm:text-sm">
+        <table class="ui-table min-w-full">
             <thead>
                 <tr>
                     <x-table-serial-header />

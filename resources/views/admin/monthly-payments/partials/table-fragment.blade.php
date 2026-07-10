@@ -30,7 +30,7 @@
     </form>
 
     <div class="ui-glass-table-wrap overflow-x-auto">
-        <table class="ui-table min-w-full text-xs sm:text-sm">
+        <table class="ui-table min-w-full">
             <thead>
                 <tr>
                     <x-table-serial-header />
@@ -59,17 +59,17 @@
                         <x-table-serial-cell :index="$loop->index" />
                         <td>
                             <div class="font-medium text-foreground">{{ $row['name'] }}</div>
-                            <div class="text-[11px] text-foreground-muted sm:hidden">{{ $row['email'] }}</div>
+                            <div class="text-sm text-foreground-muted sm:hidden">{{ $row['email'] }}</div>
                         </td>
                         <td class="hidden tabular-nums text-foreground-muted sm:table-cell">{{ $row['phone'] ?? '—' }}</td>
                         <td>
                             @if ($row['is_paid'])
-                                <span class="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success-muted px-3 py-1 text-xs font-semibold text-success">
+                                <span class="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success-muted px-3 py-1 text-sm font-semibold text-success">
                                     <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-success" aria-hidden="true"></span>
                                     {{ __('Paid') }}
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 rounded-full border border-warning/25 bg-warning-muted px-3 py-1 text-xs font-semibold text-warning">
+                                <span class="inline-flex items-center gap-1.5 rounded-full border border-warning/25 bg-warning-muted px-3 py-1 text-sm font-semibold text-warning">
                                     <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" aria-hidden="true"></span>
                                     {{ __('Unpaid') }}
                                 </span>

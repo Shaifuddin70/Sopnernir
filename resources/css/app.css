@@ -119,15 +119,19 @@
     }
 
     .ui-card-header-subtitle {
-        @apply mt-0.5 text-xs text-foreground-muted sm:text-sm;
+        @apply mt-0.5 text-sm text-foreground-muted;
     }
 
     .ui-text-link {
         @apply font-medium text-primary transition-colors hover:text-primary-hover;
     }
 
+    .ui-table {
+        @apply text-sm;
+    }
+
     .ui-table thead tr {
-        @apply border-b border-line bg-surface-variant text-left text-[11px] font-medium uppercase tracking-wide text-foreground-muted sm:text-xs;
+        @apply border-b border-line bg-surface-variant text-left text-sm font-medium uppercase tracking-wide text-foreground-muted;
     }
 
     .ui-table tbody tr {
@@ -163,23 +167,23 @@
     }
 
     .ui-badge-success {
-        @apply inline-flex rounded-full bg-success-muted px-2.5 py-0.5 text-xs font-medium text-success;
+        @apply inline-flex rounded-full bg-success-muted px-2.5 py-0.5 text-sm font-medium text-success;
     }
 
     .ui-badge-muted {
-        @apply inline-flex rounded-full bg-surface-variant px-2.5 py-0.5 text-xs font-medium text-foreground-muted;
+        @apply inline-flex rounded-full bg-surface-variant px-2.5 py-0.5 text-sm font-medium text-foreground-muted;
     }
 
     .ui-badge-brand {
-        @apply inline-flex rounded-full bg-primary-muted px-2.5 py-0.5 text-xs font-medium text-primary;
+        @apply inline-flex rounded-full bg-primary-muted px-2.5 py-0.5 text-sm font-medium text-primary;
     }
 
     .ui-badge-warning {
-        @apply inline-flex rounded-full bg-warning-muted px-2.5 py-0.5 text-xs font-medium text-warning;
+        @apply inline-flex rounded-full bg-warning-muted px-2.5 py-0.5 text-sm font-medium text-warning;
     }
 
     .ui-badge-error {
-        @apply inline-flex rounded-full bg-error-muted px-2.5 py-0.5 text-xs font-medium text-error;
+        @apply inline-flex rounded-full bg-error-muted px-2.5 py-0.5 text-sm font-medium text-error;
     }
 
     .ui-auth-shell {
@@ -333,7 +337,7 @@
     }
 
     .ui-chip {
-        @apply inline-flex items-center rounded-full border border-line bg-surface-variant px-2.5 py-0.5 text-[11px] font-medium text-foreground-muted backdrop-blur-sm sm:text-xs;
+        @apply inline-flex items-center rounded-full border border-line bg-surface-variant px-2.5 py-0.5 text-sm font-medium text-foreground-muted backdrop-blur-sm;
     }
 
     .dashboard-stat-panel {
@@ -365,7 +369,7 @@
     }
 
     .dashboard-stat dt {
-        @apply text-[10px] font-semibold uppercase tracking-wide text-foreground-muted;
+        @apply text-sm font-semibold uppercase tracking-wide text-foreground-muted;
     }
 
     .dashboard-stat dd {
@@ -373,7 +377,7 @@
     }
 
     .dashboard-stat p {
-        @apply mt-0.5 text-[10px] text-foreground-muted;
+        @apply mt-0.5 text-sm text-foreground-muted;
     }
 
     .dashboard-stat--profit dd {
@@ -385,7 +389,7 @@
     }
 
     .dashboard-chart-panel__title {
-        @apply mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted;
+        @apply mb-2 text-sm font-semibold uppercase tracking-wide text-foreground-muted;
     }
 
     .dashboard-chart-panel__canvas {

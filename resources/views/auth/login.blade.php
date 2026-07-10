@@ -37,7 +37,7 @@
                         <div class="flex items-center justify-between">
                             <x-input-label for="password" :value="__('Password')" />
                             @if (Route::has('password.request'))
-                                <a class="rounded-md text-xs font-semibold text-primary hover:text-primary-hover focus:outline-none focus:ring-2 focus:ring-primary"
+                                <a class="rounded-md text-sm font-semibold text-primary hover:text-primary-hover focus:outline-none focus:ring-2 focus:ring-primary"
                                     href="{{ route('password.request') }}">
                                     {{ __('Forgot password?') }}
                                 </a>
@@ -66,7 +66,7 @@
                         <x-input-label for="phone" :value="__('Phone number')" />
                         <x-text-input id="phone" class="mt-1 block w-full" type="text" name="phone" :value="old('phone')" autocomplete="tel" />
                         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
-                        <p class="mt-2 text-xs text-foreground-muted">
+                        <p class="mt-2 text-sm text-foreground-muted">
                             {{ __('This mode only shows your investment summary and your own investment details.') }}
                         </p>
                     </div>

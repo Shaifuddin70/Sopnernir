@@ -49,9 +49,9 @@
                         @csrf
                         @method('patch')
                         @if ($investment->is_active)
-                            <x-secondary-button type="submit" class="text-xs">{{ __('Set inactive') }}</x-secondary-button>
+                            <x-secondary-button type="submit" class="text-sm">{{ __('Set inactive') }}</x-secondary-button>
                         @else
-                            <x-primary-button type="submit" class="text-xs">{{ __('Set active') }}</x-primary-button>
+                            <x-primary-button type="submit" class="text-sm">{{ __('Set active') }}</x-primary-button>
                         @endif
                     </form>
                 </div>
@@ -60,36 +60,36 @@
             <div class="space-y-4 p-3 sm:p-4">
                 <dl class="grid grid-cols-2 gap-3 lg:grid-cols-5">
                     <div class="ui-stat-tile rounded-lg p-3 sm:p-4">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Tagged investors') }}</dt>
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Tagged investors') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-foreground sm:text-xl">
                             {{ $investment->participants_count ?? 0 }}
                         </dd>
                     </div>
                     <div class="ui-stat-tile-capital rounded-lg p-3 sm:p-4">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Total invested') }}</dt>
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Total invested') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-foreground sm:text-xl">
                             {{ $investment->total_invested_amount !== null ? number_format((float) $investment->total_invested_amount, 2, '.', '') : '—' }}
                         </dd>
                     </div>
                     <div class="ui-stat-tile-capital rounded-lg p-3 sm:p-4">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Tagged capital') }}</dt>
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Tagged capital') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-foreground sm:text-xl">
                             {{ number_format((float) ($investment->participants_sum_contribution_amount ?? 0), 2, '.', '') }}
                         </dd>
                     </div>
                     <div class="ui-stat-tile-profit rounded-lg p-3 sm:p-4">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Planned profit') }}</dt>
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Planned profit') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-success sm:text-xl">
                             {{ $investment->total_profit_amount !== null ? number_format((float) $investment->total_profit_amount, 2, '.', '') : '—' }}
                         </dd>
                         @if ($dailyProfit)
-                            <dd class="mt-1 text-xs tabular-nums text-foreground-muted">
+                            <dd class="mt-1 text-sm tabular-nums text-foreground-muted">
                                 {{ __(':amount / day', ['amount' => number_format($dailyProfit, 2, '.', '')]) }}
                             </dd>
                         @endif
                     </div>
                     <div class="ui-stat-tile-profit rounded-lg p-3 sm:p-4">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-success sm:text-xl">
                             {{ number_format((float) ($investment->periods_sum_profit_amount ?? 0), 2, '.', '') }}
                         </dd>
@@ -98,25 +98,25 @@
 
                 <dl class="grid gap-3 border-t border-line pt-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Deed number') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Deed number') }}</dt>
                         <dd class="mt-0.5 font-medium tabular-nums text-foreground">{{ $investment->deed_no ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Contribution each') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Contribution each') }}</dt>
                         <dd class="mt-0.5 font-medium tabular-nums text-foreground">
                             {{ $investment->contribution_per_investor !== null ? number_format((float) $investment->contribution_per_investor, 2, '.', '') : '—' }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Starting date') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Starting date') }}</dt>
                         <dd class="mt-0.5 font-medium text-foreground">{{ $investment->period_start?->translatedFormat('j M Y') ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Tagged from payment month') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Tagged from payment month') }}</dt>
                         <dd class="mt-0.5 font-medium text-foreground">{{ $investment->tagged_payment_month?->translatedFormat('F Y') ?? '—' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Ending date') }}</dt>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Ending date') }}</dt>
                         <dd class="mt-0.5 font-medium text-foreground">
                             {{ $investment->deed_completion_deadline?->translatedFormat('j M Y') ?? '—' }}
                         </dd>
@@ -159,7 +159,7 @@
                         @if ($investment->status === 'active' && $investment->is_active)
                             <form method="post" action="{{ route('admin.investments.accruals.fill-missing', $investment) }}">
                                 @csrf
-                                <x-secondary-button type="submit" class="text-xs">{{ __('Fill missing months') }}</x-secondary-button>
+                                <x-secondary-button type="submit" class="text-sm">{{ __('Fill missing months') }}</x-secondary-button>
                             </form>
                         @endif
                     @endcan
@@ -190,8 +190,8 @@
                     <h3 class="ui-card-header-title">{{ __('Documents') }}</h3>
                     <form method="post" action="{{ route('admin.investments.documents.store', $investment) }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
                         @csrf
-                        <input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" class="max-w-[14rem] text-xs" required />
-                        <x-primary-button type="submit" class="text-xs">{{ __('Upload') }}</x-primary-button>
+                        <input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" class="max-w-[14rem] text-sm" required />
+                        <x-primary-button type="submit" class="text-sm">{{ __('Upload') }}</x-primary-button>
                     </form>
                 </div>
             </div>
@@ -205,11 +205,11 @@
                             <li class="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                                 <span class="min-w-0 truncate">{{ $doc->original_name }}</span>
                                 <div class="flex shrink-0 gap-2">
-                                    <x-action-button :href="route('admin.investments.documents.download', [$investment, $doc])" class="text-xs">{{ __('Download') }}</x-action-button>
+                                    <x-action-button :href="route('admin.investments.documents.download', [$investment, $doc])" class="text-sm">{{ __('Download') }}</x-action-button>
                                     <form method="post" action="{{ route('admin.investments.documents.destroy', [$investment, $doc]) }}" onsubmit="return confirm('{{ __('Remove this file?') }}');">
                                         @csrf
                                         @method('delete')
-                                        <x-action-button variant="danger" class="text-xs">{{ __('Remove') }}</x-action-button>
+                                        <x-action-button variant="danger" class="text-sm">{{ __('Remove') }}</x-action-button>
                                     </form>
                                 </div>
                             </li>

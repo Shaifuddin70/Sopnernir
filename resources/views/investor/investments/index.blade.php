@@ -3,7 +3,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('My investments') }}</h2>
             @if ($dailyProfitRowsTotal > 0)
-                <x-action-button :href="route('investments.all')" variant="secondary" class="text-xs">
+                <x-action-button :href="route('investments.all')" variant="secondary" class="text-sm">
                     {{ __('All pools') }} ({{ $dailyProfitRowsTotal }})
                 </x-action-button>
             @endif
@@ -20,7 +20,7 @@
         <section class="dashboard-stat-panel min-w-0">
             <div class="dashboard-stat-panel__head">
                 <h3 class="dashboard-stat-panel__title">{{ __('Posted profit by month') }}</h3>
-                <span class="text-[11px] text-foreground-muted">{{ __('Recorded accrual payouts') }}</span>
+                <span class="text-sm text-foreground-muted">{{ __('Recorded accrual payouts') }}</span>
             </div>
             <div class="p-3">
                 <x-ajax-table-region :fetch-url="route('investments.index')" target-id="portfolio-profit-fragment" ajax-fragment="profit">

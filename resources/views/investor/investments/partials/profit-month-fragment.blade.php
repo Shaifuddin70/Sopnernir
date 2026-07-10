@@ -1,6 +1,6 @@
 @if ($profitByMonth->isEmpty())
     <div class="rounded-lg border border-dashed border-line bg-surface-variant px-3 py-6 text-center">
-        <p class="text-xs text-foreground-muted">
+        <p class="text-sm text-foreground-muted">
             @if (request()->filled('profit_search'))
                 {{ __('No rows match your search.') }}
             @else
@@ -10,7 +10,7 @@
     </div>
 @else
     <div class="ui-glass-table-wrap overflow-x-auto">
-        <table class="ui-table min-w-full text-xs">
+        <table class="ui-table min-w-full">
             <thead>
                 <tr>
                     <x-table-serial-header />

@@ -5,7 +5,7 @@
 @endphp
 
 <div class="ui-glass-table-wrap overflow-x-auto">
-    <table class="ui-table min-w-full text-xs">
+    <table class="ui-table min-w-full">
         <thead>
             <tr>
                 <x-table-serial-header />
@@ -30,14 +30,14 @@
                     <x-table-serial-cell :paginator="$serialPaginator" :index="$loop->index" />
                     <td class="min-w-[10rem]">
                         <a href="{{ $viewUrl }}" class="ui-text-link">{{ $row['title'] }}</a>
-                        <div class="mt-0.5 text-[10px] leading-snug text-foreground-muted">
+                        <div class="mt-0.5 text-sm leading-snug text-foreground-muted">
                             <span class="tabular-nums">{{ __('Deed') }} {{ $row['deed_no'] }}</span>
                             <span class="mx-1" aria-hidden="true">·</span>
                             <span class="tabular-nums">{{ $periodStart }} – {{ $periodEnd }}</span>
                             <span class="mx-1 hidden sm:inline" aria-hidden="true">·</span>
                             <span class="hidden tabular-nums sm:inline">{{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}</span>
                         </div>
-                        <div class="mt-0.5 text-[10px] tabular-nums text-foreground-muted sm:hidden">
+                        <div class="mt-0.5 text-sm tabular-nums text-foreground-muted sm:hidden">
                             {{ __('Til today') }}: {{ $row['profit_til_today'] }}
                         </div>
                     </td>
@@ -50,7 +50,7 @@
                     <td class="hidden text-right tabular-nums text-success sm:table-cell">{{ $row['profit_til_today'] }}</td>
                     <td class="hidden text-right tabular-nums text-foreground-muted lg:table-cell">{{ $row['daily_profit'] }}</td>
                     <td class="text-right">
-                        <x-action-button :href="$viewUrl" variant="secondary" class="text-xs">{{ __('View') }}</x-action-button>
+                        <x-action-button :href="$viewUrl" variant="secondary" class="text-sm">{{ __('View') }}</x-action-button>
                     </td>
                 </tr>
             @endforeach

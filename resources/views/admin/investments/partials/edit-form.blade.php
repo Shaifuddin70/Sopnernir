@@ -52,7 +52,7 @@
                 :value="old('default_monthly_rate_pct', $investment->default_monthly_rate_pct)"
                 required
             />
-            <p class="mt-1 text-xs text-foreground-muted">{{ __('Total invested and total profit are recalculated from tagged investors and the plan dates.') }}</p>
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Total invested and total profit are recalculated from tagged investors and the plan dates.') }}</p>
             <x-input-error :messages="$errors->get('default_monthly_rate_pct')" class="mt-2" />
         </div>
         @if ($investment->participants_count ?? $investment->participants()->count())

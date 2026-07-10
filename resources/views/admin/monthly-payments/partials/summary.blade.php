@@ -2,7 +2,7 @@
     $paidPct = $summaryTotal > 0
         ? number_format(($summaryPaid / $summaryTotal) * 100, 0, '.', '')
         : '0';
-    $pillClass = 'inline-flex h-11 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold';
+    $pillClass = 'inline-flex h-11 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold';
 @endphp
 
 <div class="flex flex-wrap items-center gap-2">

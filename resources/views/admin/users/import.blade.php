@@ -19,7 +19,7 @@
                     @endforeach
                 </ul>
                 @if (count($importErrors) > 25)
-                    <p class="mt-2 text-xs">{{ __('Showing first 25 errors.') }}</p>
+                    <p class="mt-2 text-sm">{{ __('Showing first 25 errors.') }}</p>
                 @endif
             </div>
         @endif

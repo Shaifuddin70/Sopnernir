@@ -18,7 +18,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <div class="min-w-0">
                         <h3 class="truncate text-sm font-semibold text-foreground">{{ $user->name }}</h3>
-                        <p class="truncate text-xs text-foreground-muted">{{ $user->email }}</p>
+                        <p class="truncate text-sm text-foreground-muted">{{ $user->email }}</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         @if ($user->isAdmin())

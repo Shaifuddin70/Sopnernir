@@ -82,7 +82,7 @@
             <div class="min-w-[12rem] flex-1">
                 <x-input-label :value="__('Account status')" />
                 @if ($user->id === auth()->id())
-                    <p class="mt-1 text-xs text-foreground-muted">{{ __('Cannot deactivate your own account.') }}</p>
+                    <p class="mt-1 text-sm text-foreground-muted">{{ __('Cannot deactivate your own account.') }}</p>
                     <input type="hidden" name="is_active" value="1" />
                 @else
                     <input type="hidden" name="is_active" value="0" />
@@ -114,7 +114,7 @@
     @csrf
     @method('patch')
 
-    <h3 class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Reset password') }}</h3>
+    <h3 class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Reset password') }}</h3>
 
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>

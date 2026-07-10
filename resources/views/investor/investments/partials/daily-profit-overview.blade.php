@@ -88,12 +88,12 @@
                 <h3 class="dashboard-stat-panel__title">{{ __('Your investments') }}</h3>
                 <div class="flex items-center gap-2">
                     @if ($hasMoreInvestments)
-                        <span class="text-[11px] text-foreground-muted tabular-nums">
+                        <span class="text-sm text-foreground-muted tabular-nums">
                             {{ __(':shown of :total', ['shown' => $previewRows->count(), 'total' => $rowsTotal]) }}
                         </span>
                     @endif
                     @if ($hasMoreInvestments)
-                        <x-action-button :href="$viewAllUrl" variant="secondary" class="text-xs">
+                        <x-action-button :href="$viewAllUrl" variant="secondary" class="text-sm">
                             {{ __('View all') }}
                         </x-action-button>
                     @endif

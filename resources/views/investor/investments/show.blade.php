@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ $investment->title }}</h2>
-            <x-action-button :href="route('investments.index')" variant="secondary" class="text-xs">{{ __('Back to portfolio') }}</x-action-button>
+            <x-action-button :href="route('investments.index')" variant="secondary" class="text-sm">{{ __('Back to portfolio') }}</x-action-button>
         </div>
     </x-slot>
 
@@ -107,13 +107,13 @@
             <section class="dashboard-stat-panel min-w-0 lg:col-span-4">
                 <div class="dashboard-stat-panel__head">
                     <h3 class="dashboard-stat-panel__title">{{ __('Documents') }}</h3>
-                    <span class="text-[11px] tabular-nums text-foreground-muted">{{ $investment->documents->count() }}</span>
+                    <span class="text-sm tabular-nums text-foreground-muted">{{ $investment->documents->count() }}</span>
                 </div>
-                <ul class="divide-y divide-line text-xs">
+                <ul class="divide-y divide-line text-sm">
                     @forelse ($investment->documents as $doc)
                         <li class="flex items-center justify-between gap-2 px-3 py-2">
                             <span class="min-w-0 truncate font-medium text-foreground">{{ $doc->original_name }}</span>
-                            <x-action-button :href="route('investments.documents.download', [$investment, $doc])" variant="secondary" class="shrink-0 text-xs">
+                            <x-action-button :href="route('investments.documents.download', [$investment, $doc])" variant="secondary" class="shrink-0">
                                 {{ __('Get') }}
                             </x-action-button>
                         </li>
@@ -153,7 +153,7 @@
                         <p class="text-sm text-foreground-muted">{{ __('No participants yet.') }}</p>
                     @else
                         <div class="ui-glass-table-wrap overflow-x-auto">
-                            <table class="ui-table min-w-full text-xs">
+                            <table class="ui-table min-w-full">
                                 <thead>
                                     <tr>
                                         <x-table-serial-header />

@@ -88,7 +88,7 @@
                 {{ __('Re-send verification email') }}
             </button>
             @if (session('status') === 'verification-link-sent')
-                <p class="mt-1 text-xs text-success">{{ __('A new verification link has been sent.') }}</p>
+                <p class="mt-1 text-sm text-success">{{ __('A new verification link has been sent.') }}</p>
             @endif
         </div>
     @endif
@@ -111,7 +111,7 @@
     @csrf
     @method('put')
 
-    <h3 class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Password') }}</h3>
+    <h3 class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Password') }}</h3>
 
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div class="sm:col-span-2">
