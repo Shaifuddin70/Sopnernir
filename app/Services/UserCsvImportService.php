@@ -43,7 +43,7 @@ class UserCsvImportService
 
         $expected = [
             'name', 'email', 'phone', 'nid_number', 'address',
-            'nominee_name', 'nominee_email', 'nominee_phone', 'nominee_address',
+            'nominee_name', 'nominee_email', 'nominee_phone', 'nominee_nid_number', 'nominee_address',
             'password',
         ];
 
@@ -87,6 +87,7 @@ class UserCsvImportService
                 'nominee_name' => ['required', 'string', 'max:255'],
                 'nominee_email' => ['required', 'email', 'max:255'],
                 'nominee_phone' => ['required', 'string', 'max:32'],
+                'nominee_nid_number' => ['required', 'string', 'max:64', 'unique:nominees,nid_number'],
                 'nominee_address' => ['required', 'string', 'max:2000'],
                 'password' => ['required', Password::defaults()],
             ]);
@@ -121,6 +122,7 @@ class UserCsvImportService
                         'name' => $clean['nominee_name'],
                         'email' => $clean['nominee_email'],
                         'phone' => $clean['nominee_phone'],
+                        'nid_number' => $clean['nominee_nid_number'],
                         'address' => $clean['nominee_address'],
                     ]);
                 });
@@ -149,6 +151,7 @@ class UserCsvImportService
             'nominee_name',
             'nominee_email',
             'nominee_phone',
+            'nominee_nid_number',
             'nominee_address',
             'password',
             'is_admin',
@@ -200,6 +203,7 @@ class UserCsvImportService
             'nominee_name' => $pick('nominee_name'),
             'nominee_email' => $pick('nominee_email'),
             'nominee_phone' => $pick('nominee_phone'),
+            'nominee_nid_number' => $pick('nominee_nid_number'),
             'nominee_address' => $pick('nominee_address'),
             'password' => $pick('password'),
             'is_admin' => $isAdmin,

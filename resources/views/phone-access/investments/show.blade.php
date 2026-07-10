@@ -39,8 +39,22 @@
                         {{ number_format((float) ($myParticipant?->contribution_amount ?? 0), 2, '.', '') }}
                     </dd>
                 </div>
+                @if ($myDailyProfit)
+                    <div>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Projected total profit') }}</dt>
+                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['projected_profit'] }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Profit til today') }}</dt>
+                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['profit_til_today'] }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Daily profit') }}</dt>
+                        <dd class="mt-1 font-semibold tabular-nums text-success">{{ $myDailyProfit['daily_profit'] }}</dd>
+                    </div>
+                @endif
                 <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('My total profit') }}</dt>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
                     <dd class="mt-1 font-semibold tabular-nums text-success">
                         {{ number_format($myTotalProfit, 2, '.', '') }}
                     </dd>
@@ -63,6 +77,7 @@
                     <table class="ui-table min-w-full text-xs sm:text-sm">
                         <thead>
                             <tr>
+                                <x-table-serial-header />
                                 <th>{{ __('Month') }}</th>
                                 <th class="text-right">{{ __('Profit') }}</th>
                             </tr>
@@ -70,6 +85,7 @@
                         <tbody>
                             @forelse ($myProfitByMonth as $row)
                                 <tr>
+                                    <x-table-serial-cell :index="$loop->index" />
                                     <td class="tabular-nums">{{ \Carbon\Carbon::parse($row->period->month)->translatedFormat('F Y') }}</td>
                                     <td class="text-right tabular-nums text-success">
                                         {{ number_format((float) $row->profit_share, 2, '.', '') }}
@@ -77,7 +93,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2" class="py-6 text-center text-foreground-muted">
+                                    <td colspan="3" class="py-6 text-center text-foreground-muted">
                                         {{ __('No profit history yet.') }}
                                     </td>
                                 </tr>

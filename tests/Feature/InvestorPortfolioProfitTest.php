@@ -24,6 +24,7 @@ class InvestorPortfolioProfitTest extends TestCase
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $investor->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
 
         InvestmentParticipant::create([
@@ -51,12 +52,10 @@ class InvestorPortfolioProfitTest extends TestCase
 
         $this->get(route('investments.index'))
             ->assertOk()
-            ->assertSee(__('Your totals across all pools'), false)
-            ->assertSee(__('Profit by month'), false)
-            ->assertSee(__('Total profit (all your pools)'), false)
+            ->assertSee(__('Investment summary'), false)
+            ->assertSee(__('Posted profit by month'), false)
             ->assertSee('Alpha Pool', false)
-            ->assertSee('7.50', false)
-            ->assertSee('1.50', false);
+            ->assertSee('7.50', false);
 
         $this->get(route('investments.show', $investment))
             ->assertOk()
@@ -74,6 +73,7 @@ class InvestorPortfolioProfitTest extends TestCase
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $investor->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
 
         InvestmentParticipant::create([
@@ -86,8 +86,6 @@ class InvestorPortfolioProfitTest extends TestCase
 
         $this->get(route('investments.index'))
             ->assertOk()
-            ->assertSee(__('Your totals across all pools'), false)
-            ->assertSee('Beta Pool', false)
-            ->assertSee(__('Total profit (all your pools)'), false);
+            ->assertSee(__('Investment summary'), false);
     }
 }

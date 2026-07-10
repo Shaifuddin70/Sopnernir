@@ -38,6 +38,7 @@ class ProfileTest extends TestCase
                     'name' => $nominee->name,
                     'email' => $nominee->email,
                     'phone' => $nominee->phone,
+                    'nid_number' => $nominee->nid_number,
                     'address' => $nominee->address,
                 ],
             ]);
@@ -70,6 +71,7 @@ class ProfileTest extends TestCase
                     'name' => $nominee->name,
                     'email' => $nominee->email,
                     'phone' => $nominee->phone,
+                    'nid_number' => $nominee->nid_number,
                     'address' => $nominee->address,
                 ],
             ]);

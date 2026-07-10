@@ -42,8 +42,12 @@ class DemoInvestorsAndInvestmentsSeeder extends Seeder
         for ($i = 0; $i < 10; $i++) {
             $investment = Investment::create([
                 'title' => 'Demo Pool '.($i + 1),
+                'deed_no' => (string) (2200 + $i),
                 'notes' => __('Seeded demo data.'),
-                'default_monthly_rate_pct' => '1.5',
+                'default_monthly_rate_pct' => '0',
+                'total_invested_amount' => '15000.00',
+                'contribution_per_investor' => '5000.00',
+                'total_profit_amount' => '2700.00',
                 'status' => Investment::STATUS_ACTIVE,
                 'created_by' => $admin->id,
                 'period_start' => $periodStart->toDateString(),

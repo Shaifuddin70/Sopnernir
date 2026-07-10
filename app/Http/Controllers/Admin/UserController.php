@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminImportUsersRequest;
+use App\Http\Requests\Admin\AdminResetUserPasswordRequest;
 use App\Http\Requests\Admin\AdminStoreUserRequest;
 use App\Http\Requests\Admin\AdminUpdateUserRequest;
 use App\Models\User;
@@ -47,7 +48,8 @@ class UserController extends Controller
                         ->orWhereHas('nominee', function ($n) use ($like): void {
                             $n->where('name', 'like', $like)
                                 ->orWhere('email', 'like', $like)
-                                ->orWhere('phone', 'like', $like);
+                                ->orWhere('phone', 'like', $like)
+                                ->orWhere('nid_number', 'like', $like);
                         });
                 });
             })
@@ -92,6 +94,7 @@ class UserController extends Controller
                 'name' => $nomineeInput['name'],
                 'email' => $nomineeInput['email'],
                 'phone' => $nomineeInput['phone'],
+                'nid_number' => $nomineeInput['nid_number'],
                 'address' => $nomineeInput['address'],
             ]);
 
@@ -179,6 +182,7 @@ class UserController extends Controller
                 'name' => $nomineeInput['name'],
                 'email' => $nomineeInput['email'],
                 'phone' => $nomineeInput['phone'],
+                'nid_number' => $nomineeInput['nid_number'],
                 'address' => $nomineeInput['address'],
             ]
         );
@@ -191,6 +195,17 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.edit', $user)->with('status', __('User updated.'));
+    }
+
+    public function resetPassword(AdminResetUserPasswordRequest $request, User $user): RedirectResponse
+    {
+        $this->authorize('update', $user);
+
+        $user->update([
+            'password' => $request->validated('password'),
+        ]);
+
+        return back()->with('status', __('Password updated for :name.', ['name' => $user->name]));
     }
 
     public function toggleActive(Request $request, User $user): RedirectResponse

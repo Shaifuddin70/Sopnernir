@@ -2,6 +2,7 @@
 <table class="ui-table min-w-full text-xs sm:text-sm">
     <thead>
         <tr>
+            <x-table-serial-header />
             <th>{{ __('Title') }}</th>
             <th>{{ __('Status') }}</th>
             <th>{{ __('Created') }}</th>
@@ -13,7 +14,10 @@
     <tbody>
         @forelse ($investments as $inv)
             <tr>
-                <td class="font-medium">{{ $inv->title }}</td>
+                <x-table-serial-cell :paginator="$investments" :index="$loop->index" />
+                <td class="font-medium">
+                    <a href="{{ route('investments.show', $inv) }}" class="ui-text-link">{{ $inv->title }}</a>
+                </td>
                 <td>
                     <span class="ui-badge-muted">{{ $inv->status }}</span>
                 </td>
@@ -26,7 +30,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="py-4 text-sm text-foreground-muted">
+                <td colspan="7" class="py-4 text-sm text-foreground-muted">
                     @if (request()->filled('search'))
                         {{ __('No pools match your search.') }}
                     @else

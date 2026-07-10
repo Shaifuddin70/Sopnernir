@@ -20,6 +20,7 @@ class NomineeFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->numerify('01#########'),
+            'nid_number' => fake()->unique()->uuid(),
             'address' => fake()->address(),
             'image' => null,
         ];

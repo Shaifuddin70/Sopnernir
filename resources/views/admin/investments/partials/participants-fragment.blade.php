@@ -2,36 +2,36 @@
     <table class="ui-table min-w-full text-sm">
         <thead>
             <tr>
-                <th>{{ __('Name') }}</th>
-                <th>{{ __('Tagged date') }}</th>
-                <th>{{ __('Contribution') }}</th>
-                <th>{{ __('Actions') }}</th>
+                <x-table-serial-header />
+                <th>{{ __('Investor') }}</th>
+                <th class="text-right">{{ __('Contribution') }}</th>
+                <th class="text-right">{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($participants as $p)
                 @php($formId = 'participant-update-'.$p->id)
                 <tr>
+                    <x-table-serial-cell :paginator="$participants" :index="$loop->index" />
                     <td class="py-2 pr-4 align-middle">
                         <x-user-identity :user="$p->user" />
                     </td>
-                    <td class="py-2 pr-4 align-middle tabular-nums">{{ $p->created_at?->format('Y-m-d') ?? '—' }}</td>
-                    <td class="py-2 pr-4 align-middle">
+                    <td class="py-2 pr-4 align-middle text-right">
                         <x-text-input
                             :form="$formId"
                             name="contribution_amount"
                             type="text"
-                            class="block w-full min-w-[6.5rem]"
+                            class="ml-auto block w-full min-w-[6.5rem] max-w-[8rem] text-right"
                             :value="$p->contribution_amount"
                             required
                         />
                     </td>
-                    <td class="py-2 align-middle">
+                    <td class="py-2 align-middle text-right">
                         <form id="{{ $formId }}" method="post" action="{{ route('admin.investments.participants.update', [$investment, $p]) }}" class="inline">
                             @csrf
                             @method('patch')
                         </form>
-                        <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex flex-wrap items-center justify-end gap-2">
                             <x-action-button type="submit" :form="$formId">
                                 {{ __('Save') }}
                             </x-action-button>

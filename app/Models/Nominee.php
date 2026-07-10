@@ -17,6 +17,7 @@ class Nominee extends Model
         'name',
         'email',
         'phone',
+        'nid_number',
         'address',
         'image',
     ];

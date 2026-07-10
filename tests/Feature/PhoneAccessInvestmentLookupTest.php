@@ -26,6 +26,7 @@ class PhoneAccessInvestmentLookupTest extends TestCase
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
 
         $otherInvestment = Investment::create([
@@ -34,6 +35,7 @@ class PhoneAccessInvestmentLookupTest extends TestCase
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
 
         InvestmentParticipant::create([
@@ -68,11 +70,9 @@ class PhoneAccessInvestmentLookupTest extends TestCase
             ->assertOk()
             ->assertSeeText('My Pool')
             ->assertDontSeeText('Other Pool')
-            ->assertSeeText('Platform total amount')
-            ->assertSeeText('9075.00')
-            ->assertSeeText('5075.00')
+            ->assertSeeText(__('Investment summary'))
             ->assertSeeText('5000.00')
-            ->assertSeeText('1');
+            ->assertSeeText('75.00');
 
         $this->get(route('phone-access.investments.show', $myInvestment))
             ->assertOk()

@@ -4,6 +4,7 @@ use App\Http\Controllers\ViteBuildAssetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\InvestmentAccrualController;
+use App\Http\Controllers\Admin\MonthlyPaymentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController;
 use App\Http\Controllers\Admin\InvestmentDocumentController;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/portfolio', [InvestorInvestmentController::class, 'index'])->name('investments.index');
+    Route::get('/portfolio/investments', [InvestorInvestmentController::class, 'all'])->name('investments.all');
     Route::get('/portfolio/{investment}/documents/{document}/download', [InvestmentDocumentController::class, 'download'])
         ->name('investments.documents.download');
     Route::get('/portfolio/{investment}', [InvestorInvestmentController::class, 'show'])->name('investments.show');
@@ -45,6 +47,7 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware('phone.access')->prefix('phone-access')->name('phone-access.')->group(function () {
     Route::get('/investments', [PhoneAccessInvestmentLookupController::class, 'index'])->name('investments.index');
+    Route::get('/investments/all', [PhoneAccessInvestmentLookupController::class, 'all'])->name('investments.all');
     Route::get('/investments/{investment}', [PhoneAccessInvestmentLookupController::class, 'show'])->name('investments.show');
     Route::post('/logout', [PhoneAccessInvestmentLookupController::class, 'destroy'])->name('logout');
 });
@@ -54,7 +57,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('users/import', [AdminUserController::class, 'importForm'])->name('users.import');
     Route::post('users/import', [AdminUserController::class, 'importStore'])->name('users.import.store');
     Route::patch('users/{user}/active', [AdminUserController::class, 'toggleActive'])->name('users.active');
+    Route::patch('users/{user}/password', [AdminUserController::class, 'resetPassword'])->name('users.password.reset');
     Route::resource('users', AdminUserController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+
+    Route::get('monthly-payments', [MonthlyPaymentController::class, 'index'])->name('monthly-payments.index');
+    Route::patch('monthly-payments', [MonthlyPaymentController::class, 'update'])->name('monthly-payments.update');
+    Route::patch('monthly-payments/bulk', [MonthlyPaymentController::class, 'bulkUpdate'])->name('monthly-payments.bulk-update');
 
     Route::patch('investments/{investment}/active', [AdminInvestmentController::class, 'toggleActive'])->name('investments.active');
     Route::resource('investments', AdminInvestmentController::class)->except(['destroy']);

@@ -31,6 +31,7 @@ class RegistrationTest extends TestCase
                 'name' => 'Nominee Person',
                 'email' => 'nominee-register@example.com',
                 'phone' => '01800000002',
+                'nid_number' => 'NID-NOM-'.uniqid(),
                 'address' => '20 Nominee Lane',
             ],
         ]);

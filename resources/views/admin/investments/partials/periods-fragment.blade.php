@@ -11,17 +11,17 @@
         <table class="ui-table min-w-full text-sm">
             <thead>
                 <tr>
+                    <x-table-serial-header />
                     <th>{{ __('Month') }}</th>
-                    <th>{{ __('Recorded') }}</th>
                     <th class="text-right">{{ __('Pool profit') }}</th>
-                    <th class="text-right">{{ __('Principal at accrual') }}</th>
+                    <th class="text-right">{{ __('Principal') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($periods as $period)
                     <tr>
+                        <x-table-serial-cell :paginator="$periods" :index="$loop->index" />
                         <td class="py-2 pr-4 tabular-nums">{{ $period->month->translatedFormat('F Y') }}</td>
-                        <td class="py-2 pr-4 tabular-nums">{{ $period->created_at?->format('Y-m-d') ?? '—' }}</td>
                         <td class="py-2 pr-4 text-right tabular-nums">{{ $period->profit_amount }}</td>
                         <td class="py-2 text-right tabular-nums">{{ $period->principal_snapshot }}</td>
                     </tr>

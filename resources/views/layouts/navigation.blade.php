@@ -60,6 +60,16 @@
                             <span>{{ __('Investments') }}</span>
                         </span>
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.monthly-payments.index')" :active="request()->routeIs('admin.monthly-payments.*')" @click="sidebarOpen = false">
+                        <span class="flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0119.5 6.75v12A1.5 1.5 0 0118 21H6A1.5 1.5 0 014.5 19.5v-12A1.5 1.5 0 016 5.25z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 14.25l2 2 4-4" />
+                            </svg>
+                            <span>{{ __('Monthly payments') }}</span>
+                        </span>
+                    </x-responsive-nav-link>
                 @endif
             </nav>
 

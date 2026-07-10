@@ -33,10 +33,15 @@ class Investment extends Model
 
     protected $fillable = [
         'title',
+        'deed_no',
         'notes',
         'period_start',
+        'tagged_payment_month',
         'deed_completion_deadline',
         'default_monthly_rate_pct',
+        'total_profit_amount',
+        'total_invested_amount',
+        'contribution_per_investor',
         'status',
         'is_active',
         'created_by',
@@ -46,8 +51,12 @@ class Investment extends Model
     {
         return [
             'period_start' => 'date',
+            'tagged_payment_month' => 'date',
             'deed_completion_deadline' => 'date',
             'default_monthly_rate_pct' => 'decimal:4',
+            'total_profit_amount' => 'decimal:2',
+            'total_invested_amount' => 'decimal:2',
+            'contribution_per_investor' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
@@ -202,5 +211,122 @@ class Investment extends Model
         }
 
         return Carbon::parse($this->period_start)->startOfMonth();
+    }
+
+    /**
+     * Number of calendar accrual months from the first accrual month through plan completion.
+     */
+    public function planAccrualMonthCount(): int
+    {
+        $startMonth = $this->firstAccrualMonthStart()->copy()->startOfMonth();
+        $endMonth = $this->planCompletionMonthStart();
+
+        if ($endMonth === null || $startMonth->gt($endMonth)) {
+            return 0;
+        }
+
+        $count = 0;
+        for ($month = $startMonth->copy(); $month->lte($endMonth); $month->addMonth()) {
+            $count++;
+        }
+
+        return $count;
+    }
+
+    public function planStartDay(): Carbon
+    {
+        if ($this->period_start !== null) {
+            return Carbon::parse($this->period_start)->startOfDay();
+        }
+
+        return $this->firstAccrualMonthStart()->copy()->startOfDay();
+    }
+
+    /**
+     * Calendar days from plan start through plan end (same basis as daily profit display).
+     */
+    public function planDayCount(): int
+    {
+        $end = $this->planCompletionDate();
+        if ($end === null) {
+            return 0;
+        }
+
+        $start = $this->planStartDay();
+        if ($start->gt($end)) {
+            return 0;
+        }
+
+        return max(1, (int) $start->diffInDays($end));
+    }
+
+    public function dailyPoolProfitFromTotal(): ?float
+    {
+        if (! $this->usesTotalProfitPlan()) {
+            return null;
+        }
+
+        $days = $this->planDayCount();
+
+        return $days > 0 ? (float) $this->total_profit_amount / $days : null;
+    }
+
+    /**
+     * Plan days elapsed from start through $date (capped by plan end).
+     */
+    public function profitDaysElapsedThrough(Carbon $date): int
+    {
+        $start = $this->planStartDay();
+        $end = $this->planCompletionDate();
+
+        if ($end === null || $date->lt($start)) {
+            return 0;
+        }
+
+        $through = $date->copy()->startOfDay();
+        if ($through->gt($end)) {
+            $through = $end->copy();
+        }
+
+        return max(0, min($this->planDayCount(), (int) $start->diffInDays($through)));
+    }
+
+    /**
+     * Cumulative pool profit earned through $date on a daily accrual basis.
+     */
+    public function cumulativeProfitThroughDate(Carbon $date): float
+    {
+        $daily = $this->dailyPoolProfitFromTotal();
+        if ($daily === null) {
+            return 0.0;
+        }
+
+        $days = $this->profitDaysElapsedThrough($date);
+
+        return min((float) $this->total_profit_amount, round($daily * $days, 2));
+    }
+
+    /**
+     * Pool profit for one calendar month (variable when the plan starts or ends mid-month).
+     */
+    public function poolProfitForMonth(Carbon $month): float
+    {
+        if (! $this->usesTotalProfitPlan()) {
+            return 0.0;
+        }
+
+        $monthStart = $month->copy()->startOfMonth()->startOfDay();
+        $monthEnd = $month->copy()->endOfMonth()->startOfDay();
+        $beforeMonth = $monthStart->copy()->subDay();
+
+        return round(
+            $this->cumulativeProfitThroughDate($monthEnd) - $this->cumulativeProfitThroughDate($beforeMonth),
+            2
+        );
+    }
+
+    public function usesTotalProfitPlan(): bool
+    {
+        return $this->total_profit_amount !== null && (float) $this->total_profit_amount > 0;
     }
 }

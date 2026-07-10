@@ -9,6 +9,7 @@ use App\Models\InvestmentPeriodUser;
 use App\Models\User;
 use App\Support\PublicMediaUrl;
 use App\Support\SqlLike;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Collection;
@@ -165,6 +166,136 @@ class DashboardMetricsService
             ->withQueryString();
 
         return $this->attachContributionTotals($rows);
+    }
+
+    /**
+     * @return array{labels: list<string>, values: list<float>}
+     */
+    public function monthlyProfitTrendPlatform(int $months = 6): array
+    {
+        $start = Carbon::now()->subMonths($months - 1)->startOfMonth();
+
+        $totals = InvestmentPeriod::query()
+            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
+            ->where('month', '>=', $start)
+            ->get(['month', 'profit_amount'])
+            ->groupBy(fn (InvestmentPeriod $period) => Carbon::parse($period->month)->format('Y-m'))
+            ->map(fn (Collection $group) => $group->sum(fn (InvestmentPeriod $period) => (float) $period->profit_amount));
+
+        return $this->fillMonthlySeries($totals, $months);
+    }
+
+    /**
+     * @return array{labels: list<string>, values: list<float>}
+     */
+    public function monthlyProfitTrendForUser(User $user, int $months = 6): array
+    {
+        $start = Carbon::now()->subMonths($months - 1)->startOfMonth();
+
+        $rows = InvestmentPeriodUser::query()
+            ->where('investment_period_users.user_id', $user->id)
+            ->join('investment_periods as ip', 'ip.id', '=', 'investment_period_users.investment_period_id')
+            ->join('investments as inv', 'inv.id', '=', 'ip.investment_id')
+            ->where('inv.is_active', true)
+            ->where('ip.month', '>=', $start)
+            ->get(['ip.month', 'investment_period_users.profit_share']);
+
+        $totals = $rows->groupBy(fn ($row) => Carbon::parse($row->month)->format('Y-m'))
+            ->map(fn (Collection $group) => $group->sum(fn ($row) => (float) $row->profit_share));
+
+        return $this->fillMonthlySeries($totals, $months);
+    }
+
+    /**
+     * @return array{active: int, draft: int, closed: int}
+     */
+    public function investmentStatusBreakdownForUser(User $user): array
+    {
+        $investmentIds = InvestmentParticipant::query()
+            ->where('user_id', $user->id)
+            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
+            ->pluck('investment_id');
+
+        if ($investmentIds->isEmpty()) {
+            return ['active' => 0, 'draft' => 0, 'closed' => 0];
+        }
+
+        return [
+            'active' => (int) Investment::query()
+                ->whereIn('id', $investmentIds)
+                ->where('status', Investment::STATUS_ACTIVE)
+                ->count(),
+            'draft' => (int) Investment::query()
+                ->whereIn('id', $investmentIds)
+                ->where('status', Investment::STATUS_DRAFT)
+                ->count(),
+            'closed' => (int) Investment::query()
+                ->whereIn('id', $investmentIds)
+                ->where('status', Investment::STATUS_CLOSED)
+                ->count(),
+        ];
+    }
+
+    /**
+     * @return array{paid: int, unpaid: int}
+     */
+    public function currentMonthPaymentSummaryForUser(User $user): array
+    {
+        $rows = app(MonthlyPaymentService::class)->rowsForMonth(Carbon::now()->startOfMonth());
+        $row = $rows->firstWhere('user_id', $user->id);
+        $isPaid = $row !== null && $row['is_paid'];
+
+        return [
+            'paid' => $isPaid ? 1 : 0,
+            'unpaid' => $isPaid ? 0 : 1,
+        ];
+    }
+
+    /**
+     * @return array{active: int, draft: int, closed: int}
+     */
+    public function investmentStatusBreakdown(): array
+    {
+        return [
+            'active' => (int) Investment::query()->where('status', Investment::STATUS_ACTIVE)->count(),
+            'draft' => (int) Investment::query()->where('status', Investment::STATUS_DRAFT)->count(),
+            'closed' => (int) Investment::query()->where('status', Investment::STATUS_CLOSED)->count(),
+        ];
+    }
+
+    /**
+     * @return array{paid: int, unpaid: int}
+     */
+    public function currentMonthPaymentSummary(): array
+    {
+        $rows = app(MonthlyPaymentService::class)->rowsForMonth(Carbon::now()->startOfMonth());
+        $paid = $rows->where('is_paid', true)->count();
+
+        return [
+            'paid' => $paid,
+            'unpaid' => max(0, $rows->count() - $paid),
+        ];
+    }
+
+    /**
+     * @param  Collection<string|int, mixed>  $totalsByYm
+     * @return array{labels: list<string>, values: list<float>}
+     */
+    private function fillMonthlySeries(Collection $totalsByYm, int $months): array
+    {
+        $labels = [];
+        $values = [];
+        $cursor = Carbon::now()->subMonths($months - 1)->startOfMonth();
+        $end = Carbon::now()->startOfMonth();
+
+        while ($cursor->lte($end)) {
+            $key = $cursor->format('Y-m');
+            $labels[] = $cursor->translatedFormat('M Y');
+            $values[] = round((float) ($totalsByYm[$key] ?? 0), 2);
+            $cursor->addMonth();
+        }
+
+        return ['labels' => $labels, 'values' => $values];
     }
 
     private function decimalString(mixed $value): string

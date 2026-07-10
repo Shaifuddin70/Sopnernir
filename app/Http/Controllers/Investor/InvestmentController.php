@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Models\InvestmentPeriodUser;
+use App\Services\InvestmentDailyProfitService;
 use App\Support\PaginationPerPage;
 use App\Support\SqlLike;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -47,13 +48,32 @@ class InvestmentController extends Controller
             ? number_format(($portfolioProfitTotal / $totalTaggedCapital) * 100, 2, '.', '')
             : null;
 
+        $dailyProfit = app(InvestmentDailyProfitService::class);
+        $dailyProfitSummary = $dailyProfit->portfolioSummaryForUser($user);
+        $dailyProfitRows = $dailyProfit->portfolioRowsForUser($user);
+        $dailyProfitRowsTotal = $dailyProfitRows->count();
+
         return view('investor.investments.index', compact(
             'investments',
             'profitByMonth',
             'portfolioProfitTotal',
             'totalTaggedCapital',
             'returnOnTaggedCapitalPct',
+            'dailyProfitSummary',
+            'dailyProfitRows',
+            'dailyProfitRowsTotal',
         ));
+    }
+
+    public function all(Request $request): View
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $investmentRows = app(InvestmentDailyProfitService::class)
+            ->paginatedPortfolioRowsForUser($user, $request, 10);
+
+        return view('investor.investments.all', compact('investmentRows'));
     }
 
     public function show(Request $request, Investment $investment): View|JsonResponse
@@ -80,6 +100,20 @@ class InvestmentController extends Controller
 
         $myParticipant = $investment->participants->firstWhere('user_id', $userId);
 
+        $poolDaily = app(InvestmentDailyProfitService::class)->poolProjection($investment);
+        $userCapital = (float) ($myParticipant?->contribution_amount ?? 0);
+        $poolCapital = (float) $investment->participants->sum('contribution_amount');
+        $share = $poolCapital > 0 ? $userCapital / $poolCapital : 0.0;
+        $myDailyProfit = $poolDaily ? [
+            'projected_profit' => number_format($poolDaily['projected_profit'] * $share, 2, '.', ''),
+            'profit_til_today' => number_format($poolDaily['profit_til_today'] * $share, 2, '.', ''),
+            'daily_profit' => number_format($poolDaily['daily_profit'] * $share, 2, '.', ''),
+            'start_date' => $poolDaily['start_date'],
+            'end_date' => $poolDaily['end_date'],
+            'plan_days' => $poolDaily['plan_days'],
+            'days_elapsed' => $poolDaily['days_elapsed'],
+        ] : null;
+
         $myTotalProfit = (string) InvestmentPeriodUser::query()
             ->where('user_id', $userId)
             ->whereHas('period', fn ($q) => $q->where('investment_id', $investment->id))
@@ -87,7 +121,7 @@ class InvestmentController extends Controller
 
         $myProfitByMonth = $this->paginatedPoolProfitForUser($request, $investment, $userId);
 
-        return view('investor.investments.show', compact('investment', 'myParticipant', 'myTotalProfit', 'myProfitByMonth'));
+        return view('investor.investments.show', compact('investment', 'myParticipant', 'myTotalProfit', 'myProfitByMonth', 'myDailyProfit'));
     }
 
     private function paginatedPortfolioPools(Request $request, int $userId): LengthAwarePaginator

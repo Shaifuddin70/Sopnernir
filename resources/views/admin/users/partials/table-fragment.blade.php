@@ -2,6 +2,7 @@
 <table class="ui-table min-w-full text-xs sm:text-sm">
     <thead>
         <tr>
+            <x-table-serial-header />
             <th>{{ __('Name') }}</th>
             <th>{{ __('Email') }}</th>
             <th>{{ __('Phone') }}</th>
@@ -17,6 +18,7 @@
     <tbody>
         @forelse ($users as $u)
             <tr>
+                <x-table-serial-cell :paginator="$users" :index="$loop->index" />
                 <td>
                     <x-user-identity :user="$u" />
                 </td>
@@ -59,7 +61,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="10" class="py-4 text-sm text-foreground-muted">
+                <td colspan="11" class="py-4 text-sm text-foreground-muted">
                     @if (request()->filled('search'))
                         {{ __('No users match your search.') }}
                     @else

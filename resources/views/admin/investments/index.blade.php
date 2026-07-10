@@ -1,4 +1,8 @@
 @php
+    $prefillPaymentMonth = request()->query('payment_month');
+    if (! is_string($prefillPaymentMonth) || ! preg_match('/^\d{4}-\d{2}$/', $prefillPaymentMonth)) {
+        $prefillPaymentMonth = null;
+    }
     $openCreateInvestmentModal = request()->boolean('new')
         || (old('_form') === 'create-investment' && $errors->isNotEmpty());
     $openEditInvestmentModal = $editingInvestment !== null;
@@ -31,7 +35,7 @@
         </div>
     </div>
 
-    <x-modal name="create-investment" :show="$openCreateInvestmentModal" focusable maxWidth="2xl">
+    <x-modal name="create-investment" :show="$openCreateInvestmentModal" focusable maxWidth="3xl">
         <div class="flex items-center justify-between border-b border-line px-6 py-4">
             <h3 class="text-lg font-semibold text-foreground">{{ __('New investment') }}</h3>
             <button
@@ -46,12 +50,14 @@
             </button>
         </div>
         <div class="max-h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
-            @include('admin.investments.partials.create-form')
+            @include('admin.investments.partials.create-form', [
+                'defaultPaymentMonth' => $prefillPaymentMonth ?? old('payment_month', now()->format('Y-m')),
+            ])
         </div>
     </x-modal>
 
     @if ($editingInvestment)
-        <x-modal name="edit-investment" :show="$openEditInvestmentModal" focusable maxWidth="2xl">
+        <x-modal name="edit-investment" :show="$openEditInvestmentModal" focusable maxWidth="3xl">
             <div class="flex items-center justify-between border-b border-line px-6 py-4">
                 <h3 class="text-lg font-semibold text-foreground">{{ __('Edit investment') }}</h3>
                 <button

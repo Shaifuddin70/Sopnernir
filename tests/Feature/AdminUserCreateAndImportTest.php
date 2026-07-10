@@ -26,6 +26,7 @@ class AdminUserCreateAndImportTest extends TestCase
                 'name' => 'Nominee Person',
                 'email' => 'nominee@example.com',
                 'phone' => '01800000000',
+                'nid_number' => 'nid-nominee-new-member',
                 'address' => '456 Nominee Ave',
             ],
             'password' => 'Password1!',
@@ -49,9 +50,9 @@ class AdminUserCreateAndImportTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
 
-        $header = 'name,email,phone,nid_number,address,nominee_name,nominee_email,nominee_phone,nominee_address,password,is_admin';
-        $row1 = 'One,one@example.com,01711111111,nid-csv-one,Addr 1,N1,n1@example.com,01722222222,N addr 1,Password1!,0';
-        $row2 = 'Two,two@example.com,01711111112,nid-csv-two,Addr 2,N2,n2@example.com,01722222223,N addr 2,Password1!,1';
+        $header = 'name,email,phone,nid_number,address,nominee_name,nominee_email,nominee_phone,nominee_nid_number,nominee_address,password,is_admin';
+        $row1 = 'One,one@example.com,01711111111,nid-csv-one,Addr 1,N1,n1@example.com,01722222222,nid-nominee-one,N addr 1,Password1!,0';
+        $row2 = 'Two,two@example.com,01711111112,nid-csv-two,Addr 2,N2,n2@example.com,01722222223,nid-nominee-two,N addr 2,Password1!,1';
         $csv = $header."\n".$row1."\n".$row2."\n";
 
         $file = UploadedFile::fake()->createWithContent('users.csv', $csv);
@@ -72,6 +73,36 @@ class AdminUserCreateAndImportTest extends TestCase
 
         $this->actingAs($investor)
             ->get(route('admin.users.create'))
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_reset_user_password(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->patch(route('admin.users.password.reset', $user), [
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('NewPassword1!', $user->password));
+    }
+
+    public function test_non_admin_cannot_reset_user_password(): void
+    {
+        $investor = User::factory()->create();
+        $target = User::factory()->create();
+
+        $this->actingAs($investor)
+            ->patch(route('admin.users.password.reset', $target), [
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+            ])
             ->assertForbidden();
     }
 }

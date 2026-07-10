@@ -8,11 +8,14 @@ use App\Models\User;
 use App\Support\PaginationPerPage;
 use App\Support\SqlLike;
 use App\Services\InvestmentAccrualService;
+use App\Services\InvestmentPlanCalculationService;
+use App\Services\MonthlyPaymentService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -33,6 +36,7 @@ class InvestmentController extends Controller
                 $q->where(function ($q) use ($like): void {
                     $q->where('title', 'like', $like)
                         ->orWhere('notes', 'like', $like)
+                        ->orWhere('deed_no', 'like', $like)
                         ->orWhere('status', 'like', $like)
                         ->orWhere('deed_completion_deadline', 'like', $like);
                 });
@@ -65,13 +69,52 @@ class InvestmentController extends Controller
     {
         $validated = $this->validateInvestment($request);
 
+        $paymentMonthInput = $request->validate([
+            'payment_month' => ['required', 'date_format:Y-m'],
+        ])['payment_month'];
+
+        $paymentMonth = Carbon::createFromFormat('Y-m', $paymentMonthInput)->startOfMonth();
+
         $validated['created_by'] = $request->user()->id;
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['tagged_payment_month'] = $paymentMonth->toDateString();
 
         $investment = Investment::create($validated);
 
+        $tagged = app(MonthlyPaymentService::class)->tagPaidInvestorsForMonth($investment, $paymentMonth);
+
+        app(InvestmentPlanCalculationService::class)->syncStoredTotals($investment->fresh());
+
+        if ($tagged > 0 && $investment->status === Investment::STATUS_DRAFT) {
+            $investment->update(['status' => Investment::STATUS_ACTIVE]);
+        }
+
+        $investment->refresh();
+        if (
+            $tagged > 0
+            && $investment->status === Investment::STATUS_ACTIVE
+            && $investment->is_active
+        ) {
+            app(InvestmentAccrualService::class)->syncMonthsThrough(
+                $investment,
+                $investment->lastAccrualMonthInclusive()
+            );
+        }
+
+        $statusParts = [__('Investment created.')];
+        if ($tagged > 0) {
+            $statusParts[] = __('Tagged :count investor(s) who paid for :month.', [
+                'count' => $tagged,
+                'month' => $paymentMonth->translatedFormat('F Y'),
+            ]);
+        } else {
+            $statusParts[] = __('No paid investors for :month — tag investors manually on the pool page.', [
+                'month' => $paymentMonth->translatedFormat('F Y'),
+            ]);
+        }
+
         return redirect()->route('admin.investments.show', $investment)
-            ->with('status', 'Investment created.');
+            ->with('status', implode(' ', $statusParts));
     }
 
     public function show(Request $request, Investment $investment): View|JsonResponse
@@ -95,14 +138,17 @@ class InvestmentController extends Controller
         }
 
         $investment->load('documents');
+        $investment->loadCount('participants');
         $investment->loadSum('participants', 'contribution_amount');
         $investment->loadSum('periods', 'profit_amount');
 
         $periods = $this->paginatedPeriodsForShow($request, $investment);
         $participants = $this->paginatedParticipantsForShow($request, $investment);
 
+        $taggedUserIds = $investment->participants()->pluck('user_id');
         $investorUsers = User::query()
             ->where('is_active', true)
+            ->when($taggedUserIds->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $taggedUserIds))
             ->orderBy('name')
             ->get();
 
@@ -162,7 +208,7 @@ class InvestmentController extends Controller
     public function update(Request $request, Investment $investment): RedirectResponse
     {
         try {
-            $validated = $this->validateInvestment($request);
+            $validated = $this->validateInvestment($request, $investment);
         } catch (ValidationException $e) {
             return $this->redirectBackToEditForm($request, $investment)
                 ->withInput()
@@ -174,6 +220,8 @@ class InvestmentController extends Controller
             : $investment->is_active;
 
         $investment->update($validated);
+
+        app(InvestmentPlanCalculationService::class)->syncStoredTotals($investment->fresh());
 
         // Keep monthly accrual rows aligned with pool settings (e.g. first accrual month).
         // Runs here even when INVESTMENT_AUTO_ACCRUE_ON_SAVE is false, because saving this
@@ -243,32 +291,39 @@ class InvestmentController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function validateInvestment(Request $request): array
+    private function validateInvestment(Request $request, ?Investment $investment = null): array
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'deed_no' => [
+                'required',
+                'string',
+                'max:64',
+                Rule::unique('investments', 'deed_no')->ignore($investment?->id),
+            ],
             'notes' => ['nullable', 'string'],
-            'period_start' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
-            'deed_completion_deadline' => ['required', 'date'],
-            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0', 'max:100'],
+            'period_start' => ['required', 'date'],
+            'deed_completion_deadline' => ['required', 'date', 'after_or_equal:period_start'],
+            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0.01'],
+            'contribution_per_investor' => ['required', 'numeric', 'min:0.01'],
             'status' => ['required', 'in:draft,active,closed'],
         ]);
 
-        $validated['period_start'] = ! empty($validated['period_start'])
-            ? Carbon::createFromFormat('Y-m', $validated['period_start'])->startOfMonth()->toDateString()
-            : null;
+        $validated['period_start'] = Carbon::parse($validated['period_start'])->toDateString();
         $validated['deed_completion_deadline'] = Carbon::parse($validated['deed_completion_deadline'])->toDateString();
+        $validated['default_monthly_rate_pct'] = number_format((float) $validated['default_monthly_rate_pct'], 4, '.', '');
+        $validated['contribution_per_investor'] = number_format((float) $validated['contribution_per_investor'], 2, '.', '');
+        $validated['total_profit_amount'] = '0.00';
+        $validated['total_invested_amount'] = '0.00';
 
-        if ($validated['period_start'] !== null) {
-            $firstMonth = Carbon::parse($validated['period_start'])->startOfMonth();
-            $completionMonth = Carbon::parse($validated['deed_completion_deadline'])->startOfMonth();
-            if ($completionMonth->lt($firstMonth)) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'deed_completion_deadline' => __('Plan completion must be in or after the first accrual month (:month).', [
-                        'month' => $firstMonth->translatedFormat('F Y'),
-                    ]),
-                ]);
-            }
+        $firstMonth = Carbon::parse($validated['period_start'])->startOfMonth();
+        $completionMonth = Carbon::parse($validated['deed_completion_deadline'])->startOfMonth();
+        if ($completionMonth->lt($firstMonth)) {
+            throw ValidationException::withMessages([
+                'deed_completion_deadline' => __('Ending date must be in or after the starting date month (:month).', [
+                    'month' => $firstMonth->translatedFormat('F Y'),
+                ]),
+            ]);
         }
 
         return $validated;

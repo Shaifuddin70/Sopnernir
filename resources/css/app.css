@@ -122,6 +122,10 @@
         @apply mt-0.5 text-xs text-foreground-muted sm:text-sm;
     }
 
+    .ui-text-link {
+        @apply font-medium text-primary transition-colors hover:text-primary-hover;
+    }
+
     .ui-table thead tr {
         @apply border-b border-line bg-surface-variant text-left text-[11px] font-medium uppercase tracking-wide text-foreground-muted sm:text-xs;
     }
@@ -256,6 +260,148 @@
 
     .ui-stat-tile-capital {
         @apply rounded-xl border border-primary/20 bg-primary-muted p-5 shadow-elevation-1 transition hover:shadow-elevation-2 sm:p-6;
+    }
+
+    /* Portfolio & dashboard — Material surfaces */
+    .portfolio-page,
+    .dashboard-page {
+        @apply relative;
+    }
+
+    .ui-glass {
+        @apply border border-line bg-surface-card/90 shadow-elevation-2 backdrop-blur-xl;
+    }
+
+    .ui-glass-subtle {
+        @apply border border-line bg-surface-variant backdrop-blur-md;
+    }
+
+    .ui-glass-panel {
+        @apply overflow-hidden rounded-2xl border border-line bg-surface-card shadow-elevation-2 backdrop-blur-xl;
+    }
+
+    .portfolio-hero {
+        @apply relative overflow-hidden rounded-2xl border border-line bg-surface-card shadow-elevation-3;
+    }
+
+    .ui-stat-glass {
+        @apply relative overflow-hidden rounded-xl border border-line bg-surface-card p-4 shadow-elevation-1 backdrop-blur-md transition duration-200 hover:border-line hover:shadow-elevation-2 sm:p-5;
+    }
+
+    .ui-stat-glass--capital {
+        @apply relative overflow-hidden rounded-xl border border-primary/20 bg-primary-muted p-4 shadow-elevation-1 backdrop-blur-md transition duration-200 hover:shadow-elevation-2 sm:p-5;
+    }
+
+    .ui-stat-glass--profit {
+        @apply relative overflow-hidden rounded-xl border border-success/20 bg-success-muted p-4 shadow-elevation-1 backdrop-blur-md transition duration-200 hover:shadow-elevation-2 sm:p-5;
+    }
+
+    .ui-stat-glass--accent {
+        @apply relative overflow-hidden rounded-xl border border-primary/25 bg-primary-muted p-4 shadow-elevation-1 ring-1 ring-primary/10 backdrop-blur-md transition duration-200 hover:shadow-elevation-2 sm:p-5;
+    }
+
+    .ui-investment-card {
+        @apply relative overflow-hidden rounded-xl border border-line bg-surface-card/90 p-4 shadow-elevation-1 backdrop-blur-md transition duration-200 hover:border-primary/30 hover:shadow-elevation-2 sm:p-5;
+    }
+
+    .ui-glass-table-wrap {
+        @apply overflow-hidden rounded-xl border border-line bg-surface-card shadow-elevation-1 ring-1 ring-line/20 backdrop-blur-sm;
+    }
+
+    .ui-glass-table-wrap .ui-table {
+        @apply border-collapse;
+    }
+
+    .ui-glass-table-wrap .ui-table thead tr {
+        @apply border-b border-line bg-surface-variant backdrop-blur-sm;
+    }
+
+    .ui-glass-table-wrap .ui-table thead th {
+        @apply border-r border-line/50 last:border-r-0;
+    }
+
+    .ui-glass-table-wrap .ui-table tbody tr {
+        @apply border-b border-line hover:bg-surface-variant/70;
+    }
+
+    .ui-glass-table-wrap .ui-table tbody tr:last-child {
+        @apply border-b-0;
+    }
+
+    .ui-glass-table-wrap .ui-table tbody td {
+        @apply border-r border-line/40 last:border-r-0;
+    }
+
+    .ui-chip {
+        @apply inline-flex items-center rounded-full border border-line bg-surface-variant px-2.5 py-0.5 text-[11px] font-medium text-foreground-muted backdrop-blur-sm sm:text-xs;
+    }
+
+    .dashboard-stat-panel {
+        @apply overflow-hidden rounded-xl border border-line bg-surface-card shadow-elevation-1;
+    }
+
+    .dashboard-stat-panel__head {
+        @apply flex items-center justify-between gap-2 border-b border-line bg-surface-variant px-3 py-2.5 sm:px-4;
+    }
+
+    .dashboard-stat-panel__title {
+        @apply text-sm font-semibold text-foreground;
+    }
+
+    .dashboard-stat-grid {
+        @apply grid grid-cols-2 gap-2 p-3 sm:grid-cols-4 sm:p-3;
+    }
+
+    .dashboard-stat {
+        @apply rounded-lg border border-line bg-surface-card px-2.5 py-2;
+    }
+
+    .dashboard-stat--capital {
+        @apply border-primary/20 bg-primary-muted;
+    }
+
+    .dashboard-stat--profit {
+        @apply border-success/20 bg-success-muted;
+    }
+
+    .dashboard-stat dt {
+        @apply text-[10px] font-semibold uppercase tracking-wide text-foreground-muted;
+    }
+
+    .dashboard-stat dd {
+        @apply mt-0.5 text-base font-bold tabular-nums tracking-tight text-foreground sm:text-lg;
+    }
+
+    .dashboard-stat p {
+        @apply mt-0.5 text-[10px] text-foreground-muted;
+    }
+
+    .dashboard-stat--profit dd {
+        @apply text-success;
+    }
+
+    .dashboard-chart-panel {
+        @apply overflow-hidden rounded-xl border border-line bg-surface-card p-3 shadow-elevation-1 sm:p-4;
+    }
+
+    .dashboard-chart-panel__title {
+        @apply mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted;
+    }
+
+    .dashboard-chart-panel__canvas {
+        @apply relative h-44 w-full sm:h-48;
+    }
+
+    .dashboard-chart-panel__canvas--square {
+        @apply h-44 sm:h-48;
+    }
+
+    .dashboard-chart-panel__canvas--short {
+        @apply h-40 sm:h-44;
+    }
+
+    .person-photo-upload:focus-within {
+        @apply ring-2 ring-primary ring-offset-2;
     }
 }
 

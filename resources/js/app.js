@@ -1,4 +1,5 @@
 import './bootstrap';
+import './dashboard-charts';
 import TomSelect from 'tom-select';
 import 'tom-select/dist/css/tom-select.css';
 
@@ -23,10 +24,11 @@ function initSearchableSelects(root = document) {
 
         new TomSelect(select, {
             create: false,
-            allowEmptyOption: true,
+            allowEmptyOption: ! select.multiple,
             maxOptions: 500,
             searchField: ['text'],
             placeholder: select.getAttribute('placeholder') || 'Search...',
+            plugins: select.multiple ? ['remove_button'] : [],
             sortField: [
                 { field: '$score' },
                 { field: '$order' },

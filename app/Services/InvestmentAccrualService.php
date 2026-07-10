@@ -167,7 +167,7 @@ class InvestmentAccrualService
             ? (string) $rateOverridePct
             : (string) $investment->default_monthly_rate_pct;
 
-        $profitCents = (int) round($principal * ((float) $rate / 100) * 100);
+        [$profitCents, $rate] = $this->resolveMonthlyProfit($investment, $principal, $rate, $monthStart);
 
         $lines = $this->splitProfitCents($participants, $principal, $profitCents);
 
@@ -234,11 +234,12 @@ class InvestmentAccrualService
         }
 
         $rate = (string) $period->applied_rate_pct;
-        $profitCents = (int) round($principal * ((float) $rate / 100) * 100);
+        [$profitCents, $rate] = $this->resolveMonthlyProfit($investment, $principal, $rate, $monthStart);
         $lines = $this->splitProfitCents($participants, $principal, $profitCents);
 
-        return DB::transaction(function () use ($period, $principal, $profitCents, $lines) {
+        return DB::transaction(function () use ($period, $principal, $profitCents, $rate, $lines) {
             $period->update([
+                'applied_rate_pct' => $rate,
                 'principal_snapshot' => number_format($principal, 2, '.', ''),
                 'profit_amount' => number_format($profitCents / 100, 2, '.', ''),
             ]);
@@ -317,5 +318,25 @@ class InvestmentAccrualService
         }
 
         return $lines;
+    }
+
+    /**
+     * @return array{0: int, 1: string} Profit in cents and applied rate % for storage.
+     */
+    private function resolveMonthlyProfit(Investment $investment, float $principal, string $ratePct, Carbon $monthStart): array
+    {
+        if ($investment->usesTotalProfitPlan()) {
+            $monthlyProfit = $investment->poolProfitForMonth($monthStart);
+            $profitCents = (int) round($monthlyProfit * 100);
+            $rate = $principal > 0 && $monthlyProfit > 0
+                ? number_format(($monthlyProfit / $principal) * 100, 4, '.', '')
+                : '0.0000';
+
+            return [$profitCents, $rate];
+        }
+
+        $profitCents = (int) round($principal * ((float) $ratePct / 100) * 100);
+
+        return [$profitCents, $ratePct];
     }
 }

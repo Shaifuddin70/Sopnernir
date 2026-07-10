@@ -22,7 +22,11 @@ class DashboardMetricsTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee(__('Your portfolio'), false);
+            ->assertSee(__('Platform'), false)
+            ->assertSee(__('Your portfolio'), false)
+            ->assertSee(__('Profit trend (6 months)'), false)
+            ->assertSee(__('Investment status'), false)
+            ->assertSee(__('This month payments'), false);
     }
 
     public function test_dashboard_shows_platform_overview_for_admin(): void
@@ -32,7 +36,8 @@ class DashboardMetricsTest extends TestCase
         $this->actingAs($admin)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee(__('Platform overview'), false);
+            ->assertSee(__('Platform'), false)
+            ->assertSee(__('Investment status'), false);
     }
 
     public function test_dashboard_shows_profit_vs_capital_and_return_for_tagged_user(): void

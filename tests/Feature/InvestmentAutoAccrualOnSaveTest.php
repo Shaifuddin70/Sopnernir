@@ -60,6 +60,7 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $investment = Investment::create([
             'title' => 'January pool',
             'default_monthly_rate_pct' => '1.5',
+            'contribution_per_investor' => '5000.00',
             'status' => Investment::STATUS_DRAFT,
             'created_by' => $admin->id,
             'period_start' => '2026-01-01',
@@ -69,8 +70,7 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $this->actingAs($admin);
 
         $this->post(route('admin.investments.participants.store', $investment), [
-            'user_id' => $investor->id,
-            'contribution_amount' => '5000',
+            'user_ids' => [$investor->id],
         ])->assertSessionHasNoErrors();
 
         $investment->refresh()->load('periods');
@@ -92,6 +92,7 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $investment = Investment::create([
             'title' => 'Full pool',
             'default_monthly_rate_pct' => '1.5',
+            'contribution_per_investor' => '100.00',
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-01-01',
@@ -110,9 +111,8 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $this->assertSame(0, $investment->periods()->count());
 
         $this->actingAs($admin);
-        $this->post(route('admin.investments.participants.tag-all', $investment), [
-            'bulk_contribution_amount' => '100.00',
-        ])->assertSessionHasNoErrors();
+        $this->post(route('admin.investments.participants.tag-all', $investment))
+            ->assertSessionHasNoErrors();
 
         $investment->refresh();
         $this->assertGreaterThanOrEqual(4, $investment->periods()->count());
@@ -130,14 +130,14 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $investment = Investment::create([
             'title' => 'Jan pool',
             'default_monthly_rate_pct' => '1.5',
+            'contribution_per_investor' => '5000.00',
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-02-01',
         ]);
 
         $this->actingAs($admin)->post(route('admin.investments.participants.store', $investment), [
-            'user_id' => $u1->id,
-            'contribution_amount' => '5000.00',
+            'user_ids' => [$u1->id],
         ])->assertSessionHasNoErrors();
 
         $investment->refresh()->load('periods.periodUsers');
@@ -146,13 +146,11 @@ class InvestmentAutoAccrualOnSaveTest extends TestCase
         $this->assertTrue($investment->periods->every(fn ($period) => $period->periodUsers->count() === 1));
 
         $this->post(route('admin.investments.participants.store', $investment), [
-            'user_id' => $admin->id,
-            'contribution_amount' => '5000.00',
+            'user_ids' => [$admin->id],
         ])->assertSessionHasNoErrors();
 
         $this->post(route('admin.investments.participants.store', $investment), [
-            'user_id' => $u2->id,
-            'contribution_amount' => '5000.00',
+            'user_ids' => [$u2->id],
         ])->assertSessionHasNoErrors();
 
         $investment->refresh()->load('periods.periodUsers');

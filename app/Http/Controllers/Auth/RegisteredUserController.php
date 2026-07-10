@@ -50,6 +50,7 @@ class RegisteredUserController extends Controller
                 'name' => $nomineeInput['name'],
                 'email' => $nomineeInput['email'],
                 'phone' => $nomineeInput['phone'],
+                'nid_number' => $nomineeInput['nid_number'],
                 'address' => $nomineeInput['address'],
             ]);
 

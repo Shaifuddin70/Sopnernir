@@ -15,6 +15,6 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->userProfileRules($this->user()->id);
+        return $this->userProfileRules($this->user()->id, $this->user()->nominee?->id);
     }
 }

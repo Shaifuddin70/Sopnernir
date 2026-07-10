@@ -36,7 +36,9 @@ class AdminUpdateUserRequest extends FormRequest
             return [];
         }
 
-        $rules = array_merge($this->userProfileRules($target->id), [
+        $target->loadMissing('nominee');
+
+        $rules = array_merge($this->userProfileRules($target->id, $target->nominee?->id), [
             'is_admin' => ['boolean'],
         ]);
         if ($this->exists('is_active')) {

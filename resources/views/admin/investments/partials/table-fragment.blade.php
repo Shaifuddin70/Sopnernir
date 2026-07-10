@@ -2,12 +2,15 @@
 <table class="ui-table min-w-full text-xs sm:text-sm">
     <thead>
         <tr>
+            <x-table-serial-header />
             <th class="py-2 pr-3">{{ __('Title') }}</th>
             <th class="py-2 pr-3">{{ __('Status') }}</th>
             <th class="py-2 pr-3">{{ __('Listed') }}</th>
-            <th class="py-2 pr-3">{{ __('Plan ends') }}</th>
-            <th class="py-2 pr-3">{{ __('Created') }}</th>
-            <th class="py-2 pr-3">{{ __('Rate %') }}</th>
+            <th class="py-2 pr-3">{{ __('Deed number') }}</th>
+            <th class="py-2 pr-3">{{ __('Starts') }}</th>
+            <th class="py-2 pr-3">{{ __('Ends') }}</th>
+            <th class="py-2 pr-3 text-right">{{ __('Total amount') }}</th>
+            <th class="py-2 pr-3 text-right">{{ __('Profit amount') }}</th>
             <th class="py-2 pr-3">{{ __('Users') }}</th>
             <th class="py-2 text-right">{{ __('Actions') }}</th>
         </tr>
@@ -15,8 +18,11 @@
     <tbody>
         @forelse ($investments as $inv)
             <tr class="align-top">
+                <x-table-serial-cell :paginator="$investments" :index="$loop->index" />
                 <td class="py-2.5 pr-3">
-                    <p class="font-medium text-foreground">{{ $inv->title }}</p>
+                    <p class="font-medium">
+                        <a href="{{ route('admin.investments.show', $inv) }}" class="ui-text-link">{{ $inv->title }}</a>
+                    </p>
                     @if ($inv->notes)
                         <p class="mt-0.5 line-clamp-1 text-xs text-foreground-muted">{{ $inv->notes }}</p>
                     @endif
@@ -38,6 +44,8 @@
                         <span class="ui-badge-muted">{{ __('Inactive') }}</span>
                     @endif
                 </td>
+                <td class="py-2.5 pr-3 tabular-nums text-foreground-muted">{{ $inv->deed_no ?? '—' }}</td>
+                <td class="py-2.5 pr-3 tabular-nums text-foreground-muted">{{ $inv->period_start?->format('Y-m-d') ?? '—' }}</td>
                 <td class="py-2.5 pr-3 tabular-nums text-foreground-muted">
                     @if ($inv->deed_completion_deadline)
                         <span @class([
@@ -48,8 +56,12 @@
                         —
                     @endif
                 </td>
-                <td class="py-2.5 pr-3 tabular-nums text-foreground-muted">{{ $inv->created_at?->format('Y-m-d') ?? '—' }}</td>
-                <td class="py-2.5 pr-3 tabular-nums">{{ $inv->default_monthly_rate_pct }}</td>
+                <td class="py-2.5 pr-3 text-right tabular-nums">
+                    {{ $inv->total_invested_amount !== null ? number_format((float) $inv->total_invested_amount, 2, '.', '') : '—' }}
+                </td>
+                <td class="py-2.5 pr-3 text-right tabular-nums text-success">
+                    {{ $inv->total_profit_amount !== null ? number_format((float) $inv->total_profit_amount, 2, '.', '') : '—' }}
+                </td>
                 <td class="py-2.5 pr-3 tabular-nums">{{ $inv->participants_count }}</td>
                 <td class="py-2.5 text-right">
                     <div class="flex flex-wrap items-center justify-end gap-2">
@@ -69,7 +81,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="8" class="py-4 text-sm text-foreground-muted">
+                <td colspan="11" class="py-4 text-sm text-foreground-muted">
                     @if (request()->filled('search'))
                         {{ __('No investments match your search.') }}
                     @else

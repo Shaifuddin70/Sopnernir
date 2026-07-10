@@ -29,6 +29,12 @@
     </div>
 
     <div>
+        <x-input-label for="nominee_nid_number" :value="__('Nominee NID number')" />
+        <x-text-input id="nominee_nid_number" name="nominee[nid_number]" type="text" class="mt-1 block w-full" :value="old('nominee.nid_number', $nominee?->nid_number)" required />
+        <x-input-error class="mt-2" :messages="$errors->get('nominee.nid_number')" />
+    </div>
+
+    <div>
         <x-input-label for="nominee_address" :value="__('Nominee address')" />
         <textarea id="nominee_address" name="nominee[address]" rows="3" class="mt-1 block w-full ui-input rounded-lg" required>{{ old('nominee.address', $nominee?->address) }}</textarea>
         <x-input-error class="mt-2" :messages="$errors->get('nominee.address')" />

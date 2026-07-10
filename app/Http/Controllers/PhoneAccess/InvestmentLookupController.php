@@ -8,6 +8,7 @@ use App\Models\InvestmentParticipant;
 use App\Models\InvestmentPeriodUser;
 use App\Models\User;
 use App\Services\DashboardMetricsService;
+use App\Services\InvestmentDailyProfitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -73,6 +74,11 @@ class InvestmentLookupController extends Controller
 
         $totalAmount = $totalTaggedCapital + $portfolioProfitTotal;
         $platform = app(DashboardMetricsService::class)->platformSummary();
+        $dailyProfit = app(InvestmentDailyProfitService::class);
+        $dailyProfitSummary = $dailyProfit->portfolioSummaryForUser($user);
+        $dailyProfitRows = $dailyProfit->portfolioRowsForUser($user);
+        $dailyProfitRowsTotal = $dailyProfitRows->count();
+        $platformDailySummary = $dailyProfit->platformSummary();
 
         return view('phone-access.investments.index', compact(
             'user',
@@ -82,7 +88,21 @@ class InvestmentLookupController extends Controller
             'portfolioProfitTotal',
             'totalAmount',
             'platform',
+            'dailyProfitSummary',
+            'dailyProfitRows',
+            'dailyProfitRowsTotal',
+            'platformDailySummary',
         ));
+    }
+
+    public function all(Request $request): View
+    {
+        $user = $this->phoneAccessUser($request);
+
+        $investmentRows = app(InvestmentDailyProfitService::class)
+            ->paginatedPortfolioRowsForUser($user, $request, 10);
+
+        return view('phone-access.investments.all', compact('user', 'investmentRows'));
     }
 
     public function show(Request $request, Investment $investment): View
@@ -116,12 +136,27 @@ class InvestmentLookupController extends Controller
             ->with('period')
             ->get();
 
+        $poolDaily = app(InvestmentDailyProfitService::class)->poolProjection($investment);
+        $userCapital = (float) ($myParticipant?->contribution_amount ?? 0);
+        $poolCapital = (float) InvestmentParticipant::query()
+            ->where('investment_id', $investment->id)
+            ->sum('contribution_amount');
+        $share = $poolCapital > 0 ? $userCapital / $poolCapital : 0.0;
+        $myDailyProfit = $poolDaily ? [
+            'projected_profit' => number_format($poolDaily['projected_profit'] * $share, 2, '.', ''),
+            'profit_til_today' => number_format($poolDaily['profit_til_today'] * $share, 2, '.', ''),
+            'daily_profit' => number_format($poolDaily['daily_profit'] * $share, 2, '.', ''),
+            'start_date' => $poolDaily['start_date'],
+            'end_date' => $poolDaily['end_date'],
+        ] : null;
+
         return view('phone-access.investments.show', compact(
             'user',
             'investment',
             'myParticipant',
             'myTotalProfit',
             'myProfitByMonth',
+            'myDailyProfit',
         ));
     }
 

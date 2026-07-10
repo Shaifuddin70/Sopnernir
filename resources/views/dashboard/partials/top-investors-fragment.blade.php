@@ -1,12 +1,10 @@
 @if ($topInvestors->isEmpty())
-    <div
-        class="rounded-xl border border-dashed border-line bg-surface-secondary px-6 py-12 text-center"
-    >
+    <div class="rounded-xl border border-dashed border-line bg-surface-variant px-4 py-10 text-center">
         <div
-            class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface-card text-foreground-muted ring-1 ring-line"
+            class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface-card text-foreground-muted"
             aria-hidden="true"
         >
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -15,7 +13,7 @@
                 />
             </svg>
         </div>
-        <p class="text-sm font-medium text-foreground-muted">
+        <p class="text-sm text-foreground-muted">
             @if (request()->filled('search'))
                 {{ __('No investors match your search.') }}
             @else
@@ -24,41 +22,33 @@
         </p>
     </div>
 @else
-    <div class="overflow-x-auto rounded-xl border border-line">
-        <table class="ui-table min-w-full text-sm">
+    <div class="ui-glass-table-wrap overflow-x-auto">
+        <table class="ui-table min-w-full text-xs sm:text-sm">
             <thead>
                 <tr>
-                    <th class="px-4 py-3.5">#</th>
-                    <th class="px-4 py-3.5">{{ __('Investor') }}</th>
-                    <th class="px-4 py-3.5">{{ __('Last payout month') }}</th>
-                    <th class="px-4 py-3.5 text-right">{{ __('Tagged capital') }}</th>
-                    <th class="px-4 py-3.5 text-right">{{ __('Total profit') }}</th>
+                    <x-table-serial-header />
+                    <th>{{ __('Investor') }}</th>
+                    <th class="hidden sm:table-cell">{{ __('Last payout month') }}</th>
+                    <th class="text-right">{{ __('Tagged capital') }}</th>
+                    <th class="text-right">{{ __('Total profit') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($topInvestors as $row)
-                    <tr
-                        class="{{ $row->user_id === auth()->id() ? 'bg-primary-muted ring-1 ring-inset ring-primary/30' : '' }}"
-                    >
-                        <td class="whitespace-nowrap px-4 py-3.5 tabular-nums text-foreground-muted">
-                            {{ $topInvestors->firstItem() + $loop->index }}
-                        </td>
-                        <td class="px-4 py-3.5">
+                    <tr @class(['bg-primary-muted/40' => $row->user_id === auth()->id()])>
+                        <x-table-serial-cell :paginator="$topInvestors" :index="$loop->index" />
+                        <td>
                             <x-user-identity
                                 :name="$row->name"
                                 :image-url="$row->profile_image_url"
                                 :subtitle="$row->email"
                             />
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3.5 tabular-nums text-foreground">
+                        <td class="hidden whitespace-nowrap tabular-nums text-foreground-muted sm:table-cell">
                             {{ $row->last_payout_month ? \Carbon\Carbon::parse($row->last_payout_month)->translatedFormat('F Y') : '—' }}
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3.5 text-right tabular-nums text-foreground">
-                            {{ $row->total_contribution }}
-                        </td>
-                        <td class="whitespace-nowrap px-4 py-3.5 text-right tabular-nums font-semibold text-success">
-                            {{ $row->total_profit }}
-                        </td>
+                        <td class="whitespace-nowrap text-right tabular-nums">{{ $row->total_contribution }}</td>
+                        <td class="whitespace-nowrap text-right tabular-nums font-semibold text-success">{{ $row->total_profit }}</td>
                     </tr>
                 @endforeach
             </tbody>

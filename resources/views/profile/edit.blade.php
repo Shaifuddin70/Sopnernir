@@ -1,20 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-foreground leading-tight">
-            {{ __('Profile') }}
-        </h2>
+        <h2 class="ui-page-header-title">{{ __('Profile') }}</h2>
     </x-slot>
 
-    <div class="max-w-7xl space-y-6">
-        {{-- Same shell as admin users create/edit: one full-width white card for account | nominee + save --}}
-        <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-            @include('profile.partials.update-profile-information-form')
-        </div>
-
-        <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-            <div class="max-w-6xl">
-                @include('profile.partials.update-password-form')
+    <div class="space-y-4 pb-2">
+        <section class="ui-glass-panel mx-auto min-w-0 max-w-5xl">
+            <div class="p-4 sm:p-5">
+                @include('profile.partials.edit-form', ['user' => $user])
             </div>
-        </div>
+        </section>
     </div>
 </x-app-layout>
