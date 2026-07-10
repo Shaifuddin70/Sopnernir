@@ -87,6 +87,11 @@
                                 {{ __(':amount / day', ['amount' => number_format($dailyProfit, 2, '.', '')]) }}
                             </dd>
                         @endif
+                        @if ($investment->averageMonthlyProfitAmount() !== null)
+                            <dd class="mt-0.5 text-sm tabular-nums text-foreground-muted">
+                                {{ __('Avg. :amount / month', ['amount' => number_format($investment->averageMonthlyProfitAmount(), 2, '.', '')]) }}
+                            </dd>
+                        @endif
                     </div>
                     <div class="ui-stat-tile-profit rounded-lg p-3 sm:p-4">
                         <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>

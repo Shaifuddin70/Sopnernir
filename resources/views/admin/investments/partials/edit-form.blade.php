@@ -43,17 +43,28 @@
             <x-input-error :messages="$errors->get('contribution_per_investor')" class="mt-2" />
         </div>
         <div>
-            <x-input-label for="edit_default_monthly_rate_pct" :value="__('Profit rate (% per month)')" />
+            <x-input-label for="edit_total_profit_amount" :value="__('Total profit')" />
             <x-text-input
-                id="edit_default_monthly_rate_pct"
-                name="default_monthly_rate_pct"
+                id="edit_total_profit_amount"
+                name="total_profit_amount"
                 type="text"
                 class="mt-1 block w-full"
-                :value="old('default_monthly_rate_pct', $investment->default_monthly_rate_pct)"
+                :value="old('total_profit_amount', $investment->total_profit_amount)"
                 required
             />
-            <p class="mt-1 text-sm text-foreground-muted">{{ __('Total invested and total profit are recalculated from tagged investors and the plan dates.') }}</p>
-            <x-input-error :messages="$errors->get('default_monthly_rate_pct')" class="mt-2" />
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Daily and monthly payouts are calculated automatically from this amount and the plan dates.') }}</p>
+            @if ($investment->averageMonthlyProfitAmount() !== null || $investment->dailyPoolProfitFromTotal() !== null)
+                <p class="mt-1 text-sm text-foreground-muted">
+                    @if ($investment->averageMonthlyProfitAmount() !== null)
+                        {{ __('Avg. :amount / month', ['amount' => number_format($investment->averageMonthlyProfitAmount(), 2, '.', '')]) }}
+                    @endif
+                    @if ($investment->dailyPoolProfitFromTotal() !== null)
+                        <span class="mx-1" aria-hidden="true">·</span>
+                        {{ __(':amount / day', ['amount' => number_format($investment->dailyPoolProfitFromTotal(), 2, '.', '')]) }}
+                    @endif
+                </p>
+            @endif
+            <x-input-error :messages="$errors->get('total_profit_amount')" class="mt-2" />
         </div>
         @if ($investment->participants_count ?? $investment->participants()->count())
             <div class="sm:col-span-2 rounded-lg border border-line bg-surface-secondary px-4 py-3 text-sm text-foreground-muted">

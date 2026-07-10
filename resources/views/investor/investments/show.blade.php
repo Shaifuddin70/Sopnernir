@@ -70,15 +70,16 @@
                             <dd>{{ $myDailyProfit['profit_til_today'] }}</dd>
                         </div>
                     @endif
-                    @if ((float) $investment->default_monthly_rate_pct > 0 && ! $myDailyProfit)
+                    @if ($myDailyProfit && $investment->usesTotalProfitPlan())
                         <div class="dashboard-stat">
-                            <dt>{{ __('Monthly rate') }}</dt>
-                            <dd>{{ $investment->default_monthly_rate_pct }}%</dd>
-                        </div>
-                    @elseif ($myDailyProfit && $investment->usesTotalProfitPlan())
-                        <div class="dashboard-stat">
-                            <dt>{{ __('Daily profit') }}</dt>
-                            <dd class="text-success">{{ $myDailyProfit['daily_profit'] }}</dd>
+                            <dt>{{ __('Avg. monthly profit') }}</dt>
+                            <dd class="text-success">
+                                @if ($investment->averageMonthlyProfitAmount() !== null)
+                                    {{ number_format($investment->averageMonthlyProfitAmount(), 2, '.', '') }}
+                                @else
+                                    —
+                                @endif
+                            </dd>
                         </div>
                     @endif
                     @if ($investment->deed_completion_deadline)

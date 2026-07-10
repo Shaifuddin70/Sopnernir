@@ -22,7 +22,7 @@ class InvestmentDeedDeadlineTest extends TestCase
             'notes' => 'Sample note',
             'period_start' => '2026-05-07',
             'deed_completion_deadline' => '2027-04-30',
-            'default_monthly_rate_pct' => '1.5',
+            'total_profit_amount' => '25000.00',
             'contribution_per_investor' => '5000.00',
             'status' => Investment::STATUS_DRAFT,
             'is_active' => '1',
@@ -36,7 +36,8 @@ class InvestmentDeedDeadlineTest extends TestCase
         $this->assertSame('2026-05-07', $investment->period_start->toDateString());
         $this->assertSame('2027-04-30', $investment->deed_completion_deadline->toDateString());
         $this->assertSame('5000.00', $investment->contribution_per_investor);
-        $this->assertSame('1.5000', $investment->default_monthly_rate_pct);
+        $this->assertSame('25000.00', $investment->total_profit_amount);
+        $this->assertSame('0.0000', $investment->default_monthly_rate_pct);
     }
 
     public function test_ending_date_is_required_when_creating_investment(): void
@@ -47,7 +48,7 @@ class InvestmentDeedDeadlineTest extends TestCase
             'title' => 'Missing deadline',
             'deed_no' => '1001',
             'period_start' => '2026-05-07',
-            'default_monthly_rate_pct' => '1.5',
+            'total_profit_amount' => '10000.00',
             'contribution_per_investor' => '1000',
             'status' => Investment::STATUS_DRAFT,
             'payment_month' => '2026-05',

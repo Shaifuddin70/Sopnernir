@@ -304,16 +304,16 @@ class InvestmentController extends Controller
             'notes' => ['nullable', 'string'],
             'period_start' => ['required', 'date'],
             'deed_completion_deadline' => ['required', 'date', 'after_or_equal:period_start'],
-            'default_monthly_rate_pct' => ['required', 'numeric', 'min:0.01'],
+            'total_profit_amount' => ['required', 'numeric', 'min:0.01'],
             'contribution_per_investor' => ['required', 'numeric', 'min:0.01'],
             'status' => ['required', 'in:draft,active,closed'],
         ]);
 
         $validated['period_start'] = Carbon::parse($validated['period_start'])->toDateString();
         $validated['deed_completion_deadline'] = Carbon::parse($validated['deed_completion_deadline'])->toDateString();
-        $validated['default_monthly_rate_pct'] = number_format((float) $validated['default_monthly_rate_pct'], 4, '.', '');
+        $validated['default_monthly_rate_pct'] = '0.0000';
+        $validated['total_profit_amount'] = number_format((float) $validated['total_profit_amount'], 2, '.', '');
         $validated['contribution_per_investor'] = number_format((float) $validated['contribution_per_investor'], 2, '.', '');
-        $validated['total_profit_amount'] = '0.00';
         $validated['total_invested_amount'] = '0.00';
 
         $firstMonth = Carbon::parse($validated['period_start'])->startOfMonth();

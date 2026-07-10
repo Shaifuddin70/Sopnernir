@@ -329,4 +329,20 @@ class Investment extends Model
     {
         return $this->total_profit_amount !== null && (float) $this->total_profit_amount > 0;
     }
+
+    /**
+     * Even split of planned total profit across accrual months (informational average).
+     */
+    public function averageMonthlyProfitAmount(): ?float
+    {
+        if (! $this->usesTotalProfitPlan()) {
+            return null;
+        }
+
+        $months = $this->planAccrualMonthCount();
+
+        return $months > 0
+            ? round((float) $this->total_profit_amount / $months, 2)
+            : null;
+    }
 }

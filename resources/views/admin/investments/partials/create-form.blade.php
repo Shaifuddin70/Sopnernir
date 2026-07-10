@@ -34,10 +34,10 @@
             <x-input-error :messages="$errors->get('contribution_per_investor')" class="mt-2" />
         </div>
         <div>
-            <x-input-label for="create_default_monthly_rate_pct" :value="__('Profit rate (% per month)')" />
-            <x-text-input id="create_default_monthly_rate_pct" name="default_monthly_rate_pct" type="text" class="mt-1 block w-full" :value="old('default_monthly_rate_pct')" required />
-            <p class="mt-1 text-sm text-foreground-muted">{{ __('Total profit is calculated from tagged capital, this rate, and the plan period.') }}</p>
-            <x-input-error :messages="$errors->get('default_monthly_rate_pct')" class="mt-2" />
+            <x-input-label for="create_total_profit_amount" :value="__('Total profit')" />
+            <x-text-input id="create_total_profit_amount" name="total_profit_amount" type="text" class="mt-1 block w-full" :value="old('total_profit_amount')" required />
+            <p class="mt-1 text-sm text-foreground-muted">{{ __('Planned profit for the full plan. Daily and monthly payouts are calculated automatically from this amount and the plan dates.') }}</p>
+            <x-input-error :messages="$errors->get('total_profit_amount')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="create_period_start" :value="__('Starting date')" />

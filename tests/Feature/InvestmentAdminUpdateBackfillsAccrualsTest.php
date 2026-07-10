@@ -32,11 +32,15 @@ class InvestmentAdminUpdateBackfillsAccrualsTest extends TestCase
 
         $investment = Investment::create([
             'title' => 'Jan pool',
+            'deed_no' => 'JAN-001',
             'notes' => '',
-            'default_monthly_rate_pct' => '1.5',
+            'default_monthly_rate_pct' => '0',
+            'total_profit_amount' => '15000.00',
+            'contribution_per_investor' => '5000.00',
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-02-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
         $investment->forceFill(['created_at' => Carbon::parse('2026-01-05')])->saveQuietly();
 
@@ -50,9 +54,12 @@ class InvestmentAdminUpdateBackfillsAccrualsTest extends TestCase
 
         $this->actingAs($admin)->patch(route('admin.investments.update', $investment), [
             'title' => 'Jan pool',
+            'deed_no' => 'JAN-001',
             'notes' => 'saved settings',
-            'period_start' => '2026-02',
-            'default_monthly_rate_pct' => '1.5',
+            'period_start' => '2026-02-01',
+            'deed_completion_deadline' => '2026-12-31',
+            'total_profit_amount' => '15000.00',
+            'contribution_per_investor' => '5000.00',
             'status' => 'active',
         ])->assertSessionHasNoErrors()->assertRedirect();
 
