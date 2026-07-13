@@ -17,7 +17,7 @@
             @if (request()->filled('search'))
                 {{ __('No investors match your search.') }}
             @else
-                {{ __('No accrual data yet. Run accruals on active investments to see rankings.') }}
+                {{ __('No investors with active investment plans yet.') }}
             @endif
         </p>
     </div>
@@ -28,9 +28,11 @@
                 <tr>
                     <x-table-serial-header />
                     <th>{{ __('Investor') }}</th>
-                    <th class="hidden sm:table-cell">{{ __('Last payout month') }}</th>
+                    <th class="hidden sm:table-cell text-right">{{ __('Pools') }}</th>
                     <th class="text-right">{{ __('Tagged capital') }}</th>
-                    <th class="text-right">{{ __('Total profit') }}</th>
+                    <th class="hidden md:table-cell text-right">{{ __('Total profit') }}</th>
+                    <th class="text-right">{{ __('Profit til today') }}</th>
+                    <th class="hidden lg:table-cell text-right">{{ __('Total til today') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,11 +46,19 @@
                                 :subtitle="$row->email"
                             />
                         </td>
-                        <td class="hidden whitespace-nowrap tabular-nums text-foreground-muted sm:table-cell">
-                            {{ $row->last_payout_month ? \Carbon\Carbon::parse($row->last_payout_month)->translatedFormat('F Y') : '—' }}
+                        <td class="hidden whitespace-nowrap text-right tabular-nums text-foreground-muted sm:table-cell">
+                            {{ $row->pools_count ?? '—' }}
                         </td>
                         <td class="whitespace-nowrap text-right tabular-nums">{{ $row->total_contribution }}</td>
-                        <td class="whitespace-nowrap text-right tabular-nums font-semibold text-success">{{ $row->total_profit }}</td>
+                        <td class="hidden whitespace-nowrap text-right tabular-nums text-success md:table-cell">
+                            {{ $row->total_projected_profit ?? $row->total_profit }}
+                        </td>
+                        <td class="whitespace-nowrap text-right tabular-nums font-semibold text-success">
+                            {{ $row->profit_til_today ?? $row->total_profit }}
+                        </td>
+                        <td class="hidden whitespace-nowrap text-right tabular-nums lg:table-cell">
+                            {{ $row->total_til_today ?? '—' }}
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

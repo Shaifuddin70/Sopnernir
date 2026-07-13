@@ -75,20 +75,23 @@ class DashboardMetricsTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function test_dashboard_lists_top_investors_after_accrual(): void
+    public function test_dashboard_lists_top_investors_by_profit_til_today(): void
     {
+        Carbon::setTestNow(Carbon::parse('2026-04-15 12:00:00', config('app.timezone')));
+
         $admin = User::factory()->admin()->create();
         $a = User::factory()->create(['email' => 'rank-a@example.com', 'name' => 'Rank A']);
         $b = User::factory()->create(['email' => 'rank-b@example.com', 'name' => 'Rank B']);
 
         $investment = Investment::create([
             'title' => 'Pool',
-            'default_monthly_rate_pct' => '1.5',
+            'default_monthly_rate_pct' => '0.0000',
+            'total_profit_amount' => '36500.00',
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $admin->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
-        $investment->forceFill(['created_at' => Carbon::parse('2026-01-05')])->saveQuietly();
 
         InvestmentParticipant::create([
             'investment_id' => $investment->id,
@@ -101,14 +104,16 @@ class DashboardMetricsTest extends TestCase
             'contribution_amount' => '1000.00',
         ]);
 
-        $this->actingAs($admin)->post(route('admin.investments.accruals.store', $investment), [
-            'month' => '2026-03',
-        ])->assertSessionHasNoErrors();
+        $summaryA = app(InvestmentDailyProfitService::class)->portfolioSummaryForUser($a);
 
         $this->actingAs($admin)
             ->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Rank A', false)
-            ->assertSee(__('Top investors'), false);
+            ->assertSee(__('Top investors'), false)
+            ->assertSee(__('By profit til today'), false)
+            ->assertSee($summaryA['profit_til_today'], false);
+
+        Carbon::setTestNow();
     }
 }

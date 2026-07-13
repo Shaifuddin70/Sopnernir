@@ -95,7 +95,7 @@
                 <div class="dashboard-chart-panel__canvas">
                     <canvas
                         data-chart-type="profit-trend"
-                        data-label="{{ __('Pool profit') }}"
+                        data-label="{{ __('Profit til period') }}"
                         aria-label="{{ __('Profit trend chart') }}"
                         role="img"
                     ></canvas>
@@ -103,7 +103,7 @@
             </section>
 
             <section class="dashboard-chart-panel lg:col-span-4">
-                <h3 class="dashboard-chart-panel__title">{{ __('Capital vs profit') }}</h3>
+                <h3 class="dashboard-chart-panel__title">{{ __('Capital vs profit til today') }}</h3>
                 <div class="dashboard-chart-panel__canvas dashboard-chart-panel__canvas--square">
                     <canvas
                         data-chart-type="capital-vs-profit"
@@ -146,7 +146,7 @@
         <section class="ui-glass-panel min-w-0">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-surface-variant px-4 py-3 sm:px-5">
                 <h3 class="text-sm font-semibold text-foreground">{{ __('Top investors') }}</h3>
-                <span class="text-sm text-foreground-muted">{{ __('By total profit share') }}</span>
+                <span class="text-sm text-foreground-muted">{{ __('By profit til today') }}</span>
             </div>
             <div class="p-3 sm:p-4">
                 <x-ajax-table-region :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment" ajax-fragment="top_investors">

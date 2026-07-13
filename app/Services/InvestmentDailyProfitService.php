@@ -99,6 +99,143 @@ class InvestmentDailyProfitService
     }
 
     /**
+     * Aggregate every tagged investor’s capital / projected / profit-til-today across active pools.
+     *
+     * @return Collection<int, array{
+     *     user_id: int,
+     *     capital: float,
+     *     projected_profit: float,
+     *     profit_til_today: float,
+     *     total_til_today: float,
+     *     pools_count: int,
+     * }>
+     */
+    public function investorRankings(?Carbon $asOf = null): Collection
+    {
+        $asOf = ($asOf ?? Carbon::today())->copy()->startOfDay();
+
+        $investments = Investment::query()
+            ->where('is_active', true)
+            ->where('status', Investment::STATUS_ACTIVE)
+            ->whereNotNull('deed_completion_deadline')
+            ->with('participants')
+            ->get();
+
+        /** @var array<int, array{user_id: int, capital: float, projected_profit: float, profit_til_today: float, pools_count: int}> $byUser */
+        $byUser = [];
+
+        foreach ($investments as $investment) {
+            $pool = $this->poolProjection($investment, $asOf);
+            if ($pool === null) {
+                continue;
+            }
+
+            $poolCapital = (float) $investment->participants->sum('contribution_amount');
+            if ($poolCapital <= 0) {
+                continue;
+            }
+
+            foreach ($investment->participants as $participant) {
+                $userId = (int) $participant->user_id;
+                $userCapital = (float) $participant->contribution_amount;
+                $share = $userCapital / $poolCapital;
+
+                if (! isset($byUser[$userId])) {
+                    $byUser[$userId] = [
+                        'user_id' => $userId,
+                        'capital' => 0.0,
+                        'projected_profit' => 0.0,
+                        'profit_til_today' => 0.0,
+                        'pools_count' => 0,
+                    ];
+                }
+
+                $byUser[$userId]['capital'] += $userCapital;
+                $byUser[$userId]['projected_profit'] += $pool['projected_profit'] * $share;
+                $byUser[$userId]['profit_til_today'] += $pool['profit_til_today'] * $share;
+                $byUser[$userId]['pools_count']++;
+            }
+        }
+
+        return collect($byUser)
+            ->map(function (array $row): array {
+                $row['capital'] = round($row['capital'], 2);
+                $row['projected_profit'] = round($row['projected_profit'], 2);
+                $row['profit_til_today'] = round($row['profit_til_today'], 2);
+                $row['total_til_today'] = round($row['capital'] + $row['profit_til_today'], 2);
+
+                return $row;
+            })
+            ->sortByDesc('profit_til_today')
+            ->values();
+    }
+
+    /**
+     * Platform pool profit earned in each calendar month (daily-spread / rate plans).
+     *
+     * @return array{labels: list<string>, values: list<float>}
+     */
+    public function monthlyPlatformProfitTrend(int $months = 6, ?Carbon $asOf = null): array
+    {
+        $asOf = ($asOf ?? Carbon::today())->copy()->startOfDay();
+        $end = $asOf->copy()->startOfMonth();
+        $start = $end->copy()->subMonths($months - 1);
+
+        $investments = Investment::query()
+            ->where('is_active', true)
+            ->where('status', Investment::STATUS_ACTIVE)
+            ->whereNotNull('deed_completion_deadline')
+            ->with('participants')
+            ->get();
+
+        $labels = [];
+        $values = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $monthTotal = 0.0;
+
+            foreach ($investments as $investment) {
+                $monthTotal += $this->poolProfitForCalendarMonth($investment, $cursor, $asOf);
+            }
+
+            $labels[] = $cursor->translatedFormat('M Y');
+            $values[] = round($monthTotal, 2);
+            $cursor->addMonth();
+        }
+
+        return ['labels' => $labels, 'values' => $values];
+    }
+
+    /**
+     * Pool profit earned in one calendar month, using the same daily projection as
+     * profit-til-today (prorated for the current month; 0 for future months).
+     */
+    public function poolProfitForCalendarMonth(Investment $investment, Carbon $month, ?Carbon $asOf = null): float
+    {
+        $asOf = ($asOf ?? Carbon::today())->copy()->startOfDay();
+        $monthStart = $month->copy()->startOfMonth()->startOfDay();
+        $monthEnd = $month->copy()->endOfMonth()->startOfDay();
+
+        if ($monthStart->gt($asOf)) {
+            return 0.0;
+        }
+
+        $through = $monthEnd->gt($asOf) ? $asOf : $monthEnd;
+        $before = $monthStart->copy()->subDay();
+
+        $atThrough = $this->poolProjection($investment, $through);
+        if ($atThrough === null) {
+            return 0.0;
+        }
+
+        $atBefore = $this->poolProjection($investment, $before);
+        $beforeProfit = $atBefore['profit_til_today'] ?? 0.0;
+
+        return round(max(0.0, $atThrough['profit_til_today'] - $beforeProfit), 2);
+    }
+
+    /**
      * @return Collection<int, array{
      *     investment_id: int,
      *     title: string,

@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
-use App\Models\InvestmentPeriod;
-use App\Models\InvestmentPeriodUser;
 use App\Models\User;
 use App\Support\PublicMediaUrl;
 use App\Support\SqlLike;
@@ -13,7 +11,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class DashboardMetricsService
 {
@@ -34,17 +31,12 @@ class DashboardMetricsService
      *     total_amount: string,
      *     member_count: int,
      *     per_person_profit_til_today: string,
-     *     accrual_periods: int,
-     *     participant_rows: int,
      *     as_of_date: string,
      * }
      */
     public function platformSummary(): array
     {
         $daily = $this->dailyProfit->platformSummary();
-        $postedProfit = InvestmentPeriod::query()
-            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->sum('profit_amount');
 
         return [
             'investments_total' => (int) Investment::query()->count(),
@@ -55,18 +47,10 @@ class DashboardMetricsService
             'total_contributions' => $daily['total_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
-            // Kept for charts / older callers; equals profit til today so capital-vs-profit matches portfolio.
             'total_profit_distributed' => $daily['profit_til_today'],
             'total_amount' => $daily['total_til_today'],
             'member_count' => $daily['member_count'],
             'per_person_profit_til_today' => $daily['per_person_profit_til_today'],
-            'accrual_periods' => (int) InvestmentPeriod::query()
-                ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-                ->count(),
-            'participant_rows' => (int) InvestmentParticipant::query()
-                ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-                ->count(),
-            'posted_profit_total' => $this->decimalString($postedProfit),
             'as_of_date' => $daily['as_of_date'],
         ];
     }
@@ -96,7 +80,6 @@ class DashboardMetricsService
             'total_contribution' => $daily['total_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
-            // Alias used by older dashboard labels / tests — same as profit til today.
             'total_profit' => $daily['profit_til_today'],
             'total_amount' => $daily['total_til_today'],
             'return_on_tagged_capital_pct' => $contrib > 0
@@ -107,37 +90,45 @@ class DashboardMetricsService
     }
 
     /**
-     * @return LengthAwarePaginator<int, object{user_id: int, name: string, email: string, total_profit: string, total_contribution: string, last_payout_month: string|null}>
+     * Top investors ranked by profit til today (same daily projection as portfolio).
+     *
+     * @return LengthAwarePaginator<int, object{
+     *     user_id: int,
+     *     name: string,
+     *     email: string,
+     *     profile_image_url: string|null,
+     *     total_contribution: string,
+     *     total_profit: string,
+     *     profit_til_today: string,
+     *     total_projected_profit: string,
+     *     total_til_today: string,
+     *     pools_count: int,
+     * }>
      */
     public function topInvestorsByProfitGlobally(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
-        $like = SqlLike::term($search);
-
-        $rows = DB::table('investment_period_users as ipu')
-            ->join('investment_periods as ip', 'ip.id', '=', 'ipu.investment_period_id')
-            ->join('investments as inv', 'inv.id', '=', 'ip.investment_id')
-            ->join('users as u', 'u.id', '=', 'ipu.user_id')
-            ->where('inv.is_active', true)
-            ->where('u.is_active', true)
-            ->when($like, function ($q) use ($like): void {
-                $q->where(function ($w) use ($like): void {
-                    $w->where('u.name', 'like', $like)
-                        ->orWhere('u.email', 'like', $like);
-                });
-            })
-            ->selectRaw('ipu.user_id, u.name, u.email, MAX(u.image) as image, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
-            ->groupBy('ipu.user_id', 'u.name', 'u.email')
-            ->orderByDesc('total_profit')
-            ->paginate($perPage, ['*'], 'top_investors_page')
-            ->withQueryString();
-
-        return $this->attachContributionTotals($rows);
+        return $this->paginateInvestorRankings(
+            $this->dailyProfit->investorRankings(),
+            $perPage,
+            $search,
+        );
     }
 
     /**
-     * Top investors by profit share, limited to investments the viewer participates in.
+     * Top co-investors on pools the viewer participates in, ranked by profit til today.
      *
-     * @return LengthAwarePaginator<int, object{user_id: int, name: string, email: string, total_profit: string, total_contribution: string, last_payout_month: string|null}>
+     * @return LengthAwarePaginator<int, object{
+     *     user_id: int,
+     *     name: string,
+     *     email: string,
+     *     profile_image_url: string|null,
+     *     total_contribution: string,
+     *     total_profit: string,
+     *     profit_til_today: string,
+     *     total_projected_profit: string,
+     *     total_til_today: string,
+     *     pools_count: int,
+     * }>
      */
     public function topCoInvestorsByProfit(User $viewer, int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
@@ -147,40 +138,20 @@ class DashboardMetricsService
             ->pluck('investment_id');
 
         if ($investmentIds->isEmpty()) {
-            return (new Paginator(
-                collect(),
-                0,
-                $perPage,
-                1,
-                [
-                    'pageName' => 'top_investors_page',
-                    'path' => Paginator::resolveCurrentPath(),
-                ]
-            ))->withQueryString();
+            return $this->emptyTopInvestorsPaginator($perPage);
         }
 
-        $like = SqlLike::term($search);
+        $allowedUserIds = InvestmentParticipant::query()
+            ->whereIn('investment_id', $investmentIds)
+            ->pluck('user_id')
+            ->unique()
+            ->all();
 
-        $rows = DB::table('investment_period_users as ipu')
-            ->join('investment_periods as ip', 'ip.id', '=', 'ipu.investment_period_id')
-            ->join('investments as inv', 'inv.id', '=', 'ip.investment_id')
-            ->join('users as u', 'u.id', '=', 'ipu.user_id')
-            ->whereIn('ip.investment_id', $investmentIds)
-            ->where('inv.is_active', true)
-            ->where('u.is_active', true)
-            ->when($like, function ($q) use ($like): void {
-                $q->where(function ($w) use ($like): void {
-                    $w->where('u.name', 'like', $like)
-                        ->orWhere('u.email', 'like', $like);
-                });
-            })
-            ->selectRaw('ipu.user_id, u.name, u.email, MAX(u.image) as image, SUM(ipu.profit_share) as total_profit, MAX(ip.month) as last_payout_month')
-            ->groupBy('ipu.user_id', 'u.name', 'u.email')
-            ->orderByDesc('total_profit')
-            ->paginate($perPage, ['*'], 'top_investors_page')
-            ->withQueryString();
+        $rankings = $this->dailyProfit->investorRankings()
+            ->filter(fn (array $row) => in_array($row['user_id'], $allowedUserIds, true))
+            ->values();
 
-        return $this->attachContributionTotals($rows);
+        return $this->paginateInvestorRankings($rankings, $perPage, $search);
     }
 
     /**
@@ -188,16 +159,7 @@ class DashboardMetricsService
      */
     public function monthlyProfitTrendPlatform(int $months = 6): array
     {
-        $start = Carbon::now()->subMonths($months - 1)->startOfMonth();
-
-        $totals = InvestmentPeriod::query()
-            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->where('month', '>=', $start)
-            ->get(['month', 'profit_amount'])
-            ->groupBy(fn (InvestmentPeriod $period) => Carbon::parse($period->month)->format('Y-m'))
-            ->map(fn (Collection $group) => $group->sum(fn (InvestmentPeriod $period) => (float) $period->profit_amount));
-
-        return $this->fillMonthlySeries($totals, $months);
+        return $this->dailyProfit->monthlyPlatformProfitTrend($months);
     }
 
     /**
@@ -205,20 +167,47 @@ class DashboardMetricsService
      */
     public function monthlyProfitTrendForUser(User $user, int $months = 6): array
     {
-        $start = Carbon::now()->subMonths($months - 1)->startOfMonth();
+        $asOf = Carbon::today()->startOfDay();
+        $end = $asOf->copy()->startOfMonth();
+        $start = $end->copy()->subMonths($months - 1);
 
-        $rows = InvestmentPeriodUser::query()
-            ->where('investment_period_users.user_id', $user->id)
-            ->join('investment_periods as ip', 'ip.id', '=', 'investment_period_users.investment_period_id')
-            ->join('investments as inv', 'inv.id', '=', 'ip.investment_id')
-            ->where('inv.is_active', true)
-            ->where('ip.month', '>=', $start)
-            ->get(['ip.month', 'investment_period_users.profit_share']);
+        $participants = InvestmentParticipant::query()
+            ->where('user_id', $user->id)
+            ->whereHas('investment', fn ($q) => $q
+                ->where('is_active', true)
+                ->where('status', Investment::STATUS_ACTIVE)
+                ->whereNotNull('deed_completion_deadline'))
+            ->with('investment.participants')
+            ->get();
 
-        $totals = $rows->groupBy(fn ($row) => Carbon::parse($row->month)->format('Y-m'))
-            ->map(fn (Collection $group) => $group->sum(fn ($row) => (float) $row->profit_share));
+        $labels = [];
+        $values = [];
+        $cursor = $start->copy();
 
-        return $this->fillMonthlySeries($totals, $months);
+        while ($cursor->lte($end)) {
+            $monthTotal = 0.0;
+
+            foreach ($participants as $participant) {
+                $investment = $participant->investment;
+                if ($investment === null) {
+                    continue;
+                }
+
+                $poolCapital = (float) $investment->participants->sum('contribution_amount');
+                if ($poolCapital <= 0) {
+                    continue;
+                }
+
+                $share = (float) $participant->contribution_amount / $poolCapital;
+                $monthTotal += $this->dailyProfit->poolProfitForCalendarMonth($investment, $cursor, $asOf) * $share;
+            }
+
+            $labels[] = $cursor->translatedFormat('M Y');
+            $values[] = round($monthTotal, 2);
+            $cursor->addMonth();
+        }
+
+        return ['labels' => $labels, 'values' => $values];
     }
 
     /**
@@ -272,9 +261,16 @@ class DashboardMetricsService
     public function investmentStatusBreakdown(): array
     {
         return [
-            'active' => (int) Investment::query()->where('status', Investment::STATUS_ACTIVE)->count(),
-            'draft' => (int) Investment::query()->where('status', Investment::STATUS_DRAFT)->count(),
-            'closed' => (int) Investment::query()->where('status', Investment::STATUS_CLOSED)->count(),
+            'active' => (int) Investment::query()
+                ->where('is_active', true)
+                ->where('status', Investment::STATUS_ACTIVE)
+                ->count(),
+            'draft' => (int) Investment::query()
+                ->where('status', Investment::STATUS_DRAFT)
+                ->count(),
+            'closed' => (int) Investment::query()
+                ->where('status', Investment::STATUS_CLOSED)
+                ->count(),
         ];
     }
 
@@ -293,24 +289,83 @@ class DashboardMetricsService
     }
 
     /**
-     * @param  Collection<string|int, mixed>  $totalsByYm
-     * @return array{labels: list<string>, values: list<float>}
+     * @param  Collection<int, array{
+     *     user_id: int,
+     *     capital: float,
+     *     projected_profit: float,
+     *     profit_til_today: float,
+     *     total_til_today: float,
+     *     pools_count: int,
+     * }>  $rankings
      */
-    private function fillMonthlySeries(Collection $totalsByYm, int $months): array
+    private function paginateInvestorRankings(Collection $rankings, int $perPage, ?string $search): LengthAwarePaginator
     {
-        $labels = [];
-        $values = [];
-        $cursor = Carbon::now()->subMonths($months - 1)->startOfMonth();
-        $end = Carbon::now()->startOfMonth();
+        $like = SqlLike::term($search);
+        $userIds = $rankings->pluck('user_id')->all();
 
-        while ($cursor->lte($end)) {
-            $key = $cursor->format('Y-m');
-            $labels[] = $cursor->translatedFormat('M Y');
-            $values[] = round((float) ($totalsByYm[$key] ?? 0), 2);
-            $cursor->addMonth();
+        if ($userIds === []) {
+            return $this->emptyTopInvestorsPaginator($perPage);
         }
 
-        return ['labels' => $labels, 'values' => $values];
+        $users = User::query()
+            ->whereIn('id', $userIds)
+            ->where('is_active', true)
+            ->when($like, function ($q) use ($like): void {
+                $q->where(function ($w) use ($like): void {
+                    $w->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like);
+                });
+            })
+            ->get(['id', 'name', 'email', 'image'])
+            ->keyBy('id');
+
+        $rows = $rankings
+            ->filter(fn (array $row) => $users->has($row['user_id']))
+            ->map(function (array $row) use ($users): object {
+                $user = $users->get($row['user_id']);
+
+                return (object) [
+                    'user_id' => $row['user_id'],
+                    'name' => (string) $user->name,
+                    'email' => (string) $user->email,
+                    'profile_image_url' => PublicMediaUrl::forPath($user->image ?? null),
+                    'total_contribution' => $this->decimalString($row['capital']),
+                    'total_profit' => $this->decimalString($row['profit_til_today']),
+                    'profit_til_today' => $this->decimalString($row['profit_til_today']),
+                    'total_projected_profit' => $this->decimalString($row['projected_profit']),
+                    'total_til_today' => $this->decimalString($row['total_til_today']),
+                    'pools_count' => (int) $row['pools_count'],
+                ];
+            })
+            ->values();
+
+        $page = max(1, (int) request()->query('top_investors_page', 1));
+        $total = $rows->count();
+
+        return (new Paginator(
+            $rows->forPage($page, $perPage)->values(),
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => Paginator::resolveCurrentPath(),
+                'pageName' => 'top_investors_page',
+            ]
+        ))->withQueryString();
+    }
+
+    private function emptyTopInvestorsPaginator(int $perPage): LengthAwarePaginator
+    {
+        return (new Paginator(
+            collect(),
+            0,
+            $perPage,
+            1,
+            [
+                'pageName' => 'top_investors_page',
+                'path' => Paginator::resolveCurrentPath(),
+            ]
+        ))->withQueryString();
     }
 
     private function decimalString(mixed $value): string
@@ -320,53 +375,5 @@ class DashboardMetricsService
         }
 
         return number_format((float) $value, 2, '.', '');
-    }
-
-    /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, object>  $rows
-     * @return LengthAwarePaginator<int, object{user_id: int, name: string, email: string, total_profit: string, total_contribution: string, last_payout_month: string|null}>
-     */
-    private function attachContributionTotals(LengthAwarePaginator $rows): LengthAwarePaginator
-    {
-        if ($rows->isEmpty()) {
-            return $rows;
-        }
-
-        /** @var Paginator<int, object> $paginator */
-        $paginator = $rows;
-
-        $items = collect($paginator->items());
-        $ids = $items->pluck('user_id')->all();
-        $contrib = InvestmentParticipant::query()
-            ->whereIn('user_id', $ids)
-            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->selectRaw('user_id, SUM(contribution_amount) as total')
-            ->groupBy('user_id')
-            ->pluck('total', 'user_id');
-
-        $mapped = $items->map(function ($row) use ($contrib): object {
-            $tid = (int) $row->user_id;
-
-            return (object) [
-                'user_id' => $tid,
-                'name' => (string) $row->name,
-                'email' => (string) $row->email,
-                'profile_image_url' => PublicMediaUrl::forPath($row->image ?? null),
-                'total_profit' => $this->decimalString($row->total_profit ?? 0),
-                'total_contribution' => $this->decimalString($contrib[$tid] ?? 0),
-                'last_payout_month' => $row->last_payout_month,
-            ];
-        });
-
-        return (new Paginator(
-            $mapped,
-            $paginator->total(),
-            $paginator->perPage(),
-            $paginator->currentPage(),
-            [
-                'path' => $paginator->path(),
-                'pageName' => $paginator->getPageName(),
-            ]
-        ))->withQueryString();
     }
 }
