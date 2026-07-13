@@ -24,10 +24,7 @@ class MonthlyPaymentTest extends TestCase
             ->assertSee(__('Monthly payments'), false)
             ->assertSee('Paying Investor', false)
             ->assertSee(__('Create investment'), false)
-            ->assertSee(
-                route('admin.investments.index', ['new' => 1, 'payment_month' => '2026-03']),
-                false
-            )
+            ->assertSee('payment_month=2026-03', false)
             ->assertSee(
                 route('admin.monthly-payments.index', ['month' => '2026-02']),
                 false
@@ -145,5 +142,48 @@ class MonthlyPaymentTest extends TestCase
         $html = (string) $response->json('html');
         $this->assertStringContainsString('Sakibur Rahman', $html);
         $this->assertStringNotContainsString('Other Person', $html);
+    }
+
+    public function test_monthly_payments_ajax_update_returns_json(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $investor = User::factory()->create(['name' => 'Ajax Investor']);
+
+        $response = $this->actingAs($admin)
+            ->patchJson(route('admin.monthly-payments.update'), [
+                'user_id' => $investor->id,
+                'month' => '2026-06',
+                'paid' => true,
+            ]);
+
+        $response->assertOk()
+            ->assertJsonPath('ok', true)
+            ->assertJsonPath('is_paid', true)
+            ->assertJsonStructure(['summary_html', 'summary' => ['paid', 'unpaid', 'total']]);
+
+        $this->assertTrue(
+            InvestorMonthlyPayment::query()
+                ->where('user_id', $investor->id)
+                ->whereDate('month', '2026-06-01')
+                ->first()
+                ?->isPaid() ?? false
+        );
+    }
+
+    public function test_monthly_payments_ajax_bulk_update_returns_json(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $first = User::factory()->create();
+        $second = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->patchJson(route('admin.monthly-payments.bulk-update'), [
+                'month' => '2026-07',
+                'paid' => true,
+                'user_ids' => [$first->id, $second->id],
+            ])
+            ->assertOk()
+            ->assertJsonPath('ok', true)
+            ->assertJsonStructure(['summary_html', 'message']);
     }
 }

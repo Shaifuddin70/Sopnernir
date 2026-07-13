@@ -46,6 +46,17 @@ class MonthlyPaymentController extends Controller
                     'filteredCount',
                     'summaryTotal',
                 ))->render(),
+                'summary_html' => view('admin.monthly-payments.partials.summary', compact(
+                    'month',
+                    'summaryPaid',
+                    'summaryUnpaid',
+                    'summaryTotal',
+                ))->render(),
+                'summary' => [
+                    'paid' => $summaryPaid,
+                    'unpaid' => $summaryUnpaid,
+                    'total' => $summaryTotal,
+                ],
             ]);
         }
 
@@ -73,11 +84,33 @@ class MonthlyPaymentController extends Controller
         /** @var User $admin */
         $admin = $request->user();
 
-        $payments->setPaidStatus($user, $month, (bool) $validated['paid'], $admin);
-
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['ok' => true]);
+            $payment = $payments->setPaidStatus($user, $month, (bool) $validated['paid'], $admin);
+            $allRows = $payments->rowsForMonth($month);
+            $summaryPaid = $allRows->where('is_paid', true)->count();
+            $summaryTotal = $allRows->count();
+            $summaryUnpaid = $summaryTotal - $summaryPaid;
+
+            return response()->json([
+                'ok' => true,
+                'user_id' => $user->id,
+                'is_paid' => $payment->isPaid(),
+                'paid_at' => $payment->paid_at?->format('Y-m-d H:i'),
+                'summary' => [
+                    'paid' => $summaryPaid,
+                    'unpaid' => $summaryUnpaid,
+                    'total' => $summaryTotal,
+                ],
+                'summary_html' => view('admin.monthly-payments.partials.summary', compact(
+                    'month',
+                    'summaryPaid',
+                    'summaryUnpaid',
+                    'summaryTotal',
+                ))->render(),
+            ]);
         }
+
+        $payments->setPaidStatus($user, $month, (bool) $validated['paid'], $admin);
 
         return back()->with('status', __('Payment status updated.'));
     }
@@ -108,7 +141,27 @@ class MonthlyPaymentController extends Controller
             : trans_choice('Marked :count investor unpaid.|Marked :count investors unpaid.', $count, ['count' => $count]);
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['ok' => true, 'message' => $message]);
+            $allRows = $payments->rowsForMonth($month);
+            $summaryPaid = $allRows->where('is_paid', true)->count();
+            $summaryTotal = $allRows->count();
+            $summaryUnpaid = $summaryTotal - $summaryPaid;
+
+            return response()->json([
+                'ok' => true,
+                'message' => $message,
+                'paid' => (bool) $validated['paid'],
+                'summary' => [
+                    'paid' => $summaryPaid,
+                    'unpaid' => $summaryUnpaid,
+                    'total' => $summaryTotal,
+                ],
+                'summary_html' => view('admin.monthly-payments.partials.summary', compact(
+                    'month',
+                    'summaryPaid',
+                    'summaryUnpaid',
+                    'summaryTotal',
+                ))->render(),
+            ]);
         }
 
         return back()->with('status', $message);

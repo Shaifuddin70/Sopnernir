@@ -164,6 +164,13 @@ document.addEventListener('alpine:init', () => {
                 if (el && typeof data.html === 'string') {
                     el.innerHTML = data.html;
                 }
+                if (typeof data.summary_html === 'string') {
+                    const summaryEl = document.getElementById('monthly-payments-summary');
+                    if (summaryEl) {
+                        summaryEl.innerHTML = data.summary_html;
+                    }
+                }
+                syncMonthlyPaymentsChecklistState(document.getElementById(this.targetId));
                 const barUrl = this.requestUrl(false);
                 const next = barUrl.pathname + barUrl.search;
                 const cur = window.location.pathname + (window.location.search || '');
@@ -342,6 +349,203 @@ document.addEventListener('alpine:init', () => {
             }
         },
     }));
+});
+
+function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+}
+
+function paidStatusBadge(isPaid, root) {
+    const paidLabel = root?.dataset.labelPaid || 'Paid';
+    const unpaidLabel = root?.dataset.labelUnpaid || 'Unpaid';
+
+    if (isPaid) {
+        return `<span class="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success-muted px-3 py-1 text-sm font-semibold text-success"><span class="h-1.5 w-1.5 shrink-0 rounded-full bg-success" aria-hidden="true"></span>${paidLabel}</span>`;
+    }
+
+    return `<span class="inline-flex items-center gap-1.5 rounded-full border border-warning/25 bg-warning-muted px-3 py-1 text-sm font-semibold text-warning"><span class="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" aria-hidden="true"></span>${unpaidLabel}</span>`;
+}
+
+function applyPaymentRowState(row, isPaid, paidAt, root) {
+    row.dataset.paid = isPaid ? '1' : '0';
+    row.classList.toggle('bg-success-muted/30', isPaid);
+
+    const statusCell = row.querySelector('[data-status-cell]');
+    if (statusCell) {
+        statusCell.innerHTML = paidStatusBadge(isPaid, root);
+    }
+
+    const paidAtCell = row.querySelector('[data-paid-at-cell]');
+    if (paidAtCell) {
+        paidAtCell.textContent = isPaid && paidAt ? paidAt : '—';
+    }
+
+    const toggle = row.querySelector('[data-paid-toggle]');
+    if (toggle instanceof HTMLInputElement) {
+        toggle.checked = isPaid;
+    }
+
+    const label = row.querySelector('[data-toggle-label]');
+    if (label) {
+        label.textContent = isPaid
+            ? (root?.dataset.labelMarkUnpaid || 'Mark unpaid')
+            : (root?.dataset.labelMarkPaid || 'Mark paid');
+    }
+}
+
+function syncMonthlyPaymentsChecklistState(scope = document) {
+    const root = scope?.querySelector?.('[data-monthly-payments-checklist]')
+        || (scope instanceof HTMLElement && scope.matches('[data-monthly-payments-checklist]') ? scope : null)
+        || document.querySelector('[data-monthly-payments-checklist]');
+
+    if (! root) {
+        return;
+    }
+
+    const toggles = Array.from(root.querySelectorAll('[data-paid-toggle]'));
+    const master = root.querySelector('[data-check-all-paid]');
+    if (! (master instanceof HTMLInputElement) || toggles.length === 0) {
+        return;
+    }
+
+    const checkedCount = toggles.filter((el) => el instanceof HTMLInputElement && el.checked).length;
+    master.checked = checkedCount === toggles.length;
+    master.indeterminate = checkedCount > 0 && checkedCount < toggles.length;
+}
+
+function applyMonthlyPaymentsSummaryHtml(html) {
+    const summaryEl = document.getElementById('monthly-payments-summary');
+    if (summaryEl && typeof html === 'string') {
+        summaryEl.innerHTML = html;
+    }
+}
+
+async function refreshMonthlyPaymentsFragment(root) {
+    const indexUrl = root?.dataset.indexUrl;
+    if (! indexUrl) {
+        return;
+    }
+
+    const url = buildMergedRequestUrl(indexUrl, {
+        set: {
+            month: root.dataset.month || null,
+        },
+    });
+
+    const res = await fetch(url.toString(), {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            Accept: 'application/json',
+        },
+        credentials: 'same-origin',
+    });
+
+    if (! res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const fragment = document.getElementById('monthly-payments-table-fragment');
+    if (fragment && typeof data.html === 'string') {
+        fragment.innerHTML = data.html;
+    }
+    if (typeof data.summary_html === 'string') {
+        applyMonthlyPaymentsSummaryHtml(data.summary_html);
+    }
+    syncMonthlyPaymentsChecklistState(fragment);
+}
+
+async function patchMonthlyPayment(url, body) {
+    const { data } = await window.axios.patch(url, body, {
+        headers: {
+            Accept: 'application/json',
+            'X-CSRF-TOKEN': csrfToken(),
+        },
+    });
+
+    return data;
+}
+
+document.addEventListener('change', async (event) => {
+    const target = event.target;
+    if (! (target instanceof HTMLInputElement)) {
+        return;
+    }
+
+    const root = target.closest('[data-monthly-payments-checklist]');
+    if (! root) {
+        return;
+    }
+
+    if (target.matches('[data-paid-toggle]')) {
+        const row = target.closest('[data-payment-row]');
+        if (! row) {
+            return;
+        }
+
+        const previous = row.dataset.paid === '1';
+        const nextPaid = target.checked;
+        target.disabled = true;
+        root.classList.add('opacity-80', 'pointer-events-none');
+
+        try {
+            const data = await patchMonthlyPayment(root.dataset.updateUrl, {
+                user_id: Number(target.value),
+                month: root.dataset.month,
+                paid: nextPaid,
+            });
+
+            applyPaymentRowState(row, Boolean(data.is_paid), data.paid_at, root);
+            if (data.summary_html) {
+                applyMonthlyPaymentsSummaryHtml(data.summary_html);
+            }
+            syncMonthlyPaymentsChecklistState(root);
+        } catch (error) {
+            console.error(error);
+            target.checked = previous;
+            applyPaymentRowState(row, previous, row.querySelector('[data-paid-at-cell]')?.textContent || null, root);
+        } finally {
+            target.disabled = false;
+            root.classList.remove('opacity-80', 'pointer-events-none');
+        }
+
+        return;
+    }
+
+    if (target.matches('[data-check-all-paid]')) {
+        const toggles = Array.from(root.querySelectorAll('[data-paid-toggle]'));
+        const userIds = toggles
+            .filter((el) => el instanceof HTMLInputElement)
+            .map((el) => Number(el.value))
+            .filter((id) => Number.isFinite(id) && id > 0);
+
+        if (userIds.length === 0) {
+            return;
+        }
+
+        const paid = target.checked;
+        target.disabled = true;
+        root.classList.add('opacity-80', 'pointer-events-none');
+
+        try {
+            await patchMonthlyPayment(root.dataset.bulkUrl, {
+                month: root.dataset.month,
+                paid,
+                user_ids: userIds,
+            });
+            await refreshMonthlyPaymentsFragment(root);
+        } catch (error) {
+            console.error(error);
+            syncMonthlyPaymentsChecklistState(root);
+        } finally {
+            target.disabled = false;
+            root.classList.remove('opacity-80', 'pointer-events-none');
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    syncMonthlyPaymentsChecklistState(document);
 });
 
 window.Alpine = Alpine;

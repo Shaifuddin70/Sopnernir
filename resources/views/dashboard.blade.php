@@ -23,28 +23,33 @@
             <section class="dashboard-stat-panel" aria-label="{{ __('Platform summary') }}">
                 <div class="dashboard-stat-panel__head">
                     <h3 class="dashboard-stat-panel__title">{{ __('Platform') }}</h3>
-                    @if (auth()->user()->isAdmin())
-                        <span class="ui-chip">{{ __('Admin') }}</span>
-                    @endif
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        @if (! empty($platform['as_of_date']))
+                            <span class="ui-chip tabular-nums">{{ __('As of :date', ['date' => \Carbon\Carbon::parse($platform['as_of_date'])->translatedFormat('j M Y')]) }}</span>
+                        @endif
+                        @if (auth()->user()->isAdmin())
+                            <span class="ui-chip">{{ __('Admin') }}</span>
+                        @endif
+                    </div>
                 </div>
                 <dl class="dashboard-stat-grid">
-                    <div class="dashboard-stat">
-                        <dt>{{ __('Investments') }}</dt>
-                        <dd>{{ $platform['investments_total'] }}</dd>
-                        <p>{{ __('Active: :n', ['n' => $platform['investments_active']]) }}</p>
-                    </div>
                     <div class="dashboard-stat dashboard-stat--capital">
-                        <dt>{{ __('Tagged capital') }}</dt>
+                        <dt>{{ __('Total capital') }}</dt>
                         <dd>{{ $platform['total_contributions'] }}</dd>
+                        <p>{{ __('Active pools: :n', ['n' => $platform['investments_active']]) }}</p>
                     </div>
                     <div class="dashboard-stat dashboard-stat--profit">
-                        <dt>{{ __('Profit distributed') }}</dt>
-                        <dd>{{ $platform['total_profit_distributed'] }}</dd>
+                        <dt>{{ __('Total profit') }}</dt>
+                        <dd>{{ $platform['total_projected_profit'] }}</dd>
+                    </div>
+                    <div class="dashboard-stat dashboard-stat--profit">
+                        <dt>{{ __('Profit til today') }}</dt>
+                        <dd>{{ $platform['profit_til_today'] }}</dd>
                     </div>
                     <div class="dashboard-stat">
-                        <dt>{{ __('Accrual months') }}</dt>
-                        <dd>{{ $platform['accrual_periods'] }}</dd>
-                        <p>{{ __(':n participants', ['n' => $platform['participant_rows']]) }}</p>
+                        <dt>{{ __('Total til today') }}</dt>
+                        <dd>{{ $platform['total_amount'] }}</dd>
+                        <p>{{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}</p>
                     </div>
                 </dl>
             </section>
@@ -52,25 +57,31 @@
             <section class="dashboard-stat-panel" aria-label="{{ __('Personal summary') }}">
                 <div class="dashboard-stat-panel__head">
                     <h3 class="dashboard-stat-panel__title">{{ __('Your portfolio') }}</h3>
-                    @if ($personal['return_on_tagged_capital_pct'] !== null)
-                        <span class="ui-chip tabular-nums">{{ __('Return :pct%', ['pct' => $personal['return_on_tagged_capital_pct']]) }}</span>
-                    @endif
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        @if (! empty($personal['as_of_date']))
+                            <span class="ui-chip tabular-nums">{{ __('As of :date', ['date' => \Carbon\Carbon::parse($personal['as_of_date'])->translatedFormat('j M Y')]) }}</span>
+                        @endif
+                        @if ($personal['return_on_tagged_capital_pct'] !== null)
+                            <span class="ui-chip tabular-nums">{{ __('Return :pct%', ['pct' => $personal['return_on_tagged_capital_pct']]) }}</span>
+                        @endif
+                    </div>
                 </div>
                 <dl class="dashboard-stat-grid">
-                    <div class="dashboard-stat">
-                        <dt>{{ __('Pools') }}</dt>
-                        <dd>{{ $personal['investments_count'] }}</dd>
-                    </div>
                     <div class="dashboard-stat dashboard-stat--capital">
                         <dt>{{ __('Your capital') }}</dt>
                         <dd>{{ $personal['total_contribution'] }}</dd>
+                        <p>{{ trans_choice(':count pool|:count pools', $personal['investments_count'], ['count' => $personal['investments_count']]) }}</p>
                     </div>
                     <div class="dashboard-stat dashboard-stat--profit">
-                        <dt>{{ __('Your profit') }}</dt>
-                        <dd>{{ $personal['total_profit'] }}</dd>
+                        <dt>{{ __('Total profit') }}</dt>
+                        <dd>{{ $personal['total_projected_profit'] }}</dd>
+                    </div>
+                    <div class="dashboard-stat dashboard-stat--profit">
+                        <dt>{{ __('Profit til today') }}</dt>
+                        <dd>{{ $personal['profit_til_today'] }}</dd>
                     </div>
                     <div class="dashboard-stat">
-                        <dt>{{ __('Total balance') }}</dt>
+                        <dt>{{ __('Total til today') }}</dt>
                         <dd>{{ $personal['total_amount'] }}</dd>
                     </div>
                 </dl>

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\PaginationPerPage;
 use App\Support\SqlLike;
 use App\Services\InvestmentAccrualService;
+use App\Services\InvestmentDailyProfitService;
 use App\Services\InvestmentPlanCalculationService;
 use App\Services\MonthlyPaymentService;
 use Carbon\Carbon;
@@ -51,13 +52,20 @@ class InvestmentController extends Controller
             ]);
         }
 
+        $summary = app(InvestmentDailyProfitService::class)->platformSummary();
+        $summary['investments_total'] = (int) Investment::query()->count();
+        $summary['investments_active'] = (int) Investment::query()
+            ->where('status', Investment::STATUS_ACTIVE)
+            ->where('is_active', true)
+            ->count();
+
         $editingInvestment = $this->resolveEditingInvestment($request);
 
         if ($editingInvestment) {
             $this->authorize('update', $editingInvestment);
         }
 
-        return view('admin.investments.index', compact('investments', 'editingInvestment'));
+        return view('admin.investments.index', compact('investments', 'editingInvestment', 'summary'));
     }
 
     public function create(): RedirectResponse
@@ -219,9 +227,26 @@ class InvestmentController extends Controller
             ? $request->boolean('is_active')
             : $investment->is_active;
 
+        $previousContribution = $investment->contribution_per_investor !== null
+            ? number_format((float) $investment->contribution_per_investor, 2, '.', '')
+            : null;
+
         $investment->update($validated);
 
-        app(InvestmentPlanCalculationService::class)->syncStoredTotals($investment->fresh());
+        $plan = app(InvestmentPlanCalculationService::class);
+        $fresh = $investment->fresh();
+        $syncedParticipants = 0;
+
+        $nextContribution = $fresh->contribution_per_investor !== null
+            ? number_format((float) $fresh->contribution_per_investor, 2, '.', '')
+            : null;
+
+        if ($nextContribution !== null && $nextContribution !== $previousContribution) {
+            $syncedParticipants = $plan->syncParticipantContributionsFromPlan($fresh);
+            $fresh = $fresh->fresh();
+        }
+
+        $plan->syncStoredTotals($fresh);
 
         // Keep monthly accrual rows aligned with pool settings (e.g. first accrual month).
         // Runs here even when INVESTMENT_AUTO_ACCRUE_ON_SAVE is false, because saving this
@@ -239,6 +264,12 @@ class InvestmentController extends Controller
         }
 
         $statusParts = [__('Investment updated.')];
+        if ($syncedParticipants > 0) {
+            $statusParts[] = __('Updated contribution for :count tagged investor(s) to :amount.', [
+                'count' => $syncedParticipants,
+                'amount' => $nextContribution,
+            ]);
+        }
         if ($created > 0) {
             $statusParts[] = __('Recorded :count missing accrual month(s).', ['count' => $created]);
         }

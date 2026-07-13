@@ -4,9 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
-use App\Models\InvestmentPeriod;
-use App\Models\InvestmentPeriodUser;
 use App\Models\User;
+use App\Services\InvestmentDailyProfitService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -42,14 +41,19 @@ class DashboardMetricsTest extends TestCase
 
     public function test_dashboard_shows_profit_vs_capital_and_return_for_tagged_user(): void
     {
+        Carbon::setTestNow(Carbon::parse('2026-04-15 12:00:00', config('app.timezone')));
+
         $user = User::factory()->create();
 
         $investment = Investment::create([
             'title' => 'Solo pool',
-            'default_monthly_rate_pct' => '1.5',
+            'default_monthly_rate_pct' => '0.0000',
+            'total_invested_amount' => '2000.00',
+            'total_profit_amount' => '365.00',
             'status' => Investment::STATUS_ACTIVE,
             'created_by' => $user->id,
             'period_start' => '2026-01-01',
+            'deed_completion_deadline' => '2026-12-31',
         ]);
 
         InvestmentParticipant::create([
@@ -58,26 +62,17 @@ class DashboardMetricsTest extends TestCase
             'contribution_amount' => '2000.00',
         ]);
 
-        $period = InvestmentPeriod::create([
-            'investment_id' => $investment->id,
-            'month' => '2026-02-01',
-            'applied_rate_pct' => '1.5000',
-            'principal_snapshot' => '2000.00',
-            'profit_amount' => '30.00',
-        ]);
-
-        InvestmentPeriodUser::create([
-            'investment_period_id' => $period->id,
-            'user_id' => $user->id,
-            'contribution_snapshot' => '2000.00',
-            'profit_share' => '30.00',
-        ]);
+        $summary = app(InvestmentDailyProfitService::class)->portfolioSummaryForUser($user);
 
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee(__('Return'), false)
-            ->assertSee('1.50', false);
+            ->assertSee(__('Profit til today'), false)
+            ->assertSee($summary['profit_til_today'], false)
+            ->assertSee($summary['total_capital'], false)
+            ->assertSee(__('Return'), false);
+
+        Carbon::setTestNow();
     }
 
     public function test_dashboard_lists_top_investors_after_accrual(): void

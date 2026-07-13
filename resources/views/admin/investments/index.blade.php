@@ -18,7 +18,45 @@
         </div>
     </x-slot>
 
-    <div class="space-y-3">
+    <div class="space-y-4">
+        <section class="dashboard-stat-panel" aria-label="{{ __('Investments summary') }}">
+            <div class="dashboard-stat-panel__head">
+                <h3 class="dashboard-stat-panel__title">{{ __('Total summary') }}</h3>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    @if (! empty($summary['as_of_date']))
+                        <span class="ui-chip tabular-nums">{{ __('As of :date', ['date' => \Carbon\Carbon::parse($summary['as_of_date'])->translatedFormat('j M Y')]) }}</span>
+                    @endif
+                    <span class="ui-chip">{{ __('Active pools: :n', ['n' => $summary['investments_active']]) }}</span>
+                </div>
+            </div>
+            <dl class="dashboard-stat-grid dashboard-stat-grid--platform">
+                <div class="dashboard-stat dashboard-stat--capital">
+                    <dt>{{ __('Total capital') }}</dt>
+                    <dd>{{ $summary['total_capital'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--profit">
+                    <dt>{{ __('Total profit') }}</dt>
+                    <dd>{{ $summary['total_projected_profit'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--profit">
+                    <dt>{{ __('Profit til today') }}</dt>
+                    <dd>{{ $summary['profit_til_today'] }}</dd>
+                </div>
+                <div class="dashboard-stat">
+                    <dt>{{ __('Members') }}</dt>
+                    <dd>{{ $summary['member_count'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--profit">
+                    <dt>{{ __('Per person') }}</dt>
+                    <dd>{{ $summary['per_person_profit_til_today'] }}</dd>
+                </div>
+                <div class="dashboard-stat">
+                    <dt>{{ __('Total til today') }}</dt>
+                    <dd>{{ $summary['total_til_today'] }}</dd>
+                </div>
+            </dl>
+        </section>
+
         <div class="ui-card">
             <div class="ui-card-header">
                 <p class="ui-card-header-title">{{ __('Investments list') }}</p>

@@ -17,23 +17,32 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardMetricsService
 {
+    public function __construct(
+        private InvestmentDailyProfitService $dailyProfit,
+    ) {}
+
     /**
+     * Platform money figures match InvestmentDailyProfitService (same as portfolio / phone access).
+     *
      * @return array{
      *     investments_total: int,
      *     investments_active: int,
      *     total_contributions: string,
+     *     total_projected_profit: string,
+     *     profit_til_today: string,
      *     total_profit_distributed: string,
      *     total_amount: string,
+     *     member_count: int,
+     *     per_person_profit_til_today: string,
      *     accrual_periods: int,
      *     participant_rows: int,
+     *     as_of_date: string,
      * }
      */
     public function platformSummary(): array
     {
-        $contributionSum = InvestmentParticipant::query()
-            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->sum('contribution_amount');
-        $profitDistributed = InvestmentPeriod::query()
+        $daily = $this->dailyProfit->platformSummary();
+        $postedProfit = InvestmentPeriod::query()
             ->whereHas('investment', fn ($q) => $q->where('is_active', true))
             ->sum('profit_amount');
 
@@ -43,51 +52,57 @@ class DashboardMetricsService
                 ->where('status', Investment::STATUS_ACTIVE)
                 ->where('is_active', true)
                 ->count(),
-            'total_contributions' => $this->decimalString($contributionSum),
-            'total_profit_distributed' => $this->decimalString($profitDistributed),
-            'total_amount' => $this->decimalString($contributionSum + $profitDistributed),
+            'total_contributions' => $daily['total_capital'],
+            'total_projected_profit' => $daily['total_projected_profit'],
+            'profit_til_today' => $daily['profit_til_today'],
+            // Kept for charts / older callers; equals profit til today so capital-vs-profit matches portfolio.
+            'total_profit_distributed' => $daily['profit_til_today'],
+            'total_amount' => $daily['total_til_today'],
+            'member_count' => $daily['member_count'],
+            'per_person_profit_til_today' => $daily['per_person_profit_til_today'],
             'accrual_periods' => (int) InvestmentPeriod::query()
                 ->whereHas('investment', fn ($q) => $q->where('is_active', true))
                 ->count(),
             'participant_rows' => (int) InvestmentParticipant::query()
                 ->whereHas('investment', fn ($q) => $q->where('is_active', true))
                 ->count(),
+            'posted_profit_total' => $this->decimalString($postedProfit),
+            'as_of_date' => $daily['as_of_date'],
         ];
     }
 
     /**
+     * Personal portfolio figures match InvestmentDailyProfitService (same as My investments).
+     *
      * @return array{
      *     investments_count: int,
      *     total_contribution: string,
+     *     total_projected_profit: string,
+     *     profit_til_today: string,
      *     total_profit: string,
      *     total_amount: string,
      *     return_on_tagged_capital_pct: string|null,
+     *     as_of_date: string,
      * }
      */
     public function personalSummary(User $user): array
     {
-        $contributionSum = InvestmentParticipant::query()
-            ->where('user_id', $user->id)
-            ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->sum('contribution_amount');
-        $profitSum = InvestmentPeriodUser::query()
-            ->where('user_id', $user->id)
-            ->whereHas('period', fn ($q) => $q->whereHas('investment', fn ($inv) => $inv->where('is_active', true)))
-            ->sum('profit_share');
-        $contrib = (float) $contributionSum;
-        $profit = (float) $profitSum;
+        $daily = $this->dailyProfit->portfolioSummaryForUser($user);
+        $contrib = (float) $daily['total_capital'];
+        $profitTilToday = (float) $daily['profit_til_today'];
 
         return [
-            'investments_count' => (int) InvestmentParticipant::query()
-                ->where('user_id', $user->id)
-                ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-                ->count(),
-            'total_contribution' => $this->decimalString($contributionSum),
-            'total_profit' => $this->decimalString($profitSum),
-            'total_amount' => $this->decimalString($contributionSum + $profitSum),
+            'investments_count' => $daily['investment_count'],
+            'total_contribution' => $daily['total_capital'],
+            'total_projected_profit' => $daily['total_projected_profit'],
+            'profit_til_today' => $daily['profit_til_today'],
+            // Alias used by older dashboard labels / tests — same as profit til today.
+            'total_profit' => $daily['profit_til_today'],
+            'total_amount' => $daily['total_til_today'],
             'return_on_tagged_capital_pct' => $contrib > 0
-                ? number_format(($profit / $contrib) * 100, 2, '.', '')
+                ? number_format(($profitTilToday / $contrib) * 100, 2, '.', '')
                 : null,
+            'as_of_date' => $daily['as_of_date'],
         ];
     }
 

@@ -54,12 +54,14 @@
                     </form>
 
                     <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-end lg:gap-4">
-                        @include('admin.monthly-payments.partials.summary', compact(
-                            'month',
-                            'summaryPaid',
-                            'summaryUnpaid',
-                            'summaryTotal',
-                        ))
+                        <div id="monthly-payments-summary">
+                            @include('admin.monthly-payments.partials.summary', compact(
+                                'month',
+                                'summaryPaid',
+                                'summaryUnpaid',
+                                'summaryTotal',
+                            ))
+                        </div>
                         <x-action-button
                             class="!h-11 w-full shrink-0 justify-center sm:w-auto"
                             :href="route('admin.investments.index', ['new' => 1, 'payment_month' => $month->format('Y-m')])"
