@@ -31,11 +31,13 @@ class InvestmentDailyProfitService
         $capital = $rows->sum(fn (array $row) => (float) $row['capital']);
         $projected = $rows->sum(fn (array $row) => (float) $row['projected_profit']);
         $tilToday = $rows->sum(fn (array $row) => (float) $row['profit_til_today']);
+        $withdrawn = $rows->sum(fn (array $row) => (float) $row['withdrawn']);
 
         return [
             'total_capital' => $this->decimal($capital),
             'total_projected_profit' => $this->decimal($projected),
             'profit_til_today' => $this->decimal($tilToday),
+            'total_withdrawn' => $this->decimal($withdrawn),
             'total_til_today' => $this->decimal($capital + $tilToday),
             'investment_count' => $rows->count(),
             'as_of_date' => $asOf->toDateString(),
@@ -62,11 +64,13 @@ class InvestmentDailyProfitService
             ->where('status', Investment::STATUS_ACTIVE)
             ->whereNotNull('deed_completion_deadline')
             ->with('participants')
+            ->withSum('profitWithdrawals as profit_withdrawn_total', 'amount')
             ->get();
 
         $capital = 0.0;
         $projected = 0.0;
         $tilToday = 0.0;
+        $withdrawn = 0.0;
         $memberIds = [];
 
         foreach ($investments as $investment) {
@@ -78,6 +82,7 @@ class InvestmentDailyProfitService
             $capital += (float) $investment->participants->sum('contribution_amount');
             $projected += $pool['projected_profit'];
             $tilToday += $pool['profit_til_today'];
+            $withdrawn += $pool['withdrawn'];
 
             foreach ($investment->participants as $participant) {
                 $memberIds[$participant->user_id] = true;
@@ -91,6 +96,7 @@ class InvestmentDailyProfitService
             'total_capital' => $this->decimal($capital),
             'total_projected_profit' => $this->decimal($projected),
             'profit_til_today' => $this->decimal($tilToday),
+            'total_withdrawn' => $this->decimal($withdrawn),
             'total_til_today' => $this->decimal($capital + $tilToday),
             'member_count' => $memberCount,
             'per_person_profit_til_today' => $this->decimal($perPerson),
@@ -119,9 +125,10 @@ class InvestmentDailyProfitService
             ->where('status', Investment::STATUS_ACTIVE)
             ->whereNotNull('deed_completion_deadline')
             ->with('participants')
+            ->withSum('profitWithdrawals as profit_withdrawn_total', 'amount')
             ->get();
 
-        /** @var array<int, array{user_id: int, capital: float, projected_profit: float, profit_til_today: float, pools_count: int}> $byUser */
+        /** @var array<int, array{user_id: int, capital: float, projected_profit: float, profit_til_today: float, withdrawn: float, pools_count: int}> $byUser */
         $byUser = [];
 
         foreach ($investments as $investment) {
@@ -146,6 +153,7 @@ class InvestmentDailyProfitService
                         'capital' => 0.0,
                         'projected_profit' => 0.0,
                         'profit_til_today' => 0.0,
+                        'withdrawn' => 0.0,
                         'pools_count' => 0,
                     ];
                 }
@@ -153,6 +161,7 @@ class InvestmentDailyProfitService
                 $byUser[$userId]['capital'] += $userCapital;
                 $byUser[$userId]['projected_profit'] += $pool['projected_profit'] * $share;
                 $byUser[$userId]['profit_til_today'] += $pool['profit_til_today'] * $share;
+                $byUser[$userId]['withdrawn'] += $pool['withdrawn'] * $share;
                 $byUser[$userId]['pools_count']++;
             }
         }
@@ -162,6 +171,7 @@ class InvestmentDailyProfitService
                 $row['capital'] = round($row['capital'], 2);
                 $row['projected_profit'] = round($row['projected_profit'], 2);
                 $row['profit_til_today'] = round($row['profit_til_today'], 2);
+                $row['withdrawn'] = round($row['withdrawn'], 2);
                 $row['total_til_today'] = round($row['capital'] + $row['profit_til_today'], 2);
 
                 return $row;
@@ -186,6 +196,7 @@ class InvestmentDailyProfitService
             ->where('status', Investment::STATUS_ACTIVE)
             ->whereNotNull('deed_completion_deadline')
             ->with('participants')
+            ->withSum('profitWithdrawals as profit_withdrawn_total', 'amount')
             ->get();
 
         $labels = [];
@@ -224,12 +235,12 @@ class InvestmentDailyProfitService
         $through = $monthEnd->gt($asOf) ? $asOf : $monthEnd;
         $before = $monthStart->copy()->subDay();
 
-        $atThrough = $this->poolProjection($investment, $through);
+        $atThrough = $this->grossPoolProjection($investment, $through);
         if ($atThrough === null) {
             return 0.0;
         }
 
-        $atBefore = $this->poolProjection($investment, $before);
+        $atBefore = $this->grossPoolProjection($investment, $before);
         $beforeProfit = $atBefore['profit_til_today'] ?? 0.0;
 
         return round(max(0.0, $atThrough['profit_til_today'] - $beforeProfit), 2);
@@ -259,7 +270,9 @@ class InvestmentDailyProfitService
         $participants = InvestmentParticipant::query()
             ->where('user_id', $user->id)
             ->whereHas('investment', fn ($q) => $q->where('is_active', true))
-            ->with('investment.participants')
+            ->with(['investment' => fn ($q) => $q
+                ->with('participants')
+                ->withSum('profitWithdrawals as profit_withdrawn_total', 'amount')])
             ->get();
 
         return $participants
@@ -281,13 +294,14 @@ class InvestmentDailyProfitService
                 $userProjected = $pool['projected_profit'] * $share;
                 $userTilToday = $pool['profit_til_today'] * $share;
                 $userDaily = $pool['daily_profit'] * $share;
+                $userWithdrawn = $pool['withdrawn'] * $share;
 
                 $poolTotalInvested = $investment->total_invested_amount !== null && (float) $investment->total_invested_amount > 0
                     ? (float) $investment->total_invested_amount
                     : $poolCapital;
                 $poolTotalProfit = $investment->usesTotalProfitPlan()
                     ? (float) $investment->total_profit_amount
-                    : (float) $pool['projected_profit'];
+                    : (float) $pool['gross_projected_profit'];
 
                 return [
                     'investment_id' => $investment->id,
@@ -302,6 +316,8 @@ class InvestmentDailyProfitService
                     'profit_amount' => $this->decimal($userProjected),
                     'pool_profit_amount' => $this->decimal($poolTotalProfit),
                     'profit_til_today' => $this->decimal($userTilToday),
+                    'withdrawn' => $this->decimal($userWithdrawn),
+                    'pool_withdrawn' => $this->decimal($pool['withdrawn']),
                     'daily_profit' => $this->decimal($userDaily),
                     'plan_days' => $pool['plan_days'],
                     'days_elapsed' => $pool['days_elapsed'],
@@ -339,9 +355,44 @@ class InvestmentDailyProfitService
      *     daily_profit: float,
      *     plan_days: int,
      *     days_elapsed: int,
+     *     withdrawn: float,
+     *     gross_projected_profit: float,
+     *     gross_profit_til_today: float,
      * }|null
      */
-    public function poolProjection(Investment $investment, ?Carbon $asOf = null): ?array
+    public function poolProjection(Investment $investment, ?Carbon $asOf = null, bool $netOfWithdrawals = true): ?array
+    {
+        $gross = $this->grossPoolProjection($investment, $asOf);
+        if ($gross === null) {
+            return null;
+        }
+
+        $withdrawn = $netOfWithdrawals ? $this->totalWithdrawnFor($investment) : 0.0;
+
+        return [
+            ...$gross,
+            'withdrawn' => $withdrawn,
+            'gross_projected_profit' => $gross['projected_profit'],
+            'gross_profit_til_today' => $gross['profit_til_today'],
+            'projected_profit' => max(0.0, round($gross['projected_profit'] - $withdrawn, 2)),
+            'profit_til_today' => max(0.0, round($gross['profit_til_today'] - $withdrawn, 2)),
+        ];
+    }
+
+    /**
+     * Accrued pool profit before subtracting withdrawals (used by withdrawal math and month trends).
+     *
+     * @return array{
+     *     start_date: string,
+     *     end_date: string,
+     *     projected_profit: float,
+     *     profit_til_today: float,
+     *     daily_profit: float,
+     *     plan_days: int,
+     *     days_elapsed: int,
+     * }|null
+     */
+    public function grossPoolProjection(Investment $investment, ?Carbon $asOf = null): ?array
     {
         $asOf = ($asOf ?? Carbon::today())->copy()->startOfDay();
         $end = $investment->planCompletionDate();
@@ -406,6 +457,19 @@ class InvestmentDailyProfitService
         }
 
         return round($total, 2);
+    }
+
+    public function totalWithdrawnFor(Investment $investment): float
+    {
+        if (array_key_exists('profit_withdrawn_total', $investment->getAttributes())) {
+            return round((float) $investment->getAttribute('profit_withdrawn_total'), 2);
+        }
+
+        if ($investment->relationLoaded('profitWithdrawals')) {
+            return round((float) $investment->profitWithdrawals->sum('amount'), 2);
+        }
+
+        return round((float) $investment->profitWithdrawals()->sum('amount'), 2);
     }
 
     private function decimal(float $value): string

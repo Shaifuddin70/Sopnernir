@@ -60,6 +60,15 @@
                             <span>{{ __('Investments') }}</span>
                         </span>
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.profit-withdrawals.index')" :active="request()->routeIs('admin.profit-withdrawals.*')" @click="sidebarOpen = false">
+                        <span class="flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M3 10.5h18M7.5 6v12m9-12v12M5.25 6h13.5A1.5 1.5 0 0120.25 7.5v9a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 015.25 6z" />
+                            </svg>
+                            <span>{{ __('Withdrawals') }}</span>
+                        </span>
+                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.monthly-payments.index')" :active="request()->routeIs('admin.monthly-payments.*')" @click="sidebarOpen = false">
                         <span class="flex items-center gap-2">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

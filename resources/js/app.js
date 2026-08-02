@@ -548,6 +548,334 @@ document.addEventListener('DOMContentLoaded', () => {
     syncMonthlyPaymentsChecklistState(document);
 });
 
+/** @type {{ mode: 'single'|'bulk', investmentIds: number[], root: HTMLElement|null }} */
+let withdrawProfitState = {
+    mode: 'single',
+    investmentIds: [],
+    root: null,
+};
+
+function withdrawRootFrom(el) {
+    return el?.closest?.('[data-profit-withdrawals]') || document.querySelector('[data-profit-withdrawals]');
+}
+
+function selectedWithdrawIds(root) {
+    return Array.from(root.querySelectorAll('[data-withdraw-check]:checked'))
+        .map((el) => Number(el.value))
+        .filter((id) => Number.isFinite(id) && id > 0);
+}
+
+function syncWithdrawSelection(root) {
+    if (!root) {
+        return;
+    }
+
+    const checks = Array.from(root.querySelectorAll('[data-withdraw-check]'));
+    const selected = checks.filter((el) => el instanceof HTMLInputElement && el.checked);
+    const bar = root.querySelector('[data-withdraw-bulk-bar]');
+    const countLabel = root.querySelector('[data-withdraw-selected-count]');
+    const checkAll = root.querySelector('[data-withdraw-check-all]');
+
+    if (bar instanceof HTMLElement) {
+        bar.classList.toggle('hidden', selected.length === 0);
+        bar.classList.toggle('flex', selected.length > 0);
+    }
+
+    if (countLabel) {
+        const template = root.dataset.labelSelected || 'Selected: :count';
+        countLabel.textContent = template.replace(':count', String(selected.length));
+    }
+
+    if (checkAll instanceof HTMLInputElement) {
+        checkAll.checked = checks.length > 0 && selected.length === checks.length;
+        checkAll.indeterminate = selected.length > 0 && selected.length < checks.length;
+    }
+}
+
+function openWithdrawModal() {
+    window.dispatchEvent(new CustomEvent('open-modal', { detail: 'withdraw-profit' }));
+}
+
+function setWithdrawError(message) {
+    const errorEl = document.querySelector('[data-withdraw-error]');
+    if (!errorEl) {
+        return;
+    }
+    if (message) {
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+    } else {
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+    }
+}
+
+function renderWithdrawPreview(data) {
+    const preview = document.querySelector('[data-withdraw-preview]');
+    const submit = document.querySelector('[data-withdraw-submit]');
+    if (!preview) {
+        return;
+    }
+
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const withdrawable = rows.filter((row) => row.can_withdraw);
+    const total = data.total_available || '0.00';
+
+    if (withdrawable.length === 0) {
+        preview.innerHTML = `<p class="text-foreground-muted">${withdrawProfitState.root?.dataset.labelNone || 'No withdrawable profit for the selection.'}</p>`;
+        if (submit instanceof HTMLButtonElement) {
+            submit.disabled = true;
+        }
+        return;
+    }
+
+    const list = withdrawable
+        .map((row) => `<li class="flex justify-between gap-3"><span class="truncate">${row.title}</span><span class="tabular-nums font-semibold text-success">${row.available}</span></li>`)
+        .join('');
+
+    preview.innerHTML = `
+        <div class="space-y-2">
+            <div class="flex justify-between gap-3 font-medium">
+                <span>Total available</span>
+                <span class="tabular-nums text-success">${total}</span>
+            </div>
+            <ul class="space-y-1 border-t border-line pt-2 text-foreground">${list}</ul>
+        </div>
+    `;
+
+    if (submit instanceof HTMLButtonElement) {
+        submit.disabled = false;
+    }
+}
+
+async function refreshWithdrawPreview() {
+    const root = withdrawProfitState.root;
+    const dateInput = document.querySelector('[data-withdraw-through-date]');
+    const submit = document.querySelector('[data-withdraw-submit]');
+
+    if (!root || !(dateInput instanceof HTMLInputElement) || withdrawProfitState.investmentIds.length === 0) {
+        return;
+    }
+
+    setWithdrawError('');
+    if (submit instanceof HTMLButtonElement) {
+        submit.disabled = true;
+    }
+
+    const url = new URL(root.dataset.previewUrl, window.location.origin);
+    withdrawProfitState.investmentIds.forEach((id) => url.searchParams.append('investment_ids[]', String(id)));
+    url.searchParams.set('through_date', dateInput.value);
+
+    try {
+        const res = await fetch(url.toString(), {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            const message = data?.errors?.through_date?.[0]
+                || data?.message
+                || root.dataset.labelPreviewError
+                || 'Could not calculate withdrawable profit.';
+            setWithdrawError(message);
+            renderWithdrawPreview({ rows: [], total_available: '0.00' });
+            return;
+        }
+        renderWithdrawPreview(data);
+    } catch (error) {
+        console.error(error);
+        setWithdrawError(root.dataset.labelPreviewError || 'Could not calculate withdrawable profit.');
+        renderWithdrawPreview({ rows: [], total_available: '0.00' });
+    }
+}
+
+function beginWithdraw({ mode, investmentIds, root, title }) {
+    withdrawProfitState = { mode, investmentIds, root };
+
+    const form = document.querySelector('[data-withdraw-profit-form]');
+    const titleEl = document.querySelector('[data-withdraw-modal-title]');
+    const subtitleEl = document.querySelector('[data-withdraw-modal-subtitle]');
+    const dateInput = document.querySelector('[data-withdraw-through-date]');
+    const notes = document.querySelector('[data-withdraw-notes]');
+    const bulkDate = root?.querySelector?.('[data-bulk-through-date]');
+
+    if (titleEl) {
+        titleEl.textContent = mode === 'bulk' ? 'Withdraw selected profits' : 'Withdraw profit';
+    }
+    if (subtitleEl) {
+        subtitleEl.textContent = mode === 'bulk'
+            ? `${investmentIds.length} investment(s)`
+            : (title || '');
+    }
+    if (dateInput instanceof HTMLInputElement) {
+        dateInput.value = (bulkDate instanceof HTMLInputElement && bulkDate.value)
+            ? bulkDate.value
+            : (dateInput.getAttribute('value') || dateInput.value);
+    }
+    if (notes instanceof HTMLTextAreaElement) {
+        notes.value = '';
+    }
+    if (form instanceof HTMLFormElement) {
+        if (mode === 'single' && investmentIds.length === 1) {
+            form.action = (root.dataset.storeUrlTemplate || '').replace('__ID__', String(investmentIds[0]));
+        } else {
+            form.action = root.dataset.bulkUrl || '#';
+        }
+    }
+
+    setWithdrawError('');
+    openWithdrawModal();
+    refreshWithdrawPreview();
+}
+
+document.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    const root = withdrawRootFrom(target);
+    if (!root) {
+        return;
+    }
+
+    if (target.matches('[data-withdraw-check], [data-withdraw-check-all]')) {
+        if (target.matches('[data-withdraw-check-all]') && target instanceof HTMLInputElement) {
+            root.querySelectorAll('[data-withdraw-check]').forEach((el) => {
+                if (el instanceof HTMLInputElement) {
+                    el.checked = target.checked;
+                }
+            });
+        }
+        syncWithdrawSelection(root);
+    }
+
+    if (target.matches('[data-withdraw-through-date]')) {
+        refreshWithdrawPreview();
+    }
+});
+
+document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    const rowOpen = target.closest('[data-row-withdraw-open]');
+    if (rowOpen instanceof HTMLElement) {
+        const root = withdrawRootFrom(rowOpen);
+        if (!root) {
+            return;
+        }
+        const id = Number(rowOpen.dataset.investmentId);
+        if (!Number.isFinite(id) || id <= 0) {
+            return;
+        }
+        beginWithdraw({
+            mode: 'single',
+            investmentIds: [id],
+            root,
+            title: rowOpen.dataset.investmentTitle || '',
+        });
+        return;
+    }
+
+    const bulkOpen = target.closest('[data-bulk-withdraw-open]');
+    if (bulkOpen instanceof HTMLElement) {
+        const root = withdrawRootFrom(bulkOpen);
+        if (!root) {
+            return;
+        }
+        const ids = selectedWithdrawIds(root);
+        if (ids.length === 0) {
+            return;
+        }
+        beginWithdraw({
+            mode: 'bulk',
+            investmentIds: ids,
+            root,
+            title: '',
+        });
+    }
+});
+
+document.addEventListener('submit', async (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || !form.matches('[data-withdraw-profit-form]')) {
+        return;
+    }
+
+    event.preventDefault();
+    const root = withdrawProfitState.root || withdrawRootFrom(form);
+    if (!root || withdrawProfitState.investmentIds.length === 0) {
+        return;
+    }
+
+    const dateInput = form.querySelector('[data-withdraw-through-date]');
+    const notes = form.querySelector('[data-withdraw-notes]');
+    const submit = form.querySelector('[data-withdraw-submit]');
+    const throughDate = dateInput instanceof HTMLInputElement ? dateInput.value : '';
+    const notesValue = notes instanceof HTMLTextAreaElement ? notes.value : '';
+
+    setWithdrawError('');
+    if (submit instanceof HTMLButtonElement) {
+        submit.disabled = true;
+    }
+
+    const body = {
+        through_date: throughDate,
+        notes: notesValue || null,
+    };
+
+    let url = form.action;
+    if (withdrawProfitState.mode === 'bulk') {
+        body.investment_ids = withdrawProfitState.investmentIds;
+        url = root.dataset.bulkUrl;
+    }
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(body),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            const message = data?.errors?.through_date?.[0]
+                || data?.errors?.investment_ids?.[0]
+                || data?.message
+                || 'Withdrawal failed.';
+            setWithdrawError(message);
+            if (submit instanceof HTMLButtonElement) {
+                submit.disabled = false;
+            }
+            return;
+        }
+
+        window.dispatchEvent(new CustomEvent('close-modal', { detail: 'withdraw-profit' }));
+        window.location.reload();
+    } catch (error) {
+        console.error(error);
+        setWithdrawError('Withdrawal failed.');
+        if (submit instanceof HTMLButtonElement) {
+            submit.disabled = false;
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-profit-withdrawals]').forEach((root) => syncWithdrawSelection(root));
+});
+
 window.Alpine = Alpine;
 
 Alpine.start();

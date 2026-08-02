@@ -107,6 +107,7 @@ class InvestmentController extends Controller
         $myDailyProfit = $poolDaily ? [
             'projected_profit' => number_format($poolDaily['projected_profit'] * $share, 2, '.', ''),
             'profit_til_today' => number_format($poolDaily['profit_til_today'] * $share, 2, '.', ''),
+            'withdrawn' => number_format($poolDaily['withdrawn'] * $share, 2, '.', ''),
             'daily_profit' => number_format($poolDaily['daily_profit'] * $share, 2, '.', ''),
             'start_date' => $poolDaily['start_date'],
             'end_date' => $poolDaily['end_date'],

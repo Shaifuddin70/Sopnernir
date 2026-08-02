@@ -10,11 +10,16 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2>{{ __('Investments') }}</h2>
-            <x-primary-button type="button" @click="$dispatch('open-modal', 'create-investment')">
-                {{ __('New investment') }}
-            </x-primary-button>
+            <div class="flex flex-wrap gap-2">
+                <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
+                    {{ __('Withdrawals') }}
+                </x-action-button>
+                <x-primary-button type="button" @click="$dispatch('open-modal', 'create-investment')">
+                    {{ __('New investment') }}
+                </x-primary-button>
+            </div>
         </div>
     </x-slot>
 
@@ -43,16 +48,16 @@
                     <dd>{{ $summary['profit_til_today'] }}</dd>
                 </div>
                 <div class="dashboard-stat">
+                    <dt>{{ __('Withdrawn') }}</dt>
+                    <dd>{{ $summary['total_withdrawn'] ?? '0.00' }}</dd>
+                </div>
+                <div class="dashboard-stat">
                     <dt>{{ __('Members') }}</dt>
                     <dd>{{ $summary['member_count'] }}</dd>
                 </div>
                 <div class="dashboard-stat dashboard-stat--profit">
                     <dt>{{ __('Per person') }}</dt>
                     <dd>{{ $summary['per_person_profit_til_today'] }}</dd>
-                </div>
-                <div class="dashboard-stat">
-                    <dt>{{ __('Total til today') }}</dt>
-                    <dd>{{ $summary['total_til_today'] }}</dd>
                 </div>
             </dl>
         </section>
@@ -114,4 +119,6 @@
             </div>
         </x-modal>
     @endif
+
+    @include('admin.investments.partials.withdraw-profit-modal')
 </x-app-layout>

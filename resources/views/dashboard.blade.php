@@ -47,8 +47,8 @@
                         <dd>{{ $platform['profit_til_today'] }}</dd>
                     </div>
                     <div class="dashboard-stat">
-                        <dt>{{ __('Total til today') }}</dt>
-                        <dd>{{ $platform['total_amount'] }}</dd>
+                        <dt>{{ __('Withdrawn') }}</dt>
+                        <dd>{{ $platform['total_withdrawn'] ?? '0.00' }}</dd>
                         <p>{{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}</p>
                     </div>
                 </dl>
@@ -81,8 +81,8 @@
                         <dd>{{ $personal['profit_til_today'] }}</dd>
                     </div>
                     <div class="dashboard-stat">
-                        <dt>{{ __('Total til today') }}</dt>
-                        <dd>{{ $personal['total_amount'] }}</dd>
+                        <dt>{{ __('Withdrawn') }}</dt>
+                        <dd>{{ $personal['total_withdrawn'] ?? '0.00' }}</dd>
                     </div>
                 </dl>
             </section>

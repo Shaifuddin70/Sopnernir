@@ -178,6 +178,11 @@ class Investment extends Model
         return $this->hasMany(InvestmentPeriod::class)->orderBy('month');
     }
 
+    public function profitWithdrawals(): HasMany
+    {
+        return $this->hasMany(InvestmentProfitWithdrawal::class)->latest('withdrawn_at');
+    }
+
     /**
      * Participant rows on each accrual period (for aggregates scoped by user_id).
      */

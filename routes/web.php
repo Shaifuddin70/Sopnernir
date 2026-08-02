@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\InvestmentAccrualController;
 use App\Http\Controllers\Admin\MonthlyPaymentController;
+use App\Http\Controllers\Admin\ProfitWithdrawalController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController;
 use App\Http\Controllers\Admin\InvestmentDocumentController;
@@ -66,6 +67,17 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     Route::patch('investments/{investment}/active', [AdminInvestmentController::class, 'toggleActive'])->name('investments.active');
     Route::resource('investments', AdminInvestmentController::class)->except(['destroy']);
+
+    Route::get('profit-withdrawals', [ProfitWithdrawalController::class, 'index'])
+        ->name('profit-withdrawals.index');
+    Route::get('profit-withdrawals/{batch}', [ProfitWithdrawalController::class, 'show'])
+        ->name('profit-withdrawals.show');
+    Route::get('investments-profit-withdrawals/preview', [ProfitWithdrawalController::class, 'preview'])
+        ->name('investments.profit-withdrawals.preview');
+    Route::post('investments/profit-withdrawals/bulk', [ProfitWithdrawalController::class, 'bulkStore'])
+        ->name('investments.profit-withdrawals.bulk');
+    Route::post('investments/{investment}/profit-withdrawals', [ProfitWithdrawalController::class, 'store'])
+        ->name('investments.profit-withdrawals.store');
 
     Route::post('investments/{investment}/documents', [InvestmentDocumentController::class, 'store'])
         ->name('investments.documents.store');

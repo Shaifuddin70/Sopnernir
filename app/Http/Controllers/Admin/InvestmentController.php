@@ -33,6 +33,7 @@ class InvestmentController extends Controller
 
         $investments = Investment::query()
             ->withCount('participants')
+            ->withSum('profitWithdrawals as profit_withdrawn_total', 'amount')
             ->when($like, function ($q) use ($like): void {
                 $q->where(function ($q) use ($like): void {
                     $q->where('title', 'like', $like)
@@ -149,6 +150,11 @@ class InvestmentController extends Controller
         $investment->loadCount('participants');
         $investment->loadSum('participants', 'contribution_amount');
         $investment->loadSum('periods', 'profit_amount');
+        $investment->loadSum('profitWithdrawals as profit_withdrawn_total', 'amount');
+        $profitWithdrawals = $investment->profitWithdrawals()
+            ->with(['withdrawnBy:id,name'])
+            ->paginate(10, ['*'], 'withdrawals_page')
+            ->withQueryString();
 
         $periods = $this->paginatedPeriodsForShow($request, $investment);
         $participants = $this->paginatedParticipantsForShow($request, $investment);
@@ -161,8 +167,19 @@ class InvestmentController extends Controller
             ->get();
 
         $editingInvestment = $this->resolveEditingInvestment($request, $investment);
+        $poolDaily = app(InvestmentDailyProfitService::class)->poolProjection($investment);
+        $availableProfit = (float) ($poolDaily['profit_til_today'] ?? 0);
 
-        return view('admin.investments.show', compact('investment', 'investorUsers', 'periods', 'participants', 'editingInvestment'));
+        return view('admin.investments.show', compact(
+            'investment',
+            'investorUsers',
+            'periods',
+            'participants',
+            'editingInvestment',
+            'profitWithdrawals',
+            'poolDaily',
+            'availableProfit',
+        ));
     }
 
     private function paginatedPeriodsForShow(Request $request, Investment $investment): LengthAwarePaginator

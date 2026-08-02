@@ -49,4 +49,9 @@ class InvestmentPolicy
     {
         return $user->isAdmin();
     }
+
+    public function withdrawProfits(User $user, Investment $investment): bool
+    {
+        return $user->isAdmin();
+    }
 }

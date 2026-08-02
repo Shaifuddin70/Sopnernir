@@ -69,6 +69,10 @@
                             <dt>{{ __('Profit til today') }}</dt>
                             <dd>{{ $myDailyProfit['profit_til_today'] }}</dd>
                         </div>
+                        <div class="dashboard-stat">
+                            <dt>{{ __('Withdrawn') }}</dt>
+                            <dd>{{ $myDailyProfit['withdrawn'] ?? '0.00' }}</dd>
+                        </div>
                     @endif
                     @if ($myDailyProfit && $investment->usesTotalProfitPlan())
                         <div class="dashboard-stat">

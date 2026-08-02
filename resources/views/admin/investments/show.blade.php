@@ -9,7 +9,16 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4">
+    <div
+        class="space-y-4"
+        data-profit-withdrawals
+        data-preview-url="{{ route('admin.investments.profit-withdrawals.preview') }}"
+        data-bulk-url="{{ route('admin.investments.profit-withdrawals.bulk') }}"
+        data-store-url-template="{{ route('admin.investments.profit-withdrawals.store', ['investment' => '__ID__']) }}"
+        data-label-selected="{{ __('Selected: :count') }}"
+        data-label-preview-error="{{ __('Could not calculate withdrawable profit.') }}"
+        data-label-none="{{ __('No withdrawable profit for the selection.') }}"
+    >
         @php
             $poolStatus = $investment->status;
             $statusBadge = match ($poolStatus) {
@@ -31,7 +40,7 @@
         <section class="ui-card min-w-0 overflow-hidden">
             <div class="ui-card-header">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex min-w-0 flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <h3 class="ui-card-header-title">{{ __('Pool overview') }}</h3>
                         <span class="{{ $statusBadge }}">{{ $statusLabel }}</span>
                         <span class="{{ $listedBadge }}">{{ $investment->is_active ? __('Listed') : __('Hidden') }}</span>
@@ -45,20 +54,30 @@
                             @endif
                         @endif
                     </div>
-                    <form method="post" action="{{ route('admin.investments.active', $investment) }}" class="shrink-0">
-                        @csrf
-                        @method('patch')
-                        @if ($investment->is_active)
-                            <x-secondary-button type="submit" class="text-sm">{{ __('Set inactive') }}</x-secondary-button>
-                        @else
-                            <x-primary-button type="submit" class="text-sm">{{ __('Set active') }}</x-primary-button>
-                        @endif
-                    </form>
+                    <div class="flex shrink-0 flex-wrap gap-2">
+                        @can('withdrawProfits', $investment)
+                            <x-action-button
+                                type="button"
+                                data-row-withdraw-open
+                                data-investment-id="{{ $investment->id }}"
+                                data-investment-title="{{ $investment->title }}"
+                            >{{ __('Withdraw') }}</x-action-button>
+                        @endcan
+                        <form method="post" action="{{ route('admin.investments.active', $investment) }}">
+                            @csrf
+                            @method('patch')
+                            @if ($investment->is_active)
+                                <x-secondary-button type="submit" class="text-sm">{{ __('Set inactive') }}</x-secondary-button>
+                            @else
+                                <x-primary-button type="submit" class="text-sm">{{ __('Set active') }}</x-primary-button>
+                            @endif
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <div class="space-y-4 p-3 sm:p-4">
-                <dl class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                <dl class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
                     <div class="ui-stat-tile rounded-lg p-3 sm:p-4">
                         <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Tagged investors') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-foreground sm:text-xl">
@@ -97,6 +116,15 @@
                         <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Posted profit') }}</dt>
                         <dd class="mt-1 text-lg font-bold tabular-nums text-success sm:text-xl">
                             {{ number_format((float) ($investment->periods_sum_profit_amount ?? 0), 2, '.', '') }}
+                        </dd>
+                    </div>
+                    <div class="ui-stat-tile-profit rounded-lg p-3 sm:p-4">
+                        <dt class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ __('Profit til today') }}</dt>
+                        <dd class="mt-1 text-lg font-bold tabular-nums text-success sm:text-xl">
+                            {{ number_format((float) $availableProfit, 2, '.', '') }}
+                        </dd>
+                        <dd class="mt-1 text-sm tabular-nums text-foreground-muted">
+                            {{ __('Withdrawn: :amount', ['amount' => number_format((float) ($investment->profit_withdrawn_total ?? 0), 2, '.', '')]) }}
                         </dd>
                     </div>
                 </dl>
@@ -192,6 +220,65 @@
         <section class="ui-card min-w-0 overflow-hidden">
             <div class="ui-card-header">
                 <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="ui-card-header-title">{{ __('Profit withdrawals') }}</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
+                            {{ __('All records') }}
+                        </x-action-button>
+                        @can('withdrawProfits', $investment)
+                            <x-primary-button
+                                type="button"
+                                class="text-sm"
+                                data-row-withdraw-open
+                                data-investment-id="{{ $investment->id }}"
+                                data-investment-title="{{ $investment->title }}"
+                            >{{ __('Withdraw profit') }}</x-primary-button>
+                        @endcan
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 sm:p-4">
+                @if ($profitWithdrawals->isEmpty())
+                    <p class="text-sm text-foreground-muted">{{ __('No profit withdrawals recorded yet.') }}</p>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="ui-table min-w-full">
+                            <thead>
+                                <tr>
+                                    <x-table-serial-header />
+                                    <th>{{ __('Through date') }}</th>
+                                    <th class="text-right">{{ __('Amount') }}</th>
+                                    <th class="hidden sm:table-cell text-right">{{ __('Profit through date') }}</th>
+                                    <th class="hidden md:table-cell">{{ __('By') }}</th>
+                                    <th class="hidden lg:table-cell">{{ __('Withdrawn at') }}</th>
+                                    <th>{{ __('Notes') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($profitWithdrawals as $withdrawal)
+                                    <tr>
+                                        <x-table-serial-cell :paginator="$profitWithdrawals" :index="$loop->index" />
+                                        <td class="tabular-nums">{{ $withdrawal->through_date?->format('Y-m-d') }}</td>
+                                        <td class="text-right tabular-nums font-semibold text-success">{{ number_format((float) $withdrawal->amount, 2, '.', '') }}</td>
+                                        <td class="hidden text-right tabular-nums sm:table-cell">{{ number_format((float) $withdrawal->profit_through_date, 2, '.', '') }}</td>
+                                        <td class="hidden md:table-cell">{{ $withdrawal->withdrawnBy?->name ?? '—' }}</td>
+                                        <td class="hidden tabular-nums text-foreground-muted lg:table-cell">{{ $withdrawal->withdrawn_at?->format('Y-m-d H:i') ?? '—' }}</td>
+                                        <td class="max-w-[12rem] truncate text-foreground-muted" title="{{ $withdrawal->notes }}">{{ $withdrawal->notes ?: '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ui-table-footer">
+                        <div class="ui-table-pagination">{{ $profitWithdrawals->links() }}</div>
+                    </div>
+                @endif
+            </div>
+        </section>
+
+        <section class="ui-card min-w-0 overflow-hidden">
+            <div class="ui-card-header">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <h3 class="ui-card-header-title">{{ __('Documents') }}</h3>
                     <form method="post" action="{{ route('admin.investments.documents.store', $investment) }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
                         @csrf
@@ -245,4 +332,6 @@
             </div>
         </x-modal>
     @endif
+
+    @include('admin.investments.partials.withdraw-profit-modal')
 </x-app-layout>

@@ -42,6 +42,10 @@
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $row['profit_til_today'] }}</dd>
                     </div>
+                    <div class="phone-access-investment-card__metric sm:col-span-2">
+                        <dt>{{ __('Withdrawn') }}</dt>
+                        <dd>{{ $showPoolTotals ? ($row['pool_withdrawn'] ?? '0.00') : ($row['withdrawn'] ?? '0.00') }}</dd>
+                    </div>
                 </dl>
             </article>
         @endforeach
@@ -57,7 +61,8 @@
                 <th class="hidden md:table-cell text-right">{{ __('Total') }}</th>
                 <th class="text-right">{{ __('Profit') }}</th>
                 <th class="text-right">{{ __('Profit til today') }}</th>
-                <th class="hidden lg:table-cell text-right">{{ __('Per day') }}</th>
+                <th class="hidden lg:table-cell text-right">{{ __('Withdrawn') }}</th>
+                <th class="hidden xl:table-cell text-right">{{ __('Per day') }}</th>
                 <th class="w-0"><span class="sr-only">{{ __('Actions') }}</span></th>
             </tr>
         </thead>
@@ -89,7 +94,10 @@
                         {{ $showPoolTotals ? $row['pool_profit_amount'] : $row['profit_amount'] }}
                     </td>
                     <td class="text-right tabular-nums font-medium text-success">{{ $row['profit_til_today'] }}</td>
-                    <td class="hidden text-right tabular-nums text-foreground-muted lg:table-cell">{{ $row['daily_profit'] }}</td>
+                    <td class="hidden text-right tabular-nums text-foreground-muted lg:table-cell">
+                        {{ $showPoolTotals ? ($row['pool_withdrawn'] ?? '0.00') : ($row['withdrawn'] ?? '0.00') }}
+                    </td>
+                    <td class="hidden text-right tabular-nums text-foreground-muted xl:table-cell">{{ $row['daily_profit'] }}</td>
                     <td class="text-right">
                         <x-action-button :href="$viewUrl" variant="secondary" class="text-sm">{{ __('View') }}</x-action-button>
                     </td>

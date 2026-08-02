@@ -32,7 +32,7 @@
                     <th class="text-right">{{ __('Tagged capital') }}</th>
                     <th class="hidden md:table-cell text-right">{{ __('Total profit') }}</th>
                     <th class="text-right">{{ __('Profit til today') }}</th>
-                    <th class="hidden lg:table-cell text-right">{{ __('Total til today') }}</th>
+                    <th class="hidden lg:table-cell text-right">{{ __('Withdrawn') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,8 +56,8 @@
                         <td class="whitespace-nowrap text-right tabular-nums font-semibold text-success">
                             {{ $row->profit_til_today ?? $row->total_profit }}
                         </td>
-                        <td class="hidden whitespace-nowrap text-right tabular-nums lg:table-cell">
-                            {{ $row->total_til_today ?? '—' }}
+                        <td class="hidden whitespace-nowrap text-right tabular-nums text-foreground-muted lg:table-cell">
+                            {{ $row->total_withdrawn ?? '0.00' }}
                         </td>
                     </tr>
                 @endforeach

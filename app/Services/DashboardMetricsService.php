@@ -47,6 +47,7 @@ class DashboardMetricsService
             'total_contributions' => $daily['total_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
+            'total_withdrawn' => $daily['total_withdrawn'],
             'total_profit_distributed' => $daily['profit_til_today'],
             'total_amount' => $daily['total_til_today'],
             'member_count' => $daily['member_count'],
@@ -80,6 +81,7 @@ class DashboardMetricsService
             'total_contribution' => $daily['total_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
+            'total_withdrawn' => $daily['total_withdrawn'],
             'total_profit' => $daily['profit_til_today'],
             'total_amount' => $daily['total_til_today'],
             'return_on_tagged_capital_pct' => $contrib > 0
@@ -333,6 +335,7 @@ class DashboardMetricsService
                     'total_profit' => $this->decimalString($row['profit_til_today']),
                     'profit_til_today' => $this->decimalString($row['profit_til_today']),
                     'total_projected_profit' => $this->decimalString($row['projected_profit']),
+                    'total_withdrawn' => $this->decimalString($row['withdrawn'] ?? 0),
                     'total_til_today' => $this->decimalString($row['total_til_today']),
                     'pools_count' => (int) $row['pools_count'],
                 ];

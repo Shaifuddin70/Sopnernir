@@ -44,6 +44,10 @@
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $myDailyProfit['profit_til_today'] }}</dd>
                     </div>
+                    <div class="dashboard-stat">
+                        <dt>{{ __('Withdrawn') }}</dt>
+                        <dd>{{ $myDailyProfit['withdrawn'] ?? '0.00' }}</dd>
+                    </div>
                     <div class="dashboard-stat dashboard-stat--profit">
                         <dt>{{ __('Daily profit') }}</dt>
                         <dd>{{ $myDailyProfit['daily_profit'] }}</dd>
