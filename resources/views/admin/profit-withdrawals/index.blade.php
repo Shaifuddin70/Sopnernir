@@ -31,8 +31,7 @@
 
         <div class="ui-card">
             <div class="ui-card-header">
-                <p class="ui-card-header-title">{{ __('Withdrawn by pool') }}</p>
-                <p class="ui-card-header-subtitle">{{ __('Total profit withdrawn from each investment pool') }}</p>
+                <p class="ui-card-header-title">{{ __('Withdrawals') }}</p>
             </div>
             <div class="p-3 text-foreground sm:p-4">
                 <x-ajax-table-region :fetch-url="route('admin.profit-withdrawals.index')" target-id="profit-withdrawals-table-fragment">
@@ -42,19 +41,9 @@
                         :placeholder="__('Search by pool title or deed number…')"
                     />
                     <div id="profit-withdrawals-table-fragment">
-                        @include('admin.profit-withdrawals.partials.table-fragment', compact('pools'))
+                        @include('admin.profit-withdrawals.partials.table-fragment', compact('batches'))
                     </div>
                 </x-ajax-table-region>
-            </div>
-        </div>
-
-        <div class="ui-card">
-            <div class="ui-card-header">
-                <p class="ui-card-header-title">{{ __('Recent withdraw actions') }}</p>
-                <p class="ui-card-header-subtitle">{{ __('Each action may include one or more pools — expand for per-pool amounts') }}</p>
-            </div>
-            <div class="p-3 text-foreground sm:p-4">
-                @include('admin.profit-withdrawals.partials.recent-batches', ['batches' => $recentBatches])
             </div>
         </div>
     </div>

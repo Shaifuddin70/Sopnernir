@@ -40,7 +40,7 @@
             type="button"
             @click="open = !open"
             :disabled="loading"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50"
+            class="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-medium text-foreground shadow-sm backdrop-blur-md hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50"
         >
             <span x-text="value"></span>
             <svg class="h-4 w-4 shrink-0 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\Investment;
+use App\Models\SpecialInstallment;
 use App\Models\User;
 use App\Notifications\MonthlyPaymentRecordedNotification;
 use App\Notifications\NewInvestmentPlanNotification;
+use App\Notifications\SpecialInstallmentRecordedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 
@@ -17,7 +19,19 @@ class InvestorNotificationService
             return;
         }
 
-        $user->notify(new MonthlyPaymentRecordedNotification($month->copy()->startOfMonth()));
+        $month = $month->copy()->startOfMonth();
+        $amount = app(MonthlyPaymentService::class)->defaultAmountForMonth($month);
+
+        $user->notify(new MonthlyPaymentRecordedNotification($month, $amount));
+    }
+
+    public function specialInstallmentRecorded(User $user, SpecialInstallment $installment): void
+    {
+        if (! $this->canEmail($user)) {
+            return;
+        }
+
+        $user->notify(new SpecialInstallmentRecordedNotification($installment));
     }
 
     public function newInvestmentPlan(Investment $investment): void

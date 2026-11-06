@@ -4,6 +4,9 @@
 
 {{ __('Your payment has been recorded.') }}
 {{ __('Payment month') }}: {{ $monthLabel }}
+@if ($amountLabel)
+{{ __('Amount') }}: {{ $amountLabel }}
+@endif
 {{ __('Thank you for staying current with :app.', ['app' => $appName]) }}
 
 {{ __('View your portfolio') }}: {{ $actionUrl }}

@@ -1,4 +1,4 @@
-<div class="overflow-x-auto">
+<div class="ui-glass-table-wrap overflow-x-auto">
 <table class="ui-table min-w-full">
     <thead>
         <tr>
@@ -25,7 +25,9 @@
                 <td class="text-right tabular-nums">{{ number_format((float) ($inv->my_contribution ?? 0), 2, '.', '') }}</td>
                 <td class="text-right tabular-nums text-success">{{ number_format((float) ($inv->my_profit ?? 0), 2, '.', '') }}</td>
                 <td class="text-right">
-                    <x-action-button :href="route('investments.show', $inv)">{{ __('View') }}</x-action-button>
+                    <div class="table-row-actions flex flex-nowrap items-center justify-end gap-2">
+                        <x-action-button :href="route('investments.show', $inv)" variant="secondary">{{ __('View') }}</x-action-button>
+                    </div>
                 </td>
             </tr>
         @empty

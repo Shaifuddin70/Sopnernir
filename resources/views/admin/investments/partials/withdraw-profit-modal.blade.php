@@ -17,7 +17,7 @@
             </div>
             <button
                 type="button"
-                class="rounded-lg p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                class="rounded-full p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 @click="$dispatch('close-modal', 'withdraw-profit')"
                 aria-label="{{ __('Close') }}"
             >

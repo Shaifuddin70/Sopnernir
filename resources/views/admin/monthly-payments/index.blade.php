@@ -53,6 +53,27 @@
                         @endif
                     </form>
 
+                    <form method="post" action="{{ route('admin.monthly-payments.amount') }}" class="flex min-w-0 flex-wrap items-center gap-2">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="month" value="{{ $month->format('Y-m') }}">
+                        @if (request()->filled('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        <label for="default_amount" class="shrink-0 text-sm font-medium text-foreground-muted">{{ __('Default amount') }}</label>
+                        <input
+                            id="default_amount"
+                            name="amount"
+                            type="text"
+                            inputmode="decimal"
+                            value="{{ old('amount', $defaultAmount) }}"
+                            required
+                            class="ui-input !mt-0 w-full min-w-[8rem] sm:w-36"
+                        >
+                        <x-action-button type="submit" class="shrink-0">{{ __('Save') }}</x-action-button>
+                        <x-input-error :messages="$errors->get('amount')" class="basis-full" />
+                    </form>
+
                     <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-end lg:gap-4">
                         <div id="monthly-payments-summary">
                             @include('admin.monthly-payments.partials.summary', compact(
@@ -63,7 +84,14 @@
                             ))
                         </div>
                         <x-action-button
-                            class="!h-11 w-full shrink-0 justify-center sm:w-auto"
+                            class="w-full shrink-0 justify-center sm:w-auto"
+                            variant="secondary"
+                            :href="route('admin.special-installments.index')"
+                        >
+                            {{ __('Special installment') }}
+                        </x-action-button>
+                        <x-action-button
+                            class="w-full shrink-0 justify-center sm:w-auto"
                             :href="route('admin.investments.index', ['new' => 1, 'payment_month' => $month->format('Y-m')])"
                             :title="__('Create an investment and tag investors who paid for :month', ['month' => $month->translatedFormat('F Y')])"
                         >

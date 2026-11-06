@@ -125,7 +125,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Branded HTML themes live in resources/views/vendor/mail. The default
-    | theme uses Shopnonir colors, logo, and layout for notification mail.
+    | theme uses Shopnernir colors, logo, and layout for notification mail.
     |
     */
 

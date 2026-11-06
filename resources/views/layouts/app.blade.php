@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Shopnonir') }}</title>
+    <title>{{ config('app.name', 'Shopnernir') }}</title>
 
     <x-favicon />
 
@@ -31,7 +31,7 @@
                         <button
                             type="button"
                             @click="sidebarOpen = true"
-                            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
+                            class="inline-flex shrink-0 items-center justify-center rounded-full p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
                             aria-expanded="false"
                             x-bind:aria-expanded="sidebarOpen"
                         >

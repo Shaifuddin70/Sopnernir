@@ -13,25 +13,50 @@
         </div>
     </x-slot>
 
-    <div>
+    <div class="users-page space-y-4">
         @if ($errors->has('active'))
-            <p class="mb-4 text-sm text-error">{{ $errors->first('active') }}</p>
+            <p class="text-sm text-error">{{ $errors->first('active') }}</p>
         @endif
 
-        <section class="ui-card">
-            <div class="ui-card-header">
-                <p class="ui-card-header-title">{{ __('Users list') }}</p>
-                <p class="ui-card-header-subtitle">{{ __('Search by name, email, phone, or nominee') }}</p>
+        <section class="dashboard-stat-panel" aria-label="{{ __('Users summary') }}">
+            <div class="dashboard-stat-panel__head">
+                <h3 class="dashboard-stat-panel__title">{{ __('Summary') }}</h3>
             </div>
-            <div class="p-4 sm:p-6">
-                <x-ajax-table-region :fetch-url="route('admin.users.index')" target-id="users-table-fragment">
-                    <x-table-search :fetch-url="route('admin.users.index')" target-id="users-table-fragment" :placeholder="__('Search by name, email, phone, or nominee…')" />
-                    <div id="users-table-fragment">
-                        @include('admin.users.partials.table-fragment', compact('users'))
-                    </div>
-                </x-ajax-table-region>
-            </div>
+            <dl class="dashboard-stat-grid">
+                <div class="dashboard-stat dashboard-stat--capital">
+                    <dt>{{ __('Users') }}</dt>
+                    <dd>{{ $userSummary['total'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--profit">
+                    <dt>{{ __('Active') }}</dt>
+                    <dd>{{ $userSummary['active'] }}</dd>
+                </div>
+                <div class="dashboard-stat">
+                    <dt>{{ __('Inactive') }}</dt>
+                    <dd>{{ $userSummary['inactive'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--capital">
+                    <dt>{{ __('Admins') }}</dt>
+                    <dd>{{ $userSummary['admins'] }}</dd>
+                </div>
+            </dl>
         </section>
-    </div>
 
+        <x-ajax-table-region :fetch-url="route('admin.users.index')" target-id="users-table-fragment" class="dashboard-stat-panel min-w-0">
+            <div class="dashboard-stat-panel__head">
+                <h3 class="dashboard-stat-panel__title">{{ __('Users list') }}</h3>
+                <x-table-search
+                    :fetch-url="route('admin.users.index')"
+                    target-id="users-table-fragment"
+                    :placeholder="__('Search by name, email, phone, or nominee…')"
+                    class="!mb-0 w-full sm:w-80"
+                />
+            </div>
+            <div class="p-3 pt-1">
+                <div id="users-table-fragment">
+                    @include('admin.users.partials.table-fragment', compact('users'))
+                </div>
+            </div>
+        </x-ajax-table-region>
+    </div>
 </x-app-layout>

@@ -369,6 +369,20 @@ function applyPaidUnpaidToggle(container, isPaid, mixed = false) {
     const paidOn = isPaid && ! mixed;
     const unpaidOn = ! isPaid && ! mixed;
 
+    if (container.hasAttribute('data-check-all-paid')) {
+        if (paidButton instanceof HTMLElement) {
+            paidButton.classList.toggle('is-paid', paidOn);
+            paidButton.setAttribute('aria-pressed', paidOn ? 'true' : 'false');
+        }
+
+        if (unpaidButton instanceof HTMLElement) {
+            unpaidButton.classList.toggle('is-unpaid', unpaidOn);
+            unpaidButton.setAttribute('aria-pressed', unpaidOn ? 'true' : 'false');
+        }
+
+        return;
+    }
+
     [paidButton, unpaidButton].forEach((button) => {
         if (! (button instanceof HTMLElement)) {
             return;
@@ -512,7 +526,7 @@ document.addEventListener('click', async (event) => {
         try {
             const data = await patchMonthlyPayment(root.dataset.updateUrl, {
                 user_id: Number(row.dataset.userId),
-                month: root.dataset.month,
+                ...(root.dataset.month ? { month: root.dataset.month } : {}),
                 paid: nextPaid,
             });
 
@@ -543,11 +557,19 @@ document.addEventListener('click', async (event) => {
             return;
         }
 
+        const confirmMessage = nextPaid
+            ? bulkGroup.dataset.confirmPaid
+            : bulkGroup.dataset.confirmUnpaid;
+
+        if (confirmMessage && ! window.confirm(confirmMessage)) {
+            return;
+        }
+
         root.classList.add('opacity-80', 'pointer-events-none');
 
         try {
             await patchMonthlyPayment(root.dataset.bulkUrl, {
-                month: root.dataset.month,
+                ...(root.dataset.month ? { month: root.dataset.month } : {}),
                 paid: nextPaid,
                 user_ids: userIds,
             });

@@ -6,6 +6,11 @@
     $prefillTitle = $prefillPaymentMonth
         ? \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()->translatedFormat('F Y')
         : null;
+    $defaultContribution = $prefillPaymentMonth
+        ? app(\App\Services\MonthlyPaymentService::class)->defaultAmountForMonth(
+            \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()
+        )
+        : null;
     $openCreateInvestmentModal = request()->boolean('new')
         || (old('_form') === 'create-investment' && $errors->isNotEmpty());
     $openEditInvestmentModal = $editingInvestment !== null;
@@ -26,10 +31,10 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4">
+    <div class="investments-page space-y-4">
         <section class="dashboard-stat-panel" aria-label="{{ __('Investments summary') }}">
             <div class="dashboard-stat-panel__head">
-                <h3 class="dashboard-stat-panel__title">{{ __('Total summary') }}</h3>
+                <h3 class="dashboard-stat-panel__title">{{ __('Summary') }}</h3>
                 <div class="flex flex-wrap items-center gap-1.5">
                     @if (! empty($summary['as_of_date']))
                         <span class="ui-chip tabular-nums">{{ __('As of :date', ['date' => \Carbon\Carbon::parse($summary['as_of_date'])->translatedFormat('j M Y')]) }}</span>
@@ -65,20 +70,22 @@
             </dl>
         </section>
 
-        <div class="ui-card">
-            <div class="ui-card-header">
-                <p class="ui-card-header-title">{{ __('Investments list') }}</p>
-                <p class="ui-card-header-subtitle">{{ __('Compact view with quick actions') }}</p>
+        <x-ajax-table-region :fetch-url="route('admin.investments.index')" target-id="investments-table-fragment" class="dashboard-stat-panel min-w-0">
+            <div class="dashboard-stat-panel__head">
+                <h3 class="dashboard-stat-panel__title">{{ __('Investments list') }}</h3>
+                <x-table-search
+                    :fetch-url="route('admin.investments.index')"
+                    target-id="investments-table-fragment"
+                    :placeholder="__('Search by title, notes, or status…')"
+                    class="!mb-0 w-full sm:w-80"
+                />
             </div>
-            <div class="p-3 text-foreground sm:p-4">
-                <x-ajax-table-region :fetch-url="route('admin.investments.index')" target-id="investments-table-fragment">
-                    <x-table-search :fetch-url="route('admin.investments.index')" target-id="investments-table-fragment" :placeholder="__('Search by title, notes, or status…')" />
-                    <div id="investments-table-fragment">
-                        @include('admin.investments.partials.table-fragment', compact('investments'))
-                    </div>
-                </x-ajax-table-region>
+            <div class="p-3 pt-1">
+                <div id="investments-table-fragment">
+                    @include('admin.investments.partials.table-fragment', compact('investments'))
+                </div>
             </div>
-        </div>
+        </x-ajax-table-region>
     </div>
 
     <x-modal name="create-investment" :show="$openCreateInvestmentModal" focusable maxWidth="3xl">
@@ -86,7 +93,7 @@
             <h3 class="text-lg font-semibold text-foreground">{{ __('New investment') }}</h3>
             <button
                 type="button"
-                class="rounded-lg p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                class="rounded-full p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 @click="$dispatch('close-modal', 'create-investment')"
                 aria-label="{{ __('Close') }}"
             >
@@ -99,28 +106,18 @@
             @include('admin.investments.partials.create-form', [
                 'defaultPaymentMonth' => $prefillPaymentMonth ?? old('payment_month', now()->format('Y-m')),
                 'defaultTitle' => $prefillTitle,
+                'defaultContribution' => $defaultContribution,
             ])
         </div>
     </x-modal>
 
     @if ($editingInvestment)
-        <x-modal name="edit-investment" :show="$openEditInvestmentModal" focusable maxWidth="3xl">
-            <div class="flex items-center justify-between border-b border-line px-6 py-4">
-                <h3 class="text-lg font-semibold text-foreground">{{ __('Edit investment') }}</h3>
-                <button
-                    type="button"
-                    class="rounded-lg p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    onclick="window.location.href = '{{ route('admin.investments.index') }}'"
-                    aria-label="{{ __('Close') }}"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="max-h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
-                @include('admin.investments.partials.edit-form', ['investment' => $editingInvestment, 'return' => 'index'])
-            </div>
+        <x-modal name="edit-investment" :show="$openEditInvestmentModal" focusable maxWidth="4xl">
+            @include('admin.investments.partials.edit-form', [
+                'investment' => $editingInvestment,
+                'return' => 'index',
+                'closeUrl' => route('admin.investments.index'),
+            ])
         </x-modal>
     @endif
 

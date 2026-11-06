@@ -229,7 +229,7 @@ class ProfitWithdrawalTest extends TestCase
             ->get(route('admin.profit-withdrawals.index'))
             ->assertOk()
             ->assertSee(__('Profit withdrawals'), false)
-            ->assertSee(__('Withdrawn by pool'), false)
+            ->assertSee(__('Withdrawals'), false)
             ->assertSee(__('Total withdrawn'), false)
             ->assertSee('History pool', false)
             ->assertDontSee('Record Investor', false);

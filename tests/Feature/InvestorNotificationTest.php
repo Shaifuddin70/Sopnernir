@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Investment;
 use App\Models\InvestorMonthlyPayment;
+use App\Models\MonthlyPaymentDefault;
 use App\Models\User;
 use App\Notifications\MonthlyPaymentRecordedNotification;
 use App\Notifications\NewInvestmentPlanNotification;
@@ -22,13 +23,21 @@ class InvestorNotificationTest extends TestCase
         $admin = User::factory()->admin()->create();
         $investor = User::factory()->create();
 
+        MonthlyPaymentDefault::query()->create([
+            'month' => '2026-04-01',
+            'amount' => '3200.00',
+        ]);
+
         $this->actingAs($admin)->patch(route('admin.monthly-payments.update'), [
             'user_id' => $investor->id,
             'month' => '2026-04',
             'paid' => true,
         ])->assertRedirect();
 
-        Notification::assertSentTo($investor, MonthlyPaymentRecordedNotification::class);
+        Notification::assertSentTo($investor, MonthlyPaymentRecordedNotification::class, function (MonthlyPaymentRecordedNotification $notification): bool {
+            return $notification->month->toDateString() === '2026-04-01'
+                && $notification->amount === '3200.00';
+        });
         Notification::assertSentToTimes($investor, MonthlyPaymentRecordedNotification::class, 1);
     }
 

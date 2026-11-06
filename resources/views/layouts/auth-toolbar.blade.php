@@ -6,11 +6,11 @@
     <div class="hidden shrink-0 lg:block">
         <x-language-switcher />
     </div>
-    <x-dropdown align="right" width="48" contentClasses="py-1 bg-surface-card border border-line">
+    <x-dropdown align="right" width="full" contentClasses="overflow-hidden rounded-2xl border border-[#e6eef8] bg-white py-1.5 shadow-[0_12px_32px_rgb(15_23_42/0.12)]">
         <x-slot name="trigger">
             <button
                 type="button"
-                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-lg border border-line bg-surface-card py-1 ps-1 pe-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface"
+                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-full border border-white/70 bg-white/80 py-1 ps-1 pe-3 text-sm font-medium leading-4 text-foreground shadow-sm backdrop-blur-md transition duration-150 ease-in-out hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             >
                 <span class="ui-user-identity__avatar ui-user-identity__avatar--compact">
                     <x-user-avatar :user="$authUser" />

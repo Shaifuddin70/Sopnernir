@@ -6,7 +6,7 @@
 <tr>
 <td align="center" style="padding-bottom: 12px;">
 <a href="{{ $url }}" target="_blank" rel="noopener" style="display: inline-block; text-decoration: none;">
-<img src="{{ $logo }}" width="72" height="72" alt="{{ config('app.name') }}" class="logo" style="border-radius: 50%;">
+<img src="{{ $logo }}" width="72" height="72" alt="{{ config('app.name') }}" class="logo" style="border:0;">
 </a>
 </td>
 </tr>

@@ -8,18 +8,14 @@ class BrandedMail
 {
     public static function logoUrl(mixed $message = null): string
     {
-        $path = public_path('images/logo.jpg');
-        $fallback = asset('images/logo.jpg');
+        $base = rtrim((string) config('app.url'), '/');
+        $host = parse_url($base, PHP_URL_HOST);
 
-        if (is_object($message) && method_exists($message, 'embed') && is_file($path)) {
-            try {
-                return $message->embed($path);
-            } catch (\Throwable) {
-                return $fallback;
-            }
+        if (! is_string($host) || in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            $base = 'https://shopnernir.com';
         }
 
-        return $fallback;
+        return $base.'/images/logo.png';
     }
 
     public static function money(mixed $amount): string

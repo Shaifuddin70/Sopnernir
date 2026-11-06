@@ -5,10 +5,12 @@ use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController
 use App\Http\Controllers\Admin\InvestmentDocumentController;
 use App\Http\Controllers\Admin\InvestmentParticipantController;
 use App\Http\Controllers\Admin\MonthlyPaymentController;
+use App\Http\Controllers\Admin\SpecialInstallmentController;
 use App\Http\Controllers\Admin\ProfitWithdrawalController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Investor\InvestmentController as InvestorInvestmentController;
+use App\Http\Controllers\Investor\PaymentController as InvestorPaymentController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PhoneAccess\InvestmentLookupController as PhoneAccessInvestmentLookupController;
 use App\Http\Controllers\ProfileController;
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/payments', [InvestorPaymentController::class, 'index'])->name('payments.index');
     Route::get('/portfolio', [InvestorInvestmentController::class, 'index'])->name('investments.index');
     Route::get('/portfolio/investments', [InvestorInvestmentController::class, 'all'])->name('investments.all');
     Route::get('/portfolio/{investment}/documents/{document}/download', [InvestmentDocumentController::class, 'download'])
@@ -62,8 +65,15 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('users', AdminUserController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 
     Route::get('monthly-payments', [MonthlyPaymentController::class, 'index'])->name('monthly-payments.index');
+    Route::patch('monthly-payments/amount', [MonthlyPaymentController::class, 'updateAmount'])->name('monthly-payments.amount');
     Route::patch('monthly-payments', [MonthlyPaymentController::class, 'update'])->name('monthly-payments.update');
     Route::patch('monthly-payments/bulk', [MonthlyPaymentController::class, 'bulkUpdate'])->name('monthly-payments.bulk-update');
+
+    Route::get('special-installments', [SpecialInstallmentController::class, 'index'])->name('special-installments.index');
+    Route::post('special-installments', [SpecialInstallmentController::class, 'store'])->name('special-installments.store');
+    Route::get('special-installments/{specialInstallment}', [SpecialInstallmentController::class, 'show'])->name('special-installments.show');
+    Route::patch('special-installments/{specialInstallment}', [SpecialInstallmentController::class, 'update'])->name('special-installments.update');
+    Route::patch('special-installments/{specialInstallment}/bulk', [SpecialInstallmentController::class, 'bulkUpdate'])->name('special-installments.bulk-update');
 
     Route::patch('investments/{investment}/active', [AdminInvestmentController::class, 'toggleActive'])->name('investments.active');
     Route::resource('investments', AdminInvestmentController::class)->except(['destroy']);

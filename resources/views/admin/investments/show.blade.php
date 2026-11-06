@@ -129,10 +129,10 @@
                     </div>
                 </dl>
 
-                <dl class="grid gap-3 border-t border-line pt-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                <dl class="grid gap-3 border-t border-line pt-4 text-sm sm:grid-cols-2 lg:grid-cols-5">
                     <div>
                         <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Deed number') }}</dt>
-                        <dd class="mt-0.5 font-medium tabular-nums text-foreground">{{ $investment->deed_no ?? '—' }}</dd>
+                        <dd class="mt-0.5 font-medium tabular-nums text-foreground">{{ $investment->deed_no ?: '—' }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Contribution each') }}</dt>
@@ -184,6 +184,7 @@
             </div>
         </section>
 
+        <div class="grid items-start gap-4 lg:grid-cols-2">
         <section class="ui-card min-w-0 overflow-hidden">
             <div class="ui-card-header">
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -241,7 +242,7 @@
                 @if ($profitWithdrawals->isEmpty())
                     <p class="text-sm text-foreground-muted">{{ __('No profit withdrawals recorded yet.') }}</p>
                 @else
-                    <div class="overflow-x-auto">
+                    <div class="ui-glass-table-wrap overflow-x-auto">
                         <table class="ui-table min-w-full">
                             <thead>
                                 <tr>
@@ -267,9 +268,11 @@
                                         <td class="max-w-[12rem] truncate text-foreground-muted" title="{{ $withdrawal->notes }}">{{ $withdrawal->notes ?: '—' }}</td>
                                         <td class="text-right">
                                             @can('withdrawProfits', $investment)
-                                                @include('admin.profit-withdrawals.partials.reverse-form', [
-                                                    'action' => route('admin.investments.profit-withdrawals.destroy', [$investment, $withdrawal]),
-                                                ])
+                                                <div class="table-row-actions flex flex-nowrap items-center justify-end gap-2">
+                                                    @include('admin.profit-withdrawals.partials.reverse-form', [
+                                                        'action' => route('admin.investments.profit-withdrawals.destroy', [$investment, $withdrawal]),
+                                                    ])
+                                                </div>
                                             @endcan
                                         </td>
                                     </tr>
@@ -283,6 +286,7 @@
                 @endif
             </div>
         </section>
+        </div>
 
         <section class="ui-card min-w-0 overflow-hidden">
             <div class="ui-card-header">
@@ -304,12 +308,12 @@
                         @foreach ($investment->documents as $doc)
                             <li class="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                                 <span class="min-w-0 truncate">{{ $doc->original_name }}</span>
-                                <div class="flex shrink-0 gap-2">
-                                    <x-action-button :href="route('admin.investments.documents.download', [$investment, $doc])" class="text-sm">{{ __('Download') }}</x-action-button>
-                                    <form method="post" action="{{ route('admin.investments.documents.destroy', [$investment, $doc]) }}" onsubmit="return confirm('{{ __('Remove this file?') }}');">
+                                <div class="table-row-actions flex shrink-0 flex-nowrap items-center justify-end gap-2">
+                                    <x-action-button :href="route('admin.investments.documents.download', [$investment, $doc])">{{ __('Download') }}</x-action-button>
+                                    <form method="post" action="{{ route('admin.investments.documents.destroy', [$investment, $doc]) }}" class="inline-flex" onsubmit="return confirm('{{ __('Remove this file?') }}');">
                                         @csrf
                                         @method('delete')
-                                        <x-action-button variant="danger" class="text-sm">{{ __('Remove') }}</x-action-button>
+                                        <x-action-button variant="danger">{{ __('Remove') }}</x-action-button>
                                     </form>
                                 </div>
                             </li>
@@ -321,23 +325,12 @@
     </div>
 
     @if ($editingInvestment)
-        <x-modal name="edit-investment" :show="true" focusable maxWidth="3xl">
-            <div class="flex items-center justify-between border-b border-line px-6 py-4">
-                <h3 class="text-lg font-semibold text-foreground">{{ __('Edit investment') }}</h3>
-                <button
-                    type="button"
-                    class="rounded-lg p-1.5 text-foreground-muted transition hover:bg-surface-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    @click="window.location.href = '{{ route('admin.investments.show', $investment) }}'"
-                    aria-label="{{ __('Close') }}"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="max-h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
-                @include('admin.investments.partials.edit-form', ['investment' => $editingInvestment, 'return' => 'show'])
-            </div>
+        <x-modal name="edit-investment" :show="true" focusable maxWidth="4xl">
+            @include('admin.investments.partials.edit-form', [
+                'investment' => $editingInvestment,
+                'return' => 'show',
+                'closeUrl' => route('admin.investments.show', $investment),
+            ])
         </x-modal>
     @endif
 

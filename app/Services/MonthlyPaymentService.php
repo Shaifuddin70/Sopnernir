@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Models\InvestorMonthlyPayment;
+use App\Models\MonthlyPaymentDefault;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -65,6 +66,23 @@ class MonthlyPaymentService
     public function paidCountForMonth(Carbon $month): int
     {
         return $this->paidUserIdsForMonth($month)->count();
+    }
+
+    public function defaultAmountForMonth(Carbon $month): ?string
+    {
+        $amount = MonthlyPaymentDefault::query()
+            ->whereDate('month', $month->copy()->startOfMonth()->toDateString())
+            ->value('amount');
+
+        return $amount !== null ? number_format((float) $amount, 2, '.', '') : null;
+    }
+
+    public function setDefaultAmount(Carbon $month, float|string $amount): MonthlyPaymentDefault
+    {
+        return MonthlyPaymentDefault::query()->updateOrCreate(
+            ['month' => $month->copy()->startOfMonth()->toDateString()],
+            ['amount' => number_format((float) $amount, 2, '.', '')],
+        );
     }
 
     public function setPaidStatus(User $user, Carbon $month, bool $paid, User $recordedBy): InvestorMonthlyPayment

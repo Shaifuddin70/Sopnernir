@@ -24,7 +24,7 @@
         </div>
         <div>
             <x-input-label for="create_contribution_per_investor" :value="__('Contribution each')" />
-            <x-text-input id="create_contribution_per_investor" name="contribution_per_investor" type="text" class="mt-1 block w-full" :value="old('contribution_per_investor')" required />
+            <x-text-input id="create_contribution_per_investor" name="contribution_per_investor" type="text" class="mt-1 block w-full" :value="old('contribution_per_investor', $defaultContribution ?? '')" required />
             <p class="mt-1 text-sm text-foreground-muted">{{ __('Applied to each investor when they are tagged on this pool.') }}</p>
             <x-input-error :messages="$errors->get('contribution_per_investor')" class="mt-2" />
         </div>

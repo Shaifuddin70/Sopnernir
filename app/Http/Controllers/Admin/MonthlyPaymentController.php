@@ -60,6 +60,8 @@ class MonthlyPaymentController extends Controller
             ]);
         }
 
+        $defaultAmount = $payments->defaultAmountForMonth($month);
+
         return view('admin.monthly-payments.index', compact(
             'rows',
             'month',
@@ -67,7 +69,28 @@ class MonthlyPaymentController extends Controller
             'summaryPaid',
             'summaryUnpaid',
             'summaryTotal',
+            'defaultAmount',
         ));
+    }
+
+    public function updateAmount(Request $request, MonthlyPaymentService $payments): RedirectResponse
+    {
+        $validated = $request->validate([
+            'month' => ['required', 'date_format:Y-m'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
+        ]);
+
+        $month = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
+        $payments->setDefaultAmount($month, $validated['amount']);
+
+        return redirect()
+            ->route('admin.monthly-payments.index', array_filter([
+                'month' => $month->format('Y-m'),
+                'search' => $request->input('search'),
+            ]))
+            ->with('status', __('Default amount saved for :month.', [
+                'month' => $month->translatedFormat('F Y'),
+            ]));
     }
 
     public function update(Request $request, MonthlyPaymentService $payments): RedirectResponse|JsonResponse

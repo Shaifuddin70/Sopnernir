@@ -12,10 +12,17 @@
         {{ __('Thank you for staying current with :app.', ['app' => $appName]) }}
     </p>
 
-    <x-email.hero
-        :label="__('Payment month')"
-        :value="$monthLabel"
-    />
+    @if ($amountLabel)
+        <x-email.hero
+            :label="$monthLabel"
+            :value="$amountLabel"
+        />
+    @else
+        <x-email.hero
+            :label="__('Payment month')"
+            :value="$monthLabel"
+        />
+    @endif
 
     <x-email.button :url="$actionUrl">{{ __('View your portfolio') }}</x-email.button>
 </x-email.layout>

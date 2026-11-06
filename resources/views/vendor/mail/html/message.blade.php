@@ -2,16 +2,7 @@
 {{-- Header --}}
 <x-slot:header>
 @php
-    $logoPath = public_path('images/logo.jpg');
-    $logoUrl = asset('images/logo.jpg');
-
-    if (isset($message) && is_object($message) && method_exists($message, 'embed') && is_file($logoPath)) {
-        try {
-            $logoUrl = $message->embed($logoPath);
-        } catch (Throwable) {
-            $logoUrl = asset('images/logo.jpg');
-        }
-    }
+    $logoUrl = \App\Support\BrandedMail::logoUrl();
 @endphp
 <x-mail::header :url="config('app.url')" :logo="$logoUrl">
 {{ config('app.name') }}

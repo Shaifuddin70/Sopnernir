@@ -2,13 +2,17 @@
 
 namespace App\Notifications;
 
+use App\Support\BrandedMail;
 use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class MonthlyPaymentRecordedNotification extends Notification
 {
-    public function __construct(public Carbon $month) {}
+    public function __construct(
+        public Carbon $month,
+        public ?string $amount = null,
+    ) {}
 
     /**
      * @return list<string>
@@ -26,6 +30,9 @@ class MonthlyPaymentRecordedNotification extends Notification
             'appName' => config('app.name'),
             'userName' => $notifiable->name ?? __('there'),
             'monthLabel' => $label,
+            'amountLabel' => $this->amount !== null && $this->amount !== ''
+                ? BrandedMail::money($this->amount)
+                : null,
             'actionUrl' => route('investments.index'),
         ];
 

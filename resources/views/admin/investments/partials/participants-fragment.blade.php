@@ -1,4 +1,4 @@
-<div class="overflow-x-auto">
+<div class="ui-glass-table-wrap overflow-x-auto">
     <table class="ui-table min-w-full text-sm">
         <thead>
             <tr>
@@ -31,11 +31,11 @@
                             @csrf
                             @method('patch')
                         </form>
-                        <div class="flex flex-wrap items-center justify-end gap-2">
+                        <div class="table-row-actions flex flex-nowrap items-center justify-end gap-2">
                             <x-action-button type="submit" :form="$formId">
                                 {{ __('Save') }}
                             </x-action-button>
-                            <form method="post" action="{{ route('admin.investments.participants.destroy', [$investment, $p]) }}" class="inline" onsubmit="return confirm('{{ __('Remove participant?') }}');">
+                            <form method="post" action="{{ route('admin.investments.participants.destroy', [$investment, $p]) }}" class="inline-flex" onsubmit="return confirm('{{ __('Remove participant?') }}');">
                                 @csrf
                                 @method('delete')
                                 <x-action-button variant="danger">{{ __('Remove') }}</x-action-button>

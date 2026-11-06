@@ -27,7 +27,9 @@
                             {{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}
                         </p>
                     </div>
-                    <x-action-button :href="$viewUrl" variant="secondary" class="shrink-0 text-sm">{{ __('View') }}</x-action-button>
+                    <div class="table-row-actions shrink-0">
+                        <x-action-button :href="$viewUrl" variant="secondary">{{ __('View') }}</x-action-button>
+                    </div>
                 </div>
                 <dl class="phone-access-investment-card__metrics">
                     <div class="phone-access-investment-card__metric">
@@ -63,7 +65,7 @@
                 <th class="text-right">{{ __('Profit til today') }}</th>
                 <th class="hidden lg:table-cell text-right">{{ __('Withdrawn') }}</th>
                 <th class="hidden xl:table-cell text-right">{{ __('Per day') }}</th>
-                <th class="w-0"><span class="sr-only">{{ __('Actions') }}</span></th>
+                <th class="w-0 text-right">{{ __('Action') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -99,7 +101,9 @@
                     </td>
                     <td class="hidden text-right tabular-nums text-foreground-muted xl:table-cell">{{ $row['daily_profit'] }}</td>
                     <td class="text-right">
-                        <x-action-button :href="$viewUrl" variant="secondary" class="text-sm">{{ __('View') }}</x-action-button>
+                        <div class="table-row-actions flex flex-nowrap items-center justify-end gap-2">
+                            <x-action-button :href="$viewUrl" variant="secondary">{{ __('View') }}</x-action-button>
+                        </div>
                     </td>
                 </tr>
             @endforeach

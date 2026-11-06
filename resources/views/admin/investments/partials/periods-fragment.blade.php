@@ -7,7 +7,7 @@
         @endif
     </p>
 @else
-    <div class="overflow-x-auto">
+    <div class="ui-glass-table-wrap overflow-x-auto">
         <table class="ui-table min-w-full text-sm">
             <thead>
                 <tr>

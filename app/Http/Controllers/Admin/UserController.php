@@ -63,7 +63,20 @@ class UserController extends Controller
             ]);
         }
 
-        return view('admin.users.index', compact('users'));
+        $counts = User::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active')
+            ->selectRaw('SUM(CASE WHEN is_admin = 1 OR role = ? THEN 1 ELSE 0 END) as admins', [User::ROLE_ADMIN])
+            ->first();
+
+        $userSummary = [
+            'total' => (int) $counts->total,
+            'active' => (int) $counts->active,
+            'inactive' => (int) $counts->total - (int) $counts->active,
+            'admins' => (int) $counts->admins,
+        ];
+
+        return view('admin.users.index', compact('users', 'userSummary'));
     }
 
     public function create(): View

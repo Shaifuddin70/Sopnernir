@@ -118,9 +118,11 @@
                     @forelse ($investment->documents as $doc)
                         <li class="flex items-center justify-between gap-2 px-3 py-2">
                             <span class="min-w-0 truncate font-medium text-foreground">{{ $doc->original_name }}</span>
-                            <x-action-button :href="route('investments.documents.download', [$investment, $doc])" variant="secondary" class="shrink-0">
-                                {{ __('Get') }}
-                            </x-action-button>
+                            <div class="table-row-actions shrink-0">
+                                <x-action-button :href="route('investments.documents.download', [$investment, $doc])" variant="secondary">
+                                    {{ __('Get') }}
+                                </x-action-button>
+                            </div>
                         </li>
                     @empty
                         <li class="px-3 py-6 text-center text-foreground-muted">{{ __('No documents.') }}</li>

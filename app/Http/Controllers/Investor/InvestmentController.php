@@ -9,6 +9,7 @@ use App\Models\InvestmentPeriodUser;
 use App\Services\InvestmentDailyProfitService;
 use App\Support\PaginationPerPage;
 use App\Support\SqlLike;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,6 +53,7 @@ class InvestmentController extends Controller
         $dailyProfitSummary = $dailyProfit->portfolioSummaryForUser($user);
         $dailyProfitRows = $dailyProfit->portfolioRowsForUser($user);
         $dailyProfitRowsTotal = $dailyProfitRows->count();
+        $profitMonthChart = $this->profitMonthChartForUser($userId);
 
         return view('investor.investments.index', compact(
             'investments',
@@ -62,6 +64,7 @@ class InvestmentController extends Controller
             'dailyProfitSummary',
             'dailyProfitRows',
             'dailyProfitRowsTotal',
+            'profitMonthChart',
         ));
     }
 
@@ -185,6 +188,29 @@ class InvestmentController extends Controller
             ->with('period')
             ->paginate(PaginationPerPage::resolve($request, 'pool_profit_per_page', 10), ['investment_period_users.*'], 'profit_page')
             ->withQueryString();
+    }
+
+    /**
+     * @return array{labels: list<string>, values: list<float>}
+     */
+    private function profitMonthChartForUser(int $userId): array
+    {
+        $rows = InvestmentPeriodUser::query()
+            ->where('investment_period_users.user_id', $userId)
+            ->join('investment_periods', 'investment_period_users.investment_period_id', '=', 'investment_periods.id')
+            ->join('investments', 'investments.id', '=', 'investment_periods.investment_id')
+            ->where('investments.is_active', true)
+            ->selectRaw('investment_periods.month as month, SUM(investment_period_users.profit_share) as total')
+            ->groupBy('investment_periods.month')
+            ->orderBy('investment_periods.month')
+            ->get()
+            ->take(-8)
+            ->values();
+
+        return [
+            'labels' => $rows->map(fn ($row) => Carbon::parse($row->month)->translatedFormat('M Y'))->all(),
+            'values' => $rows->map(fn ($row) => round((float) $row->total, 2))->all(),
+        ];
     }
 
     private function portfolioProfitTotalForUser(int $userId): float

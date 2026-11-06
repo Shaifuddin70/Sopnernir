@@ -4,14 +4,14 @@
             <h2 class="ui-page-header-title">{{ __('Dashboard') }}</h2>
             <div class="flex flex-wrap gap-2">
                 @if (auth()->user()->isAdmin())
-                    <x-action-button :href="route('admin.investments.index')" variant="secondary" class="text-sm">
+                    <x-action-button :href="route('admin.investments.index')" variant="secondary">
                         {{ __('Investments') }}
                     </x-action-button>
-                    <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary" class="text-sm">
+                    <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary">
                         {{ __('Payments') }}
                     </x-action-button>
                 @endif
-                <x-action-button :href="route('investments.index')" variant="secondary" class="text-sm">
+                <x-action-button :href="route('investments.index')" variant="secondary">
                     {{ __('Portfolio') }}
                 </x-action-button>
             </div>
@@ -46,7 +46,7 @@
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $platform['profit_til_today'] }}</dd>
                     </div>
-                    <div class="dashboard-stat">
+                    <div class="dashboard-stat dashboard-stat--muted">
                         <dt>{{ __('Withdrawn') }}</dt>
                         <dd>{{ $platform['total_withdrawn'] ?? '0.00' }}</dd>
                         <p>{{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}</p>
@@ -80,7 +80,7 @@
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $personal['profit_til_today'] }}</dd>
                     </div>
-                    <div class="dashboard-stat">
+                    <div class="dashboard-stat dashboard-stat--muted">
                         <dt>{{ __('Withdrawn') }}</dt>
                         <dd>{{ $personal['total_withdrawn'] ?? '0.00' }}</dd>
                     </div>
@@ -143,12 +143,12 @@
             </section>
         </div>
 
-        <section class="ui-glass-panel min-w-0">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-surface-variant px-4 py-3 sm:px-5">
-                <h3 class="text-sm font-semibold text-foreground">{{ __('Top investors') }}</h3>
+        <section class="dashboard-chart-panel min-w-0">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="dashboard-chart-panel__title !mb-0">{{ __('Top investors') }}</h3>
                 <span class="text-sm text-foreground-muted">{{ __('By profit til today') }}</span>
             </div>
-            <div class="p-3 sm:p-4">
+            <div>
                 <x-ajax-table-region :fetch-url="route('dashboard')" target-id="dashboard-top-investors-fragment" ajax-fragment="top_investors">
                     <x-table-search
                         :fetch-url="route('dashboard')"

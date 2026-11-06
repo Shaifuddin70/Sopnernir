@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Models\InvestorMonthlyPayment;
+use App\Models\MonthlyPaymentDefault;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -190,5 +191,30 @@ class MonthlyPaymentTest extends TestCase
             ->assertOk()
             ->assertJsonPath('ok', true)
             ->assertJsonStructure(['summary_html', 'message']);
+    }
+
+    public function test_admin_can_set_a_default_amount_for_a_month(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->patch(route('admin.monthly-payments.amount'), [
+                'month' => '2026-03',
+                'amount' => '2500',
+            ])
+            ->assertRedirect(route('admin.monthly-payments.index', ['month' => '2026-03']));
+
+        $this->assertSame('2500.00', MonthlyPaymentDefault::query()->first()?->amount);
+
+        $this->actingAs($admin)
+            ->get(route('admin.monthly-payments.index', ['month' => '2026-03']))
+            ->assertOk()
+            ->assertSee('value="2500.00"', false)
+            ->assertSee(__('Default amount'), false);
+
+        $this->actingAs($admin)
+            ->get(route('admin.investments.index', ['new' => 1, 'payment_month' => '2026-03']))
+            ->assertOk()
+            ->assertSee('value="2500.00"', false);
     }
 }

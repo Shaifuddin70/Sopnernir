@@ -53,7 +53,7 @@
                 <h3 class="ui-card-header-title">{{ __('Pools in this withdrawal') }}</h3>
             </div>
             <div class="p-3 sm:p-4">
-                <div class="overflow-x-auto">
+                <div class="ui-glass-table-wrap overflow-x-auto">
                     <table class="ui-table min-w-full">
                         <thead>
                             <tr>
@@ -84,11 +84,10 @@
                                     </td>
                                     <td class="text-right">
                                         @if ($withdrawal->investment)
-                                            <div class="flex flex-wrap items-center justify-end gap-2">
+                                            <div class="table-row-actions flex flex-nowrap items-center justify-end gap-2">
                                                 <x-action-button
                                                     :href="route('admin.investments.show', $withdrawal->investment)"
                                                     variant="secondary"
-                                                    class="text-sm"
                                                 >{{ __('View pool') }}</x-action-button>
                                                 @include('admin.profit-withdrawals.partials.reverse-form', [
                                                     'action' => route('admin.investments.profit-withdrawals.destroy', [$withdrawal->investment, $withdrawal]),

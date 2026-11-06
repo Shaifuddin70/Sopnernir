@@ -23,8 +23,8 @@ class MailThemeTest extends TestCase
         $this->assertStringContainsString(__('Investment pools'), $html);
         $this->assertStringContainsString('alt="'.config('app.name').'"', $html);
         $this->assertTrue(
-            str_contains($html, 'images/logo.jpg') || str_contains($html, 'data:image/'),
-            'Email should include the Shopnonir logo image'
+            str_contains($html, 'images/logo.png') || str_contains($html, 'data:image/'),
+            'Email should include the Shopnernir logo image'
         );
         $this->assertStringContainsString('Reset your password.', $html);
         $this->assertStringContainsString('Hello Rokib,', $html);
@@ -60,10 +60,12 @@ class MailThemeTest extends TestCase
     public function test_payment_email_includes_month_summary(): void
     {
         $user = User::factory()->create(['name' => 'Rokib']);
-        $html = $this->renderMail((new MonthlyPaymentRecordedNotification(now()->startOfMonth()))->toMail($user));
+        $month = now()->startOfMonth();
+        $html = $this->renderMail((new MonthlyPaymentRecordedNotification($month, '2500.00'))->toMail($user));
 
         $this->assertStringContainsString(__('Payment recorded'), $html);
-        $this->assertStringContainsString(__('Payment month'), $html);
+        $this->assertStringContainsString($month->translatedFormat('F Y'), $html);
+        $this->assertStringContainsString('2,500.00', $html);
         $this->assertStringContainsString(__('Your payment has been recorded.'), $html);
         $this->assertStringNotContainsString(__('Payment details'), $html);
     }

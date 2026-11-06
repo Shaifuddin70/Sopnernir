@@ -25,26 +25,29 @@ class ProfitWithdrawalController extends Controller
 
         $like = SqlLike::term($request->query('search'));
 
-        $pools = Investment::query()
-            ->whereHas('profitWithdrawals')
-            ->withSum('profitWithdrawals as total_withdrawn', 'amount')
-            ->withCount('profitWithdrawals as withdrawals_count')
-            ->withMax('profitWithdrawals as last_withdrawn_at', 'withdrawn_at')
-            ->when($like, function ($q) use ($like): void {
-                $q->where(function ($w) use ($like): void {
-                    $w->where('title', 'like', $like)
-                        ->orWhere('deed_no', 'like', $like)
-                        ->orWhere('notes', 'like', $like);
+        $batches = InvestmentProfitWithdrawalBatch::query()
+            ->with([
+                'withdrawnBy:id,name',
+                'withdrawals.investment:id,title,deed_no',
+            ])
+            ->when($like, function ($query) use ($like): void {
+                $query->where(function ($query) use ($like): void {
+                    $query->where('notes', 'like', $like)
+                        ->orWhereHas('withdrawals.investment', function ($query) use ($like): void {
+                            $query->where('title', 'like', $like)
+                                ->orWhere('deed_no', 'like', $like)
+                                ->orWhere('notes', 'like', $like);
+                        });
                 });
             })
-            ->orderByDesc('total_withdrawn')
-            ->orderBy('title')
+            ->latest('withdrawn_at')
+            ->latest('id')
             ->paginate(PaginationPerPage::resolve($request, 'per_page', 15))
             ->withQueryString();
 
         if ($request->ajax()) {
             return response()->json([
-                'html' => view('admin.profit-withdrawals.partials.table-fragment', compact('pools'))->render(),
+                'html' => view('admin.profit-withdrawals.partials.table-fragment', compact('batches'))->render(),
             ]);
         }
 
@@ -52,19 +55,8 @@ class ProfitWithdrawalController extends Controller
         $summaryPoolCount = (int) Investment::query()->whereHas('profitWithdrawals')->count();
         $summaryCount = (int) InvestmentProfitWithdrawalBatch::query()->count();
 
-        $recentBatches = InvestmentProfitWithdrawalBatch::query()
-            ->with([
-                'withdrawnBy:id,name',
-                'withdrawals.investment:id,title,deed_no',
-            ])
-            ->latest('withdrawn_at')
-            ->latest('id')
-            ->limit(10)
-            ->get();
-
         return view('admin.profit-withdrawals.index', compact(
-            'pools',
-            'recentBatches',
+            'batches',
             'summaryTotalAmount',
             'summaryPoolCount',
             'summaryCount',

@@ -71,13 +71,27 @@ function initProfitTrend(canvas, data) {
             datasets: [{
                 label: canvas.dataset.label || 'Profit',
                 data: data.values,
-                borderColor: colors.primary,
-                backgroundColor: colors.primaryMuted,
+                borderColor: '#1e88e5',
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (! chartArea) {
+                        return 'rgba(30, 136, 229, 0.15)';
+                    }
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    gradient.addColorStop(0, 'rgba(30, 136, 229, 0.28)');
+                    gradient.addColorStop(1, 'rgba(30, 136, 229, 0.02)');
+
+                    return gradient;
+                },
                 fill: true,
-                tension: 0.35,
+                tension: 0.4,
                 pointRadius: 3,
+                pointBackgroundColor: '#1e88e5',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
                 pointHoverRadius: 4,
-                borderWidth: 2,
+                borderWidth: 2.5,
             }],
         },
         options: {
@@ -115,16 +129,14 @@ function initCapitalVsProfit(canvas, data) {
                 data: empty ? [1, 0] : [capital, profit],
                 backgroundColor: empty
                     ? [colors.border, colors.border]
-                    : [colors.primaryMuted, colors.successMuted],
-                borderColor: empty
-                    ? [colors.muted, colors.muted]
-                    : [colors.primary, colors.success],
-                borderWidth: 1,
+                    : ['#1e88e5', '#43a047'],
+                borderWidth: 0,
+                hoverOffset: 2,
             }],
         },
         options: {
             ...baseOptions,
-            cutout: '62%',
+            cutout: '72%',
             plugins: {
                 ...baseOptions.plugins,
                 legend: { position: 'bottom' },
@@ -146,10 +158,10 @@ function initInvestmentStatus(canvas, data) {
             ],
             datasets: [{
                 data: [data.active, data.draft, data.closed],
-                backgroundColor: [colors.successMuted, colors.warningMuted, colors.primaryMuted],
-                borderColor: [colors.success, colors.warning, colors.primary],
-                borderWidth: 1,
-                borderRadius: 6,
+                backgroundColor: ['#7dcea0', '#ffe0b2', '#bbdefb'],
+                borderWidth: 0,
+                borderRadius: 8,
+                maxBarThickness: 72,
             }],
         },
         options: {
@@ -187,22 +199,78 @@ function initMonthlyPayments(canvas, data) {
                 data: empty ? [0, 1] : [paid, unpaid],
                 backgroundColor: empty
                     ? [colors.border, colors.border]
-                    : [colors.successMuted, colors.warningMuted],
-                borderColor: empty
-                    ? [colors.muted, colors.muted]
-                    : [colors.success, colors.warning],
-                borderWidth: 1,
+                    : ['#66bb6a', '#ffb74d'],
+                borderWidth: 0,
+                hoverOffset: 2,
             }],
         },
         options: {
             ...baseOptions,
-            cutout: '62%',
+            cutout: '72%',
             plugins: {
                 ...baseOptions.plugins,
                 legend: { position: 'bottom' },
             },
         },
     });
+}
+
+function initPortfolioProfitMonth(canvas, data) {
+    const colors = palette();
+
+    return new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: canvas.dataset.label || 'Profit',
+                data: data.values,
+                backgroundColor: '#1e88e5',
+                borderWidth: 0,
+                borderRadius: 6,
+                maxBarThickness: 42,
+            }],
+        },
+        options: {
+            ...baseOptions,
+            plugins: {
+                ...baseOptions.plugins,
+                legend: { display: false },
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: colors.muted,
+                        font: { size: 10 },
+                        maxRotation: 0,
+                        minRotation: 0,
+                        autoSkip: true,
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#e8eef5' },
+                    ticks: { color: colors.muted, font: { size: 11 } },
+                },
+            },
+        },
+    });
+}
+
+function initPortfolioCharts() {
+    const canvas = document.querySelector('[data-chart-type="portfolio-profit-month"]');
+    const dataEl = document.getElementById('portfolio-profit-chart-data');
+
+    if (! canvas || ! dataEl) {
+        return;
+    }
+
+    try {
+        initPortfolioProfitMonth(canvas, JSON.parse(dataEl.textContent || '{}'));
+    } catch (error) {
+        console.error('Portfolio profit chart: invalid JSON payload', error);
+    }
 }
 
 function initDashboardCharts() {
@@ -252,8 +320,13 @@ function initDashboardCharts() {
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDashboardCharts);
-} else {
+function initCharts() {
     initDashboardCharts();
+    initPortfolioCharts();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCharts);
+} else {
+    initCharts();
 }

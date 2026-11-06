@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    --color-bg: #f5f7fa;
+    --color-bg: #eef3f8;
     --color-bg-secondary: #ffffff;
     --color-card: #ffffff;
     --color-surface-variant: #eef1f6;
@@ -61,27 +61,47 @@
     }
 
     .ui-sidebar-nav {
-        @apply flex-1 space-y-1 overflow-y-auto py-4 ui-shell-padding;
+        @apply flex-1 space-y-1.5 overflow-y-auto py-3 ui-shell-padding;
     }
 
     .ui-page-bg {
-        @apply bg-surface;
+        background:
+            radial-gradient(ellipse 80% 50% at 8% -8%, rgb(25 118 210 / 0.18), transparent 55%),
+            radial-gradient(ellipse 60% 42% at 96% 0%, rgb(46 125 50 / 0.12), transparent 48%),
+            radial-gradient(ellipse 50% 36% at 70% 100%, rgb(25 118 210 / 0.08), transparent 50%),
+            linear-gradient(180deg, #e7eef8 0%, #f5f8fc 46%, #eef3f8 100%);
     }
 
     .ui-sidebar {
-        @apply border-r border-line bg-surface-secondary text-foreground shadow-elevation-2;
+        @apply border-r border-white/60 bg-white/55 text-foreground shadow-[8px_0_32px_rgb(15_23_42/0.06)] backdrop-blur-2xl;
     }
 
     .ui-sidebar-brand-border {
-        @apply border-b border-line;
+        @apply border-b-0;
     }
 
     .ui-main-header {
-        @apply border-b border-line bg-surface-secondary shadow-elevation-1;
+        @apply relative border-b-0 bg-transparent shadow-none;
+    }
+
+    .ui-main-header::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: -1.75rem;
+        pointer-events: none;
+        background: linear-gradient(to bottom, rgb(255 255 255 / 0.72), rgb(238 243 248 / 0.45) 46%, transparent);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%);
     }
 
     .ui-page-header-title {
-        @apply truncate text-lg font-medium tracking-tight text-foreground sm:text-xl;
+        @apply truncate text-xl font-semibold tracking-tight text-foreground sm:text-2xl;
     }
 
     .ui-user-identity {
@@ -99,11 +119,11 @@
     }
 
     .ui-card {
-        @apply rounded-xl bg-surface-card shadow-elevation-2;
+        @apply overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_10px_30px_rgb(15_23_42/0.06)] backdrop-blur-xl;
     }
 
     .ui-card-header {
-        @apply rounded-t-xl border-b border-line bg-surface-secondary px-4 py-3 sm:px-5 sm:py-4;
+        @apply rounded-t-2xl border-b border-white/60 bg-white/35 px-4 py-3 backdrop-blur-md sm:px-5 sm:py-4;
     }
 
     .ui-table-footer {
@@ -187,15 +207,19 @@
     }
 
     .ui-auth-shell {
-        @apply min-h-screen bg-surface;
+        min-height: 100vh;
+        background:
+            radial-gradient(ellipse 80% 50% at 8% -8%, rgb(25 118 210 / 0.18), transparent 55%),
+            radial-gradient(ellipse 60% 42% at 96% 0%, rgb(46 125 50 / 0.12), transparent 48%),
+            linear-gradient(180deg, #e7eef8 0%, #f5f8fc 46%, #eef3f8 100%);
     }
 
     .ui-auth-card {
-        @apply overflow-hidden rounded-2xl bg-surface-card shadow-elevation-3;
+        @apply overflow-hidden rounded-2xl border border-white/70 bg-white/70 shadow-[0_16px_40px_rgb(15_23_42/0.08)] backdrop-blur-2xl;
     }
 
     .ui-input {
-        @apply block w-full rounded-lg border border-line bg-surface-secondary px-4 py-3 text-sm leading-normal text-foreground shadow-sm placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
+        @apply block w-full rounded-xl border border-white/80 bg-white/70 px-4 py-3 text-sm leading-normal text-foreground shadow-sm backdrop-blur-md placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
         min-height: 2.75rem;
     }
 
@@ -243,7 +267,7 @@
     }
 
     .ui-table-search {
-        @apply rounded-lg border border-line bg-surface-secondary text-foreground shadow-sm placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
+        @apply rounded-full border border-white/80 bg-white/70 text-foreground shadow-sm backdrop-blur-md placeholder:text-foreground-muted focus:border-primary focus:ring-2 focus:ring-primary/20;
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
         line-height: 1.25rem;
@@ -281,11 +305,181 @@
     }
 
     .ui-glass-panel {
-        @apply overflow-hidden rounded-2xl border border-line bg-surface-card shadow-elevation-2 backdrop-blur-xl;
+        @apply overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-[0_10px_30px_rgb(15_23_42/0.06)] backdrop-blur-xl;
     }
 
-    .portfolio-hero {
-        @apply relative overflow-hidden rounded-2xl border border-line bg-surface-card shadow-elevation-3;
+    .portfolio-stat {
+        @apply flex flex-col gap-2 border border-transparent px-3.5 py-3.5;
+    }
+
+    .portfolio-stat .portfolio-stat__label {
+        @apply flex items-center gap-2 text-[13px] font-medium normal-case tracking-normal text-[#5f6b7a];
+    }
+
+    .portfolio-stat__icon {
+        @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-sm;
+    }
+
+    .portfolio-stat__icon svg {
+        @apply h-4 w-4;
+    }
+
+    .portfolio-stat dd {
+        @apply text-[1.35rem] font-bold leading-none;
+    }
+
+    .portfolio-page .portfolio-stat--capital,
+    .payments-page .portfolio-stat--capital {
+        background-color: #e7f1ff;
+    }
+
+    .portfolio-stat--capital .portfolio-stat__icon {
+        @apply text-[#1e88e5];
+    }
+
+    .portfolio-page .portfolio-stat--profit,
+    .payments-page .portfolio-stat--profit {
+        background-color: #e5f7ec;
+    }
+
+    .portfolio-page .portfolio-stat--today,
+    .payments-page .portfolio-stat--today {
+        background-color: #eefaf3;
+    }
+
+    .portfolio-stat--profit .portfolio-stat__icon,
+    .portfolio-stat--today .portfolio-stat__icon {
+        @apply text-[#2e9d57];
+    }
+
+    .portfolio-page .portfolio-stat--profit dd,
+    .portfolio-page .portfolio-stat--today dd,
+    .payments-page .portfolio-stat--profit dd,
+    .payments-page .portfolio-stat--today dd {
+        color: #1f8a4c;
+    }
+
+    .portfolio-page .portfolio-stat--withdrawn,
+    .payments-page .portfolio-stat--withdrawn {
+        background-color: #f7f9fc;
+        border-color: #e8eef5;
+    }
+
+    .portfolio-stat--withdrawn .portfolio-stat__icon {
+        @apply text-[#7b8794];
+    }
+
+    .edit-investment {
+        @apply flex max-h-[calc(100vh-3rem)] flex-col;
+    }
+
+    .edit-investment__header,
+    .edit-investment__footer {
+        @apply flex shrink-0 items-center justify-between gap-3 px-5 py-4 sm:px-6;
+    }
+
+    .edit-investment__header {
+        @apply border-b border-white/70;
+    }
+
+    .edit-investment__footer {
+        @apply justify-end border-t border-[#e6eef8];
+    }
+
+    .edit-investment__badge {
+        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e7f1ff] text-[#1e88e5];
+    }
+
+    .edit-investment__badge svg,
+    .edit-investment__section-title svg,
+    .edit-investment__estimate-note svg,
+    .edit-investment__totals svg {
+        @apply h-5 w-5;
+    }
+
+    .edit-investment__close {
+        @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#e6eef8] bg-white text-foreground-muted shadow-sm hover:text-foreground;
+    }
+
+    .edit-investment__body {
+        @apply min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4 sm:px-6;
+    }
+
+    .edit-investment__section,
+    .edit-investment__estimates {
+        @apply rounded-2xl border border-[#e3eef9] bg-[#f5f9ff] p-4;
+    }
+
+    .edit-investment__estimates {
+        background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
+    }
+
+    .edit-investment__section-title {
+        @apply mb-3 flex items-center gap-2 text-sm font-bold text-[#1565c0];
+    }
+
+    .edit-investment__status {
+        padding-left: 2rem;
+        border-radius: 0.75rem;
+        background-color: rgb(255 255 255 / 0.85);
+    }
+
+    .edit-investment__estimate-row {
+        @apply grid grid-cols-2 overflow-hidden rounded-xl border border-[#d7e6f5] bg-white/80;
+    }
+
+    .edit-investment__estimate-row > div {
+        @apply px-3 py-3;
+    }
+
+    .edit-investment__estimate-row > div + div {
+        @apply border-l border-[#d7e6f5];
+    }
+
+    .edit-investment__estimate-row p {
+        @apply text-xs text-foreground-muted;
+    }
+
+    .edit-investment__estimate-row strong {
+        @apply mt-0.5 block text-xl font-bold tabular-nums text-[#16324f];
+    }
+
+    .edit-investment__estimate-icon {
+        @apply mb-1 inline-flex text-[#1e88e5];
+    }
+
+    .edit-investment__estimate-icon svg {
+        @apply h-4 w-4;
+    }
+
+    .edit-investment__estimate-note {
+        @apply mt-3 flex items-start gap-2 text-xs leading-5 text-foreground-muted;
+    }
+
+    .edit-investment__estimate-note svg {
+        @apply mt-0.5 h-4 w-4 shrink-0 text-[#1e88e5];
+    }
+
+    .edit-investment__totals {
+        @apply flex items-center gap-2 rounded-2xl border border-[#d7f0e2] px-4 py-3 text-sm text-[#3d5c4a];
+        background: linear-gradient(90deg, #e7f8ee 0%, #f4fbf7 100%);
+    }
+
+    .edit-investment__totals svg {
+        @apply shrink-0 text-[#2e9d57];
+    }
+
+    .edit-investment__totals strong {
+        @apply font-bold tabular-nums text-[#16324f];
+    }
+
+    .edit-investment .ui-input,
+    .edit-investment textarea.ui-input {
+        @apply border-[#e3eaf2] bg-white;
+    }
+
+    .portfolio-profit-chart {
+        @apply relative h-56 w-full sm:h-64;
     }
 
     .ui-stat-glass {
@@ -309,7 +503,7 @@
     }
 
     .ui-glass-table-wrap {
-        @apply overflow-hidden rounded-xl border border-line bg-surface-card shadow-elevation-1 ring-1 ring-line/20 backdrop-blur-sm;
+        @apply overflow-hidden rounded-2xl border border-white/70 bg-white/55 shadow-[0_8px_24px_rgb(15_23_42/0.05)] backdrop-blur-xl;
     }
 
     .ui-glass-table-wrap .ui-table {
@@ -317,23 +511,72 @@
     }
 
     .ui-glass-table-wrap .ui-table thead tr {
-        @apply border-b border-line bg-surface-variant backdrop-blur-sm;
+        @apply border-b border-[#e8eef5] bg-transparent text-[13px] font-semibold normal-case tracking-normal text-[#8b97a8];
     }
 
-    .ui-glass-table-wrap .ui-table thead th {
-        @apply border-r border-line/50 last:border-r-0;
+    .ui-glass-table-wrap .ui-table thead th,
+    .ui-glass-table-wrap .ui-table tbody td {
+        @apply border-r-0;
     }
 
     .ui-glass-table-wrap .ui-table tbody tr {
-        @apply border-b border-line hover:bg-surface-variant/70;
+        @apply border-b border-[#eef2f6] hover:bg-white/50;
     }
 
     .ui-glass-table-wrap .ui-table tbody tr:last-child {
         @apply border-b-0;
     }
 
-    .ui-glass-table-wrap .ui-table tbody td {
-        @apply border-r border-line/40 last:border-r-0;
+    .ui-glass-table-wrap .ui-table thead th:has(.ui-paid-toggle--bulk) {
+        padding-top: 0.85rem;
+        padding-bottom: 1rem;
+    }
+
+    .ui-paid-toggle--bulk {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 0.4rem 0.4rem;
+        border: 1px dashed #c5d2e2;
+        border-radius: 0.9rem;
+        background: #f7fafc;
+    }
+
+    .ui-paid-toggle__all {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
+        color: #8b97a8;
+    }
+
+    .ui-paid-toggle__bulk-choices {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .ui-paid-toggle__bulk-btn {
+        border: 1px solid #d5deea;
+        border-radius: 999px;
+        background: #fff;
+        padding: 0.2rem 0.55rem;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.1;
+        color: #5f6b7a;
+    }
+
+    .ui-paid-toggle__bulk-btn.is-paid {
+        border-color: #1f8a4c;
+        color: #1f8a4c;
+    }
+
+    .ui-paid-toggle__bulk-btn.is-unpaid {
+        border-color: #ed6c02;
+        color: #c2410c;
     }
 
     .ui-chip {
@@ -341,7 +584,7 @@
     }
 
     .dashboard-stat-panel {
-        @apply rounded-xl border border-line bg-surface-card shadow-elevation-1;
+        @apply rounded-2xl border border-white/70 bg-white/65 shadow-[0_10px_30px_rgb(15_23_42/0.06)] backdrop-blur-xl;
     }
 
     .dashboard-stat-panel--scroll {
@@ -349,35 +592,35 @@
     }
 
     .dashboard-stat-panel__head {
-        @apply flex flex-col items-start gap-2 border-b border-line bg-surface-variant px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4;
+        @apply flex flex-col items-start gap-2 px-4 pb-1 pt-4 sm:flex-row sm:items-center sm:justify-between sm:px-5;
     }
 
     .dashboard-stat-panel__title {
-        @apply text-sm font-semibold text-foreground;
+        @apply text-base font-semibold text-foreground;
     }
 
     .dashboard-stat-grid {
-        @apply grid grid-cols-2 gap-2 p-3 sm:grid-cols-4 sm:p-3;
+        @apply grid grid-cols-2 gap-2.5 p-4 sm:grid-cols-4 sm:p-5;
     }
 
     .dashboard-stat {
-        @apply rounded-lg border border-line bg-surface-card px-2.5 py-2;
+        @apply rounded-xl border-0 bg-[#f4f7fb] px-3 py-3;
     }
 
     .dashboard-stat--capital {
-        @apply border-primary/20 bg-primary-muted;
+        @apply bg-[#e7f1ff];
     }
 
     .dashboard-stat--profit {
-        @apply border-success/20 bg-success-muted;
+        @apply bg-[#e7f8ee];
     }
 
     .dashboard-stat dt {
-        @apply text-sm font-semibold uppercase tracking-wide text-foreground-muted;
+        @apply text-[11px] font-semibold uppercase tracking-wide text-foreground-muted;
     }
 
     .dashboard-stat dd {
-        @apply mt-0.5 break-words text-base font-bold tabular-nums tracking-tight text-foreground sm:text-lg;
+        @apply mt-1 break-words text-lg font-bold tabular-nums tracking-tight text-[#12233a] sm:text-xl;
     }
 
     .dashboard-stat-grid--platform {
@@ -494,15 +737,15 @@
     }
 
     .dashboard-stat--profit dd {
-        @apply text-success;
+        @apply text-[#1f8a4c];
     }
 
     .dashboard-chart-panel {
-        @apply overflow-hidden rounded-xl border border-line bg-surface-card p-3 shadow-elevation-1 sm:p-4;
+        @apply overflow-hidden rounded-2xl border border-white/70 bg-white/65 p-4 shadow-[0_10px_30px_rgb(15_23_42/0.06)] backdrop-blur-xl sm:p-5;
     }
 
     .dashboard-chart-panel__title {
-        @apply mb-2 text-sm font-semibold uppercase tracking-wide text-foreground-muted;
+        @apply mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-foreground-muted;
     }
 
     .dashboard-chart-panel__canvas {
@@ -597,4 +840,11 @@
 .ts-wrapper.plugin-remove_button .item .remove {
     border-left: 1px solid var(--color-border);
     color: var(--color-text-muted);
+}
+
+.investment-row-actions a,
+.investment-row-actions button,
+.table-row-actions a,
+.table-row-actions button {
+    box-shadow: 0 4px 12px rgb(15 23 42 / 0.12);
 }
