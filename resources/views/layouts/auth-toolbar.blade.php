@@ -3,7 +3,7 @@
 @endphp
 
 <div class="flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
-    <div class="hidden shrink-0 lg:block">
+    <div @class(['shrink-0', 'hidden lg:block' => $authUser->isAdmin()])>
         <x-language-switcher />
     </div>
     <x-dropdown align="right" width="full" contentClasses="overflow-hidden rounded-2xl border border-[#e6eef8] bg-white py-1.5 shadow-[0_12px_32px_rgb(15_23_42/0.12)]">

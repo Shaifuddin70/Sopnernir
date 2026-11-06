@@ -21,26 +21,13 @@
 
 <body class="font-sans antialiased">
     <x-status-banner />
-    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen ui-page-bg">
+    <div class="flex min-h-screen ui-page-bg">
         @include('layouts.navigation')
 
         <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
             <header class="ui-main-header sticky top-0 z-30 shrink-0">
                 <div class="ui-page-container ui-header-bar">
                     <div class="ui-header-main flex min-w-0 flex-1 items-center gap-3">
-                        <button
-                            type="button"
-                            @click="sidebarOpen = true"
-                            class="ui-header-menu inline-flex shrink-0 items-center justify-center rounded-full p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
-                            aria-expanded="false"
-                            x-bind:aria-expanded="sidebarOpen"
-                        >
-                            <span class="sr-only">{{ __('Open navigation') }}</span>
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-
                         @isset($header)
                             <div class="ui-header-slot min-w-0 flex-1 [&_h2]:ui-page-header-title">
                                 {{ $header }}
@@ -54,10 +41,12 @@
                 </div>
             </header>
 
-            <main class="ui-page-container flex-1 py-4 sm:py-6">
+            <main class="ui-page-container ui-app-main flex-1 py-4 sm:py-6">
                 {{ $slot }}
             </main>
         </div>
+
+        @include('layouts.mobile-nav')
     </div>
 </body>
 
