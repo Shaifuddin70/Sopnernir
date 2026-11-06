@@ -89,7 +89,7 @@
     @endif
 
     <nav class="ui-mobile-tabbar__bar" aria-label="{{ __('Main') }}">
-        <a href="{{ route('dashboard') }}" class="ui-mobile-tab {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
+        <a href="{{ route('dashboard') }}" class="ui-mobile-tab ui-mobile-tab--home {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10.5 12 3l9 7.5" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.25 9.75V20.25h13.5V9.75" />
@@ -97,7 +97,7 @@
             </svg>
             <span>{{ __('Dashboard') }}</span>
         </a>
-        <a href="{{ route('investments.index') }}" class="ui-mobile-tab {{ request()->routeIs('investments.*') ? 'is-active' : '' }}">
+        <a href="{{ route('investments.index') }}" class="ui-mobile-tab ui-mobile-tab--portfolio {{ request()->routeIs('investments.*') ? 'is-active' : '' }}">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3.75a8.25 8.25 0 1 0 8.25 8.25H12V3.75Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.25 3.9a8.25 8.25 0 0 1 5.85 5.85h-5.85V3.9Z" />
@@ -105,7 +105,7 @@
             <span>{{ __('Portfolio') }}</span>
         </a>
         @unless ($isAdmin)
-            <a href="{{ route('payments.index') }}" class="ui-mobile-tab {{ request()->routeIs('payments.*') ? 'is-active' : '' }}">
+            <a href="{{ route('payments.index') }}" class="ui-mobile-tab ui-mobile-tab--payments {{ request()->routeIs('payments.*') ? 'is-active' : '' }}">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="6.25" width="18" height="11.5" rx="2" stroke-width="1.8" />
                     <circle cx="12" cy="12" r="2.15" stroke-width="1.8" />
@@ -114,7 +114,7 @@
                 <span>{{ __('Payments') }}</span>
             </a>
         @endunless
-        <a href="{{ route('profile.edit') }}" class="ui-mobile-tab {{ request()->routeIs('profile.*') ? 'is-active' : '' }}">
+        <a href="{{ route('profile.edit') }}" class="ui-mobile-tab ui-mobile-tab--profile {{ request()->routeIs('profile.*') ? 'is-active' : '' }}">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="8.25" r="3.1" stroke-width="1.8" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.25 19.25a6.75 6.75 0 0 1 13.5 0" />
@@ -124,7 +124,7 @@
         @if ($isAdmin)
         <button
             type="button"
-            class="ui-mobile-tab {{ $moreActive ? 'is-active' : '' }}"
+            class="ui-mobile-tab ui-mobile-tab--more {{ $moreActive ? 'is-active' : '' }}"
             @click="moreOpen = !moreOpen"
             :aria-expanded="moreOpen"
         >
