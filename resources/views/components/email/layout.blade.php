@@ -36,8 +36,14 @@
                                 <td valign="middle" style="width:70%;">
                                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                         <tr>
-                                            <td valign="middle" style="padding-right:12px;">
-                                                <img src="{{ $logoUrl }}" width="48" height="48" alt="{{ $app }}" style="display:block;width:48px;height:48px;border:0;" />
+                                            <td valign="middle" style="padding-right:14px;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff;border-radius:14px;">
+                                                    <tr>
+                                                        <td bgcolor="#ffffff" style="background-color:#ffffff;padding:6px;border-radius:14px;line-height:0;">
+                                                            <img src="{{ $logoUrl }}" width="48" height="48" alt="{{ $app }}" style="display:block;width:48px;height:48px;border:0;" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
                                             </td>
                                             <td valign="middle">
                                                 <div style="font-family:Georgia,'Times New Roman',serif;color:#ffffff;font-size:22px;line-height:1.15;font-weight:700;letter-spacing:0.04em;">{{ $app }}</div>
