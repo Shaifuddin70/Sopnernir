@@ -44,12 +44,36 @@ class InvestorPaymentVisibilityTest extends TestCase
             'recorded_by' => $investor->id,
         ]);
 
+        MonthlyPaymentDefault::create([
+            'month' => '2026-03-01',
+            'amount' => '1500.00',
+        ]);
+
         $this->actingAs($investor)
             ->get(route('payments.index'))
             ->assertOk()
-            ->assertSee('March Pool', false)
-            ->assertSee('5,000.00', false)
-            ->assertSee(__('Payments'), false);
+            ->assertSee('March 2026', false)
+            ->assertSee('1,500.00', false)
+            ->assertDontSee('March Pool', false)
+            ->assertDontSee('5,000.00', false);
+    }
+
+    public function test_paid_month_shows_without_a_pool(): void
+    {
+        $investor = User::factory()->create();
+
+        InvestorMonthlyPayment::create([
+            'user_id' => $investor->id,
+            'month' => '2026-04-01',
+            'paid_at' => '2026-04-20 10:00:00',
+            'recorded_by' => $investor->id,
+        ]);
+
+        $this->actingAs($investor)
+            ->get(route('payments.index'))
+            ->assertOk()
+            ->assertSee('April 2026', false)
+            ->assertDontSee(__('No payments yet.'), false);
     }
 
     public function test_unpaid_month_hides_the_investment_amount(): void
@@ -73,7 +97,7 @@ class InvestorPaymentVisibilityTest extends TestCase
             ->assertOk()
             ->assertDontSee('Hidden Pool', false)
             ->assertDontSee('8000.00', false)
-            ->assertSee(__('No paid investments yet.'), false);
+            ->assertSee(__('No payments yet.'), false);
     }
 
     public function test_paid_month_shows_the_default_amount_before_a_pool_exists(): void

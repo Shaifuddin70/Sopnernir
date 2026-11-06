@@ -7,6 +7,7 @@ use App\Models\Investment;
 use App\Models\InvestorMonthlyPayment;
 use App\Models\MonthlyPaymentDefault;
 use App\Models\SpecialInstallmentPayment;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -33,64 +34,55 @@ class PaymentController extends Controller
             ->get()
             ->keyBy(fn (MonthlyPaymentDefault $default) => $default->month->toDateString());
 
-        $investments = Investment::query()
-            ->when($monthKeys !== [], fn ($query) => $query->whereIn('tagged_payment_month', $monthKeys))
+        $pools = Investment::query()
             ->when($monthKeys === [], fn ($query) => $query->whereRaw('0 = 1'))
-            ->with(['participants' => fn ($query) => $query->where('user_id', $user->id)])
-            ->orderBy('title')
-            ->get()
-            ->groupBy(fn (Investment $investment) => $investment->tagged_payment_month->toDateString());
-
-        $rows = collect();
-
-        foreach ($payments as $payment) {
-            $key = $payment->month->copy()->startOfMonth()->toDateString();
-            $pools = $investments->get($key, collect());
-
-            $defaultAmount = $defaults->get($key)?->amount;
-            $defaultAmount = $defaultAmount !== null ? number_format((float) $defaultAmount, 2, '.', '') : null;
-
-            if ($pools->isEmpty()) {
-                $rows->push([
-                    'month' => $payment->month,
-                    'paid_at' => $payment->paid_at,
-                    'investment' => null,
-                    'amount' => $defaultAmount,
-                    'can_view' => false,
-                ]);
-
-                continue;
-            }
-
-            foreach ($pools as $investment) {
-                $participant = $investment->participants->first();
-                $amount = $participant?->contribution_amount ?? $investment->contribution_per_investor ?? $defaultAmount;
-
-                $rows->push([
-                    'month' => $payment->month,
-                    'paid_at' => $payment->paid_at,
-                    'investment' => $investment,
-                    'amount' => $amount !== null ? number_format((float) $amount, 2, '.', '') : null,
-                    'can_view' => $user->can('view', $investment),
-                ]);
-            }
-        }
-
-        $months = $rows
-            ->groupBy(fn (array $row) => $row['month']->copy()->startOfMonth()->toDateString())
-            ->map(function ($group) {
-                $first = $group->first();
-                $total = $group->sum(fn (array $row) => (float) ($row['amount'] ?? 0));
-                $hasAmount = $group->contains(fn (array $row) => $row['amount'] !== null);
-
-                return [
-                    'month' => $first['month'],
-                    'paid_at' => $first['paid_at'],
-                    'amount' => $hasAmount ? number_format($total, 2, '.', '') : null,
-                    'pools' => $group->filter(fn (array $row) => $row['investment'] !== null)->values(),
-                ];
+            ->when($monthKeys !== [], function ($query) use ($monthKeys) {
+                $query->where(function ($query) use ($monthKeys) {
+                    $query->whereIn('tagged_payment_month', $monthKeys)
+                        ->orWhere(function ($query) use ($monthKeys) {
+                            $query->whereNull('tagged_payment_month')
+                                ->where(function ($query) use ($monthKeys) {
+                                    foreach ($monthKeys as $key) {
+                                        $start = Carbon::parse($key)->startOfMonth();
+                                        $query->orWhereBetween('period_start', [
+                                            $start->toDateString(),
+                                            $start->copy()->endOfMonth()->toDateString(),
+                                        ]);
+                                    }
+                                });
+                        });
+                });
             })
-            ->values();
+            ->with(['participants' => fn ($query) => $query->where('user_id', $user->id)])
+            ->get()
+            ->groupBy(function (Investment $investment) {
+                $month = $investment->tagged_payment_month ?? $investment->period_start;
+
+                return $month?->copy()->startOfMonth()->toDateString();
+            });
+
+        $months = $payments->map(function (InvestorMonthlyPayment $payment) use ($defaults, $pools) {
+            $key = $payment->month->copy()->startOfMonth()->toDateString();
+            $amount = $defaults->get($key)?->amount;
+
+            if ($amount === null) {
+                $pool = $pools->get($key, collect())->first();
+                $participant = $pool?->participants->first();
+                $amount = $participant?->contribution_amount ?? $pool?->contribution_per_investor;
+            }
+
+            return [
+                'month' => $payment->month,
+                'paid_at' => $payment->paid_at,
+                'amount' => $amount !== null ? number_format((float) $amount, 2, '.', '') : null,
+            ];
+        })->values();
+
+        $poolCount = Investment::query()
+            ->when($monthKeys === [], fn ($query) => $query->whereRaw('0 = 1'))
+            ->when($monthKeys !== [], fn ($query) => $query->whereIn('tagged_payment_month', $monthKeys))
+            ->whereHas('participants', fn ($query) => $query->where('user_id', $user->id))
+            ->count();
 
         $specials = SpecialInstallmentPayment::query()
             ->where('user_id', $user->id)
@@ -100,9 +92,8 @@ class PaymentController extends Controller
             ->get();
 
         $monthlyTotal = $months->sum(fn (array $month) => (float) ($month['amount'] ?? 0));
-        $specialTotal = $specials->sum(fn (SpecialInstallmentPayment $payment) => (float) $payment->installment->amount);
+        $specialTotal = $specials->sum(fn (SpecialInstallmentPayment $payment) => (float) ($payment->installment->amount ?? 0));
         $paidTotal = number_format($monthlyTotal + $specialTotal, 2);
-        $poolCount = $months->sum(fn (array $month) => $month['pools']->count());
         $latest = $months->first();
 
         return view('investor.payments.index', [

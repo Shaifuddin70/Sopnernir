@@ -2,38 +2,19 @@
     $lines = collect();
 
     foreach ($months as $month) {
-        $pools = $month['pools'];
-
-        if ($pools->isEmpty()) {
-            $lines->push([
-                'sort' => $month['paid_at'],
-                'title' => $month['month']->translatedFormat('F Y'),
-                'investment' => null,
-                'kind' => 'monthly',
-                'amount' => $month['amount'],
-                'paid_at' => $month['paid_at'],
-            ]);
-
-            continue;
-        }
-
-        foreach ($pools as $pool) {
-            $lines->push([
-                'sort' => $month['paid_at'],
-                'title' => $month['month']->translatedFormat('F Y'),
-                'investment' => $pool,
-                'kind' => 'monthly',
-                'amount' => $pool['amount'] ?? $month['amount'],
-                'paid_at' => $month['paid_at'],
-            ]);
-        }
+        $lines->push([
+            'sort' => $month['paid_at'],
+            'title' => $month['month']->translatedFormat('F Y'),
+            'kind' => 'monthly',
+            'amount' => $month['amount'],
+            'paid_at' => $month['paid_at'],
+        ]);
     }
 
     foreach ($specials as $special) {
         $lines->push([
             'sort' => $special->paid_at,
             'title' => $special->installment->title,
-            'investment' => null,
             'kind' => 'special',
             'amount' => $special->installment->amount,
             'paid_at' => $special->paid_at,
@@ -119,7 +100,7 @@
             <div class="p-3 pt-1">
                 @if ($lines->isEmpty())
                     <div class="rounded-xl border border-dashed border-[#e3eaf2] bg-white/50 px-3 py-10 text-center">
-                        <p class="text-sm text-foreground-muted">{{ __('No paid investments yet.') }}</p>
+                        <p class="text-sm text-foreground-muted">{{ __('No payments yet.') }}</p>
                     </div>
                 @else
                     <div class="ui-glass-table-wrap overflow-x-auto">
@@ -139,15 +120,6 @@
                                         <x-table-serial-cell :index="$loop->index" />
                                         <td>
                                             <div class="font-medium text-foreground">{{ $line['title'] }}</div>
-                                            @if ($line['investment'])
-                                                <div class="mt-0.5 text-sm">
-                                                    @if ($line['investment']['can_view'])
-                                                        <a href="{{ route('investments.show', $line['investment']['investment']) }}" class="ui-text-link">{{ $line['investment']['investment']->title }}</a>
-                                                    @else
-                                                        <span class="text-foreground-muted">{{ $line['investment']['investment']->title }}</span>
-                                                    @endif
-                                                </div>
-                                            @endif
                                         </td>
                                         <td>
                                             @if ($line['kind'] === 'special')
