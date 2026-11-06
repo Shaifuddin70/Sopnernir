@@ -355,42 +355,55 @@ function csrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 }
 
-function paidStatusBadge(isPaid, root) {
-    const paidLabel = root?.dataset.labelPaid || 'Paid';
-    const unpaidLabel = root?.dataset.labelUnpaid || 'Unpaid';
+const paidToggleOnClasses = ['bg-success', 'text-white', 'shadow-sm'];
+const unpaidToggleOnClasses = ['bg-warning', 'text-white', 'shadow-sm'];
+const paidToggleOffClasses = ['text-foreground-muted', 'hover:bg-surface-card', 'hover:text-foreground'];
 
-    if (isPaid) {
-        return `<span class="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success-muted px-3 py-1 text-sm font-semibold text-success"><span class="h-1.5 w-1.5 shrink-0 rounded-full bg-success" aria-hidden="true"></span>${paidLabel}</span>`;
+function applyPaidUnpaidToggle(container, isPaid, mixed = false) {
+    if (! container) {
+        return;
     }
 
-    return `<span class="inline-flex items-center gap-1.5 rounded-full border border-warning/25 bg-warning-muted px-3 py-1 text-sm font-semibold text-warning"><span class="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" aria-hidden="true"></span>${unpaidLabel}</span>`;
+    const paidButton = container.querySelector('[data-paid-choice="1"]');
+    const unpaidButton = container.querySelector('[data-paid-choice="0"]');
+    const paidOn = isPaid && ! mixed;
+    const unpaidOn = ! isPaid && ! mixed;
+
+    [paidButton, unpaidButton].forEach((button) => {
+        if (! (button instanceof HTMLElement)) {
+            return;
+        }
+
+        button.classList.remove(...paidToggleOnClasses, ...unpaidToggleOnClasses, ...paidToggleOffClasses);
+    });
+
+    if (paidButton instanceof HTMLElement) {
+        paidButton.classList.add(...(paidOn ? paidToggleOnClasses : paidToggleOffClasses));
+        paidButton.setAttribute('aria-pressed', paidOn ? 'true' : 'false');
+    }
+
+    if (unpaidButton instanceof HTMLElement) {
+        unpaidButton.classList.add(...(unpaidOn ? unpaidToggleOnClasses : paidToggleOffClasses));
+        unpaidButton.setAttribute('aria-pressed', unpaidOn ? 'true' : 'false');
+    }
 }
 
-function applyPaymentRowState(row, isPaid, paidAt, root) {
+function monthlyPaymentUserIds(root) {
+    return Array.from(root.querySelectorAll('[data-payment-row]'))
+        .map((row) => Number(row.dataset.userId))
+        .filter((id) => Number.isFinite(id) && id > 0);
+}
+
+function applyPaymentRowState(row, isPaid, paidAt) {
     row.dataset.paid = isPaid ? '1' : '0';
     row.classList.toggle('bg-success-muted/30', isPaid);
-
-    const statusCell = row.querySelector('[data-status-cell]');
-    if (statusCell) {
-        statusCell.innerHTML = paidStatusBadge(isPaid, root);
-    }
 
     const paidAtCell = row.querySelector('[data-paid-at-cell]');
     if (paidAtCell) {
         paidAtCell.textContent = isPaid && paidAt ? paidAt : '—';
     }
 
-    const toggle = row.querySelector('[data-paid-toggle]');
-    if (toggle instanceof HTMLInputElement) {
-        toggle.checked = isPaid;
-    }
-
-    const label = row.querySelector('[data-toggle-label]');
-    if (label) {
-        label.textContent = isPaid
-            ? (root?.dataset.labelMarkUnpaid || 'Mark unpaid')
-            : (root?.dataset.labelMarkPaid || 'Mark paid');
-    }
+    applyPaidUnpaidToggle(row.querySelector('[data-paid-toggle]'), isPaid);
 }
 
 function syncMonthlyPaymentsChecklistState(scope = document) {
@@ -402,15 +415,14 @@ function syncMonthlyPaymentsChecklistState(scope = document) {
         return;
     }
 
-    const toggles = Array.from(root.querySelectorAll('[data-paid-toggle]'));
+    const rows = Array.from(root.querySelectorAll('[data-payment-row]'));
     const master = root.querySelector('[data-check-all-paid]');
-    if (! (master instanceof HTMLInputElement) || toggles.length === 0) {
+    if (! master || rows.length === 0) {
         return;
     }
 
-    const checkedCount = toggles.filter((el) => el instanceof HTMLInputElement && el.checked).length;
-    master.checked = checkedCount === toggles.length;
-    master.indeterminate = checkedCount > 0 && checkedCount < toggles.length;
+    const paidCount = rows.filter((row) => row.dataset.paid === '1').length;
+    applyPaidUnpaidToggle(master, paidCount === rows.length, paidCount > 0 && paidCount < rows.length);
 }
 
 function applyMonthlyPaymentsSummaryHtml(html) {
@@ -466,9 +478,12 @@ async function patchMonthlyPayment(url, body) {
     return data;
 }
 
-document.addEventListener('change', async (event) => {
-    const target = event.target;
-    if (! (target instanceof HTMLInputElement)) {
+document.addEventListener('click', async (event) => {
+    const target = event.target instanceof Element
+        ? event.target.closest('[data-paid-choice]')
+        : null;
+
+    if (! (target instanceof HTMLButtonElement)) {
         return;
     }
 
@@ -477,60 +492,63 @@ document.addEventListener('change', async (event) => {
         return;
     }
 
-    if (target.matches('[data-paid-toggle]')) {
+    const nextPaid = target.dataset.paidChoice === '1';
+    const bulkGroup = target.closest('[data-check-all-paid]');
+    const rowGroup = target.closest('[data-paid-toggle]');
+
+    if (rowGroup && ! bulkGroup) {
         const row = target.closest('[data-payment-row]');
         if (! row) {
             return;
         }
 
         const previous = row.dataset.paid === '1';
-        const nextPaid = target.checked;
-        target.disabled = true;
+        if (previous === nextPaid) {
+            return;
+        }
+
         root.classList.add('opacity-80', 'pointer-events-none');
 
         try {
             const data = await patchMonthlyPayment(root.dataset.updateUrl, {
-                user_id: Number(target.value),
+                user_id: Number(row.dataset.userId),
                 month: root.dataset.month,
                 paid: nextPaid,
             });
 
-            applyPaymentRowState(row, Boolean(data.is_paid), data.paid_at, root);
+            applyPaymentRowState(row, Boolean(data.is_paid), data.paid_at);
             if (data.summary_html) {
                 applyMonthlyPaymentsSummaryHtml(data.summary_html);
             }
             syncMonthlyPaymentsChecklistState(root);
         } catch (error) {
             console.error(error);
-            target.checked = previous;
-            applyPaymentRowState(row, previous, row.querySelector('[data-paid-at-cell]')?.textContent || null, root);
+            applyPaymentRowState(row, previous, row.querySelector('[data-paid-at-cell]')?.textContent || null);
         } finally {
-            target.disabled = false;
             root.classList.remove('opacity-80', 'pointer-events-none');
         }
 
         return;
     }
 
-    if (target.matches('[data-check-all-paid]')) {
-        const toggles = Array.from(root.querySelectorAll('[data-paid-toggle]'));
-        const userIds = toggles
-            .filter((el) => el instanceof HTMLInputElement)
-            .map((el) => Number(el.value))
-            .filter((id) => Number.isFinite(id) && id > 0);
-
+    if (bulkGroup) {
+        const userIds = monthlyPaymentUserIds(root);
         if (userIds.length === 0) {
             return;
         }
 
-        const paid = target.checked;
-        target.disabled = true;
+        const rows = Array.from(root.querySelectorAll('[data-payment-row]'));
+        const paidCount = rows.filter((row) => row.dataset.paid === '1').length;
+        if ((nextPaid && paidCount === rows.length) || (! nextPaid && paidCount === 0)) {
+            return;
+        }
+
         root.classList.add('opacity-80', 'pointer-events-none');
 
         try {
             await patchMonthlyPayment(root.dataset.bulkUrl, {
                 month: root.dataset.month,
-                paid,
+                paid: nextPaid,
                 user_ids: userIds,
             });
             await refreshMonthlyPaymentsFragment(root);
@@ -538,7 +556,6 @@ document.addEventListener('change', async (event) => {
             console.error(error);
             syncMonthlyPaymentsChecklistState(root);
         } finally {
-            target.disabled = false;
             root.classList.remove('opacity-80', 'pointer-events-none');
         }
     }

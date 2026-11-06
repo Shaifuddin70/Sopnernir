@@ -172,6 +172,64 @@ class ProfitWithdrawalService
         });
     }
 
+    /**
+     * Undo an entire withdraw action (one or more pools) so the amount is available again.
+     */
+    public function reverseBatch(InvestmentProfitWithdrawalBatch $batch): InvestmentProfitWithdrawalBatch
+    {
+        return DB::transaction(function () use ($batch) {
+            $locked = InvestmentProfitWithdrawalBatch::query()
+                ->whereKey($batch->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $locked->delete();
+
+            return $locked;
+        });
+    }
+
+    /**
+     * Undo one pool’s withdrawal. If it was the last pool in the batch, the batch is removed too.
+     */
+    public function reverseWithdrawal(InvestmentProfitWithdrawal $withdrawal): InvestmentProfitWithdrawal
+    {
+        return DB::transaction(function () use ($withdrawal) {
+            $locked = InvestmentProfitWithdrawal::query()
+                ->whereKey($withdrawal->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $batchId = $locked->batch_id;
+            $locked->delete();
+
+            if ($batchId === null) {
+                return $locked;
+            }
+
+            $batch = InvestmentProfitWithdrawalBatch::query()
+                ->whereKey($batchId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($batch === null) {
+                return $locked;
+            }
+
+            $remaining = $batch->withdrawals()->get();
+            if ($remaining->isEmpty()) {
+                $batch->delete();
+            } else {
+                $batch->update([
+                    'amount' => $this->decimal((float) $remaining->sum('amount')),
+                    'pools_count' => $remaining->count(),
+                ]);
+            }
+
+            return $locked;
+        });
+    }
+
     public function totalWithdrawn(Investment $investment): float
     {
         return round((float) $investment->profitWithdrawals()->sum('amount'), 2);

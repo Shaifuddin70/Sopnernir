@@ -252,6 +252,7 @@
                                     <th class="hidden md:table-cell">{{ __('By') }}</th>
                                     <th class="hidden lg:table-cell">{{ __('Withdrawn at') }}</th>
                                     <th>{{ __('Notes') }}</th>
+                                    <th class="text-right">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -264,6 +265,13 @@
                                         <td class="hidden md:table-cell">{{ $withdrawal->withdrawnBy?->name ?? '—' }}</td>
                                         <td class="hidden tabular-nums text-foreground-muted lg:table-cell">{{ $withdrawal->withdrawn_at?->format('Y-m-d H:i') ?? '—' }}</td>
                                         <td class="max-w-[12rem] truncate text-foreground-muted" title="{{ $withdrawal->notes }}">{{ $withdrawal->notes ?: '—' }}</td>
+                                        <td class="text-right">
+                                            @can('withdrawProfits', $investment)
+                                                @include('admin.profit-withdrawals.partials.reverse-form', [
+                                                    'action' => route('admin.investments.profit-withdrawals.destroy', [$investment, $withdrawal]),
+                                                ])
+                                            @endcan
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

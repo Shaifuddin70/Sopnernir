@@ -2,9 +2,14 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('Withdrawal details') }}</h2>
-            <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
-                {{ __('All withdrawals') }}
-            </x-action-button>
+            <div class="flex flex-wrap items-center gap-2">
+                @include('admin.profit-withdrawals.partials.reverse-form', [
+                    'action' => route('admin.profit-withdrawals.destroy', $batch),
+                ])
+                <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
+                    {{ __('All withdrawals') }}
+                </x-action-button>
+            </div>
         </div>
     </x-slot>
 
@@ -79,11 +84,16 @@
                                     </td>
                                     <td class="text-right">
                                         @if ($withdrawal->investment)
-                                            <x-action-button
-                                                :href="route('admin.investments.show', $withdrawal->investment)"
-                                                variant="secondary"
-                                                class="text-sm"
-                                            >{{ __('View pool') }}</x-action-button>
+                                            <div class="flex flex-wrap items-center justify-end gap-2">
+                                                <x-action-button
+                                                    :href="route('admin.investments.show', $withdrawal->investment)"
+                                                    variant="secondary"
+                                                    class="text-sm"
+                                                >{{ __('View pool') }}</x-action-button>
+                                                @include('admin.profit-withdrawals.partials.reverse-form', [
+                                                    'action' => route('admin.investments.profit-withdrawals.destroy', [$withdrawal->investment, $withdrawal]),
+                                                ])
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>

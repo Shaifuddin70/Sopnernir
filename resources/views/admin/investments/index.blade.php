@@ -3,6 +3,9 @@
     if (! is_string($prefillPaymentMonth) || ! preg_match('/^\d{4}-\d{2}$/', $prefillPaymentMonth)) {
         $prefillPaymentMonth = null;
     }
+    $prefillTitle = $prefillPaymentMonth
+        ? \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()->translatedFormat('F Y')
+        : null;
     $openCreateInvestmentModal = request()->boolean('new')
         || (old('_form') === 'create-investment' && $errors->isNotEmpty());
     $openEditInvestmentModal = $editingInvestment !== null;
@@ -95,6 +98,7 @@
         <div class="max-h-[calc(100vh-5rem)] overflow-y-auto px-6 py-4">
             @include('admin.investments.partials.create-form', [
                 'defaultPaymentMonth' => $prefillPaymentMonth ?? old('payment_month', now()->format('Y-m')),
+                'defaultTitle' => $prefillTitle,
             ])
         </div>
     </x-modal>

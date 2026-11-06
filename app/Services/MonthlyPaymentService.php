@@ -71,10 +71,19 @@ class MonthlyPaymentService
     {
         $monthStart = $month->copy()->startOfMonth();
 
-        $payment = InvestorMonthlyPayment::query()->firstOrNew([
-            'user_id' => $user->id,
-            'month' => $monthStart->toDateString(),
-        ]);
+        $payment = InvestorMonthlyPayment::query()
+            ->where('user_id', $user->id)
+            ->whereDate('month', $monthStart->toDateString())
+            ->first();
+
+        if ($payment === null) {
+            $payment = new InvestorMonthlyPayment([
+                'user_id' => $user->id,
+                'month' => $monthStart->toDateString(),
+            ]);
+        }
+
+        $wasPaid = $payment->exists && $payment->isPaid();
 
         if ($paid) {
             $payment->paid_at = $payment->paid_at ?? now();
@@ -85,6 +94,10 @@ class MonthlyPaymentService
         }
 
         $payment->save();
+
+        if ($paid && ! $wasPaid) {
+            app(InvestorNotificationService::class)->paymentRecorded($user, $monthStart);
+        }
 
         return $payment;
     }

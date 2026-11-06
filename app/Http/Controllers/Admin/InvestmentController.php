@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Investment;
 use App\Models\User;
-use App\Support\PaginationPerPage;
-use App\Support\SqlLike;
 use App\Services\InvestmentAccrualService;
 use App\Services\InvestmentDailyProfitService;
 use App\Services\InvestmentPlanCalculationService;
+use App\Services\InvestorNotificationService;
 use App\Services\MonthlyPaymentService;
+use App\Support\PaginationPerPage;
+use App\Support\SqlLike;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -121,6 +122,8 @@ class InvestmentController extends Controller
                 'month' => $paymentMonth->translatedFormat('F Y'),
             ]);
         }
+
+        app(InvestorNotificationService::class)->newInvestmentPlan($investment->fresh());
 
         return redirect()->route('admin.investments.show', $investment)
             ->with('status', implode(' ', $statusParts));

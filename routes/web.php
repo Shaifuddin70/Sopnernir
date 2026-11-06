@@ -1,18 +1,18 @@
 <?php
 
-use App\Http\Controllers\ViteBuildAssetController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\InvestmentAccrualController;
-use App\Http\Controllers\Admin\MonthlyPaymentController;
-use App\Http\Controllers\Admin\ProfitWithdrawalController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController;
 use App\Http\Controllers\Admin\InvestmentDocumentController;
 use App\Http\Controllers\Admin\InvestmentParticipantController;
+use App\Http\Controllers\Admin\MonthlyPaymentController;
+use App\Http\Controllers\Admin\ProfitWithdrawalController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Investor\InvestmentController as InvestorInvestmentController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PhoneAccess\InvestmentLookupController as PhoneAccessInvestmentLookupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ViteBuildAssetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/build/{path}', [ViteBuildAssetController::class, 'show'])
@@ -72,12 +72,16 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         ->name('profit-withdrawals.index');
     Route::get('profit-withdrawals/{batch}', [ProfitWithdrawalController::class, 'show'])
         ->name('profit-withdrawals.show');
+    Route::delete('profit-withdrawals/{batch}', [ProfitWithdrawalController::class, 'destroy'])
+        ->name('profit-withdrawals.destroy');
     Route::get('investments-profit-withdrawals/preview', [ProfitWithdrawalController::class, 'preview'])
         ->name('investments.profit-withdrawals.preview');
     Route::post('investments/profit-withdrawals/bulk', [ProfitWithdrawalController::class, 'bulkStore'])
         ->name('investments.profit-withdrawals.bulk');
     Route::post('investments/{investment}/profit-withdrawals', [ProfitWithdrawalController::class, 'store'])
         ->name('investments.profit-withdrawals.store');
+    Route::delete('investments/{investment}/profit-withdrawals/{withdrawal}', [ProfitWithdrawalController::class, 'destroyWithdrawal'])
+        ->name('investments.profit-withdrawals.destroy');
 
     Route::post('investments/{investment}/documents', [InvestmentDocumentController::class, 'store'])
         ->name('investments.documents.store');

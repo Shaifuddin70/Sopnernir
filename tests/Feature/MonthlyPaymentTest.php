@@ -42,7 +42,9 @@ class MonthlyPaymentTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.investments.index', ['new' => 1, 'payment_month' => '2026-03']))
             ->assertOk()
-            ->assertSee('value="2026-03"', false);
+            ->assertSee('value="2026-03"', false)
+            ->assertSee('value="March 2026"', false)
+            ->assertDontSee('id="create_notes"', false);
     }
 
     public function test_admin_can_mark_investor_paid_for_month(): void
@@ -71,7 +73,10 @@ class MonthlyPaymentTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.monthly-payments.index', ['month' => '2026-05']))
             ->assertOk()
-            ->assertSee(__('Check all'), false);
+            ->assertSee('data-paid-choice="1"', false)
+            ->assertSee('data-paid-choice="0"', false)
+            ->assertSee('data-check-all-paid', false)
+            ->assertDontSee('type="checkbox"', false);
 
         $this->actingAs($admin)->patch(route('admin.monthly-payments.bulk-update'), [
             'month' => '2026-05',

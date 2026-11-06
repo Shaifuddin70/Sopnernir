@@ -52,6 +52,9 @@
                                     variant="secondary"
                                     class="text-sm"
                                 >{{ __('Open') }}</x-action-button>
+                                @include('admin.profit-withdrawals.partials.reverse-form', [
+                                    'action' => route('admin.profit-withdrawals.destroy', $batch),
+                                ])
                             </div>
                         </td>
                     </tr>
@@ -83,11 +86,16 @@
                                                 </td>
                                                 <td class="text-right">
                                                     @if ($withdrawal->investment)
-                                                        <x-action-button
-                                                            :href="route('admin.investments.show', $withdrawal->investment)"
-                                                            variant="secondary"
-                                                            class="text-sm"
-                                                        >{{ __('View pool') }}</x-action-button>
+                                                        <div class="flex flex-wrap items-center justify-end gap-2">
+                                                            <x-action-button
+                                                                :href="route('admin.investments.show', $withdrawal->investment)"
+                                                                variant="secondary"
+                                                                class="text-sm"
+                                                            >{{ __('View pool') }}</x-action-button>
+                                                            @include('admin.profit-withdrawals.partials.reverse-form', [
+                                                                'action' => route('admin.investments.profit-withdrawals.destroy', [$withdrawal->investment, $withdrawal]),
+                                                            ])
+                                                        </div>
                                                     @endif
                                                 </td>
                                             </tr>

@@ -5,13 +5,8 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="sm:col-span-2">
             <x-input-label for="create_title" :value="__('Title')" />
-            <x-text-input id="create_title" name="title" type="text" class="mt-1 block w-full" :value="old('title')" required autofocus />
+            <x-text-input id="create_title" name="title" type="text" class="mt-1 block w-full" :value="old('title', $defaultTitle ?? '')" required autofocus />
             <x-input-error :messages="$errors->get('title')" class="mt-2" />
-        </div>
-        <div class="sm:col-span-2">
-            <x-input-label for="create_notes" :value="__('Notes')" />
-            <textarea id="create_notes" name="notes" rows="3" class="ui-input mt-1 block w-full rounded-lg">{{ old('notes') }}</textarea>
-            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="create_deed_no" :value="__('Deed number')" />

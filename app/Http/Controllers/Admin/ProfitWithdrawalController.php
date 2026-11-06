@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Investment;
+use App\Models\InvestmentProfitWithdrawal;
 use App\Models\InvestmentProfitWithdrawalBatch;
 use App\Services\ProfitWithdrawalService;
 use App\Support\PaginationPerPage;
@@ -195,6 +196,61 @@ class ProfitWithdrawalController extends Controller
                 'count' => $batch->pools_count,
                 'total_amount' => (string) $batch->amount,
             ]);
+        }
+
+        return back()->with('status', $message);
+    }
+
+    public function destroy(InvestmentProfitWithdrawalBatch $batch, ProfitWithdrawalService $withdrawals): RedirectResponse
+    {
+        $this->authorize('create', Investment::class);
+
+        $batch->load('withdrawals.investment');
+
+        foreach ($batch->withdrawals as $withdrawal) {
+            if ($withdrawal->investment) {
+                $this->authorize('withdrawProfits', $withdrawal->investment);
+            }
+        }
+
+        $reversed = $withdrawals->reverseBatch($batch);
+
+        return redirect()
+            ->route('admin.profit-withdrawals.index')
+            ->with('status', __('Reversed withdrawal of :amount.', [
+                'amount' => number_format((float) $reversed->amount, 2, '.', ''),
+            ]));
+    }
+
+    public function destroyWithdrawal(
+        Request $request,
+        Investment $investment,
+        InvestmentProfitWithdrawal $withdrawal,
+        ProfitWithdrawalService $withdrawals,
+    ): RedirectResponse {
+        $this->authorize('withdrawProfits', $investment);
+
+        if ($withdrawal->investment_id !== $investment->id) {
+            abort(404);
+        }
+
+        $batchId = $withdrawal->batch_id;
+        $reversed = $withdrawals->reverseWithdrawal($withdrawal);
+
+        $message = __('Reversed withdrawal of :amount from :title.', [
+            'amount' => number_format((float) $reversed->amount, 2, '.', ''),
+            'title' => $investment->title,
+        ]);
+
+        $batchGone = $batchId !== null
+            && ! InvestmentProfitWithdrawalBatch::query()->whereKey($batchId)->exists();
+
+        if ($batchGone) {
+            $showUrl = route('admin.profit-withdrawals.show', $batchId);
+            $referer = $request->headers->get('referer');
+            if (is_string($referer) && str_starts_with($referer, $showUrl)) {
+                return redirect()->route('admin.profit-withdrawals.index')->with('status', $message);
+            }
         }
 
         return back()->with('status', $message);
