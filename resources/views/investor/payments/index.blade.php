@@ -60,7 +60,7 @@
                 <div class="dashboard-stat portfolio-stat portfolio-stat--capital">
                     <dt class="portfolio-stat__label">
                         <span class="portfolio-stat__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <rect x="4" y="5" width="16" height="15" rx="2" />
                                 <path stroke-linecap="round" d="M8 3v4M16 3v4M4 10h16" />
                             </svg>
@@ -72,7 +72,7 @@
                 <div class="dashboard-stat portfolio-stat portfolio-stat--profit">
                     <dt class="portfolio-stat__label">
                         <span class="portfolio-stat__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 7.5c0-1.5-1.8-2.5-4.5-2.5S7.5 6 7.5 7.5 9.3 10 12 10s4.5 1 4.5 2.5S14.7 15 12 15s-4.5-1-4.5-2.5" />
                             </svg>
@@ -84,7 +84,7 @@
                 <div class="dashboard-stat portfolio-stat portfolio-stat--today">
                     <dt class="portfolio-stat__label">
                         <span class="portfolio-stat__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3 4 7l8 4 8-4-8-4Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4 12 8 4 8-4" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4 17 8 4 8-4" />
@@ -97,7 +97,7 @@
                 <div class="dashboard-stat portfolio-stat portfolio-stat--withdrawn">
                     <dt class="portfolio-stat__label">
                         <span class="portfolio-stat__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <circle cx="12" cy="12" r="8" />
                                 <path stroke-linecap="round" d="M12 8v4l3 2" />
                             </svg>
