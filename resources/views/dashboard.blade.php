@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="ui-page-header-title">{{ __('Dashboard') }}</h2>
-            <div class="flex flex-wrap gap-2">
+        <div class="ui-header-heading flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="ui-page-header-title shrink-0">{{ __('Dashboard') }}</h2>
+            <div class="header-action-scroll">
                 @if (auth()->user()->isAdmin())
                     <x-action-button :href="route('admin.investments.index')" variant="secondary">
                         {{ __('Investments') }}

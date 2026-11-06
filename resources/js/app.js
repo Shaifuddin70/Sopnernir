@@ -911,8 +911,34 @@ document.addEventListener('submit', async (event) => {
     }
 });
 
+function syncHeaderActionScroll(el) {
+    el.classList.toggle('is-scrolled', el.scrollLeft > 8);
+    el.classList.toggle('is-end', el.scrollLeft + el.clientWidth >= el.scrollWidth - 8);
+}
+
+function initHeaderActionScrolls(root = document) {
+    root.querySelectorAll('.header-action-scroll').forEach((el) => {
+        if (!(el instanceof HTMLElement) || el.dataset.headerScrollReady === '1') {
+            return;
+        }
+
+        el.dataset.headerScrollReady = '1';
+        el.addEventListener('scroll', () => syncHeaderActionScroll(el), { passive: true });
+        syncHeaderActionScroll(el);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-profit-withdrawals]').forEach((root) => syncWithdrawSelection(root));
+    initHeaderActionScrolls(document);
+});
+
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.header-action-scroll').forEach((el) => {
+        if (el instanceof HTMLElement) {
+            syncHeaderActionScroll(el);
+        }
+    });
 });
 
 window.Alpine = Alpine;

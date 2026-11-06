@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('Withdrawal details') }}</h2>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="header-action-scroll">
                 @include('admin.profit-withdrawals.partials.reverse-form', [
                     'action' => route('admin.profit-withdrawals.destroy', $batch),
                 ])

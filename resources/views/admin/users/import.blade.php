@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap justify-between items-center gap-2">
-            <h2 class="font-semibold text-xl text-foreground leading-tight">{{ __('Import users') }}</h2>
-            <x-action-button :href="route('admin.users.index')" variant="secondary"
-                class="text-sm">{{ __('Back to list') }}</x-action-button>
+        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <h2 class="ui-page-header-title">{{ __('Import users') }}</h2>
+            <div class="header-action-scroll">
+                <x-action-button :href="route('admin.users.index')" variant="secondary"
+                    class="text-sm">{{ __('Back to list') }}</x-action-button>
+            </div>
         </div>
     </x-slot>
 

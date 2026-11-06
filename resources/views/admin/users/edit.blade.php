@@ -1,10 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('Edit user') }}</h2>
-            <x-action-button :href="route('admin.users.index')" variant="secondary" class="text-sm">
-                {{ __('Back to list') }}
-            </x-action-button>
+            <div class="header-action-scroll">
+                <x-action-button :href="route('admin.users.index')" variant="secondary" class="text-sm">
+                    {{ __('Back to list') }}
+                </x-action-button>
+            </div>
         </div>
     </x-slot>
 

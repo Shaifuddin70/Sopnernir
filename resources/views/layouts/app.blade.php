@@ -26,12 +26,12 @@
 
         <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
             <header class="ui-main-header sticky top-0 z-30 shrink-0">
-                <div class="ui-page-container flex min-h-14 items-center justify-between gap-3">
-                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                <div class="ui-page-container ui-header-bar">
+                    <div class="ui-header-main flex min-w-0 flex-1 items-center gap-3">
                         <button
                             type="button"
                             @click="sidebarOpen = true"
-                            class="inline-flex shrink-0 items-center justify-center rounded-full p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
+                            class="ui-header-menu inline-flex shrink-0 items-center justify-center rounded-full p-2 text-foreground-muted hover:bg-surface-variant hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary lg:hidden"
                             aria-expanded="false"
                             x-bind:aria-expanded="sidebarOpen"
                         >
@@ -42,13 +42,15 @@
                         </button>
 
                         @isset($header)
-                            <div class="min-w-0 flex-1 [&_h2]:ui-page-header-title">
+                            <div class="ui-header-slot min-w-0 flex-1 [&_h2]:ui-page-header-title">
                                 {{ $header }}
                             </div>
                         @endisset
                     </div>
 
-                    @include('layouts.auth-toolbar')
+                    <div class="ui-header-profile">
+                        @include('layouts.auth-toolbar')
+                    </div>
                 </div>
             </header>
 

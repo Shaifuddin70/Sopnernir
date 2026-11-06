@@ -2,10 +2,10 @@
     $paidPct = $summaryTotal > 0
         ? number_format(($summaryPaid / $summaryTotal) * 100, 0, '.', '')
         : '0';
-    $pillClass = 'inline-flex h-11 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold';
+    $pillClass = 'inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-semibold';
 @endphp
 
-<div class="flex flex-wrap items-center gap-2">
+<div class="flex flex-nowrap items-center gap-2">
     <span class="{{ $pillClass }} border border-line bg-surface-card text-foreground-muted">
         {{ __('Total') }}
         <span class="tabular-nums text-foreground">{{ $summaryTotal }}</span>

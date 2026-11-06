@@ -12,13 +12,13 @@
             ]);
         @endphp
         <section class="ui-glass-panel min-w-0">
-            <div class="border-b border-line bg-surface-variant px-4 py-4 sm:px-6">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="border-b border-line bg-surface-variant px-4 py-3 sm:px-5">
+                <div class="flex flex-wrap items-center gap-3">
                     <form method="get" action="{{ route('admin.monthly-payments.index') }}" class="shrink-0">
                         <div class="flex items-center gap-2">
                             <x-action-button
                                 variant="secondary"
-                                class="!h-11 !w-11 shrink-0 !p-0"
+                                class="!h-10 !w-10 shrink-0 !p-0"
                                 :href="route('admin.monthly-payments.index', array_merge(['month' => $previousMonth], $monthNavQuery))"
                                 :title="__('Previous month')"
                                 :aria-label="__('Previous month')"
@@ -33,12 +33,12 @@
                                 type="month"
                                 value="{{ $month->format('Y-m') }}"
                                 aria-label="{{ __('Month') }}"
-                                class="ui-input !mt-0 w-full min-w-[11rem] sm:min-w-[12rem]"
+                                class="ui-input !mt-0 !h-10 !min-h-0 w-[11.5rem]"
                                 onchange="this.form.submit()"
                             >
                             <x-action-button
                                 variant="secondary"
-                                class="!h-11 !w-11 shrink-0 !p-0"
+                                class="!h-10 !w-10 shrink-0 !p-0"
                                 :href="route('admin.monthly-payments.index', array_merge(['month' => $nextMonth], $monthNavQuery))"
                                 :title="__('Next month')"
                                 :aria-label="__('Next month')"
@@ -53,7 +53,7 @@
                         @endif
                     </form>
 
-                    <form method="post" action="{{ route('admin.monthly-payments.amount') }}" class="flex min-w-0 flex-wrap items-center gap-2">
+                    <form method="post" action="{{ route('admin.monthly-payments.amount') }}" class="flex shrink-0 items-center gap-2">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="month" value="{{ $month->format('Y-m') }}">
@@ -68,13 +68,13 @@
                             inputmode="decimal"
                             value="{{ old('amount', $defaultAmount) }}"
                             required
-                            class="ui-input !mt-0 w-full min-w-[8rem] sm:w-36"
+                            class="ui-input !mt-0 !h-10 !min-h-0 w-28"
                         >
                         <x-action-button type="submit" class="shrink-0">{{ __('Save') }}</x-action-button>
-                        <x-input-error :messages="$errors->get('amount')" class="basis-full" />
                     </form>
+                    <x-input-error :messages="$errors->get('amount')" class="basis-full" />
 
-                    <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-end lg:gap-4">
+                    <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
                         <div id="monthly-payments-summary">
                             @include('admin.monthly-payments.partials.summary', compact(
                                 'month',
@@ -84,14 +84,14 @@
                             ))
                         </div>
                         <x-action-button
-                            class="w-full shrink-0 justify-center sm:w-auto"
+                            class="shrink-0"
                             variant="secondary"
                             :href="route('admin.special-installments.index')"
                         >
                             {{ __('Special installment') }}
                         </x-action-button>
                         <x-action-button
-                            class="w-full shrink-0 justify-center sm:w-auto"
+                            class="shrink-0"
                             :href="route('admin.investments.index', ['new' => 1, 'payment_month' => $month->format('Y-m')])"
                             :title="__('Create an investment and tag investors who paid for :month', ['month' => $month->translatedFormat('F Y')])"
                         >

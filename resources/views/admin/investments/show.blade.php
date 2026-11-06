@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 class="font-semibold text-xl text-foreground leading-tight">{{ $investment->title }}</h2>
-            <div class="flex flex-wrap gap-2">
+        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <h2 class="ui-page-header-title">{{ $investment->title }}</h2>
+            <div class="header-action-scroll">
                 <x-action-button :href="route('admin.investments.edit', [$investment, 'return' => 'show'])" variant="secondary">{{ __('Edit') }}</x-action-button>
                 <x-action-button :href="route('admin.investments.index')" variant="secondary">{{ __('List') }}</x-action-button>
             </div>

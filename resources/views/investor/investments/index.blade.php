@@ -1,11 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('My investments') }}</h2>
             @if ($dailyProfitRowsTotal > 0)
-                <x-action-button :href="route('investments.all')" variant="secondary">
-                    {{ __('All pools') }} ({{ $dailyProfitRowsTotal }})
-                </x-action-button>
+                <div class="header-action-scroll">
+                    <x-action-button :href="route('investments.all')" variant="secondary">
+                        {{ __('All pools') }} ({{ $dailyProfitRowsTotal }})
+                    </x-action-button>
+                </div>
             @endif
         </div>
     </x-slot>
