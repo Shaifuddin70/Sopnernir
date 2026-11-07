@@ -114,7 +114,7 @@
                 <span>{{ __('Payments') }}</span>
             </a>
         @endunless
-        <a href="{{ route('profile.show') }}" class="ui-mobile-tab ui-mobile-tab--profile {{ request()->routeIs('profile.*') ? 'is-active' : '' }}">
+        <a href="/profile" class="ui-mobile-tab ui-mobile-tab--profile {{ request()->is('profile', 'profile/*') ? 'is-active' : '' }}">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="8.25" r="3.1" stroke-width="1.8" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.25 19.25a6.75 6.75 0 0 1 13.5 0" />

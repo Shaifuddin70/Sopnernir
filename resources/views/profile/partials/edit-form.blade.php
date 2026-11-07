@@ -115,7 +115,7 @@
     <div class="profile-save-bar">
         <x-primary-button type="submit" class="w-full sm:w-auto">{{ __('Save changes') }}</x-primary-button>
         <x-action-button
-            :href="route('profile.show')"
+            href="/profile"
             variant="secondary"
             class="w-full sm:w-auto"
         >

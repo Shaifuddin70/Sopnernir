@@ -33,7 +33,7 @@
                     @endif
                     <div class="profile-hero__actions">
                         <x-action-button
-                            :href="route('profile.edit')"
+                            href="/profile/edit"
                             class="profile-edit-btn w-full sm:w-auto"
                         >
                             {{ __('Edit profile') }}
@@ -128,7 +128,7 @@
             </div>
             <div class="profile-section__body">
                 <x-action-button
-                    :href="route('profile.edit').'#password'"
+                    href="/profile/edit#password"
                     variant="secondary"
                     class="w-full sm:w-auto"
                 >

@@ -31,7 +31,7 @@
                     <x-language-switcher />
                 </div>
             @endunless
-            <x-dropdown-link :href="route('profile.show')">
+            <x-dropdown-link href="/profile">
                 {{ __('Profile') }}
             </x-dropdown-link>
 
