@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
-            <h2 class="ui-page-header-title">{{ __('All investments') }}</h2>
-            <div class="header-action-scroll">
-                <x-action-button :href="route('investments.index')" variant="secondary" class="text-sm">
-                    {{ __('Back to portfolio') }}
+        <div class="ui-header-heading">
+            <div class="portfolio-header-main">
+                <h2 class="ui-page-header-title">{{ __('All investments') }}</h2>
+                <x-action-button :href="route('investments.index')" variant="secondary" class="portfolio-all-pools-btn shrink-0 text-sm">
+                    {{ __('Back') }}
                 </x-action-button>
             </div>
         </div>

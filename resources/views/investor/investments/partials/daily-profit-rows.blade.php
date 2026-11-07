@@ -5,57 +5,57 @@
     $isPhoneAccess = $viewRoute === 'phone-access';
 @endphp
 
-@if ($isPhoneAccess)
-    <div class="space-y-3 md:hidden">
-        @foreach ($rows as $row)
-            @php
-                $viewUrl = route('phone-access.investments.show', $row['investment_id']);
-                $periodStart = \Carbon\Carbon::parse($row['start_date'])->translatedFormat('j M Y');
-                $periodEnd = \Carbon\Carbon::parse($row['end_date'])->translatedFormat('j M Y');
-            @endphp
-            <article class="phone-access-investment-card">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <a href="{{ $viewUrl }}" class="ui-text-link text-base">{{ $row['title'] }}</a>
-                        <p class="mt-1 text-sm text-foreground-muted">
-                            {{ __('Deed') }} {{ $row['deed_no'] }}
-                        </p>
-                        <p class="mt-0.5 text-sm tabular-nums text-foreground-muted">
-                            {{ $periodStart }} – {{ $periodEnd }}
-                        </p>
-                        <p class="mt-0.5 text-sm tabular-nums text-foreground-muted">
-                            {{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}
-                        </p>
-                    </div>
-                    <div class="table-row-actions shrink-0">
-                        <x-action-button :href="$viewUrl" variant="secondary">{{ __('View') }}</x-action-button>
-                    </div>
+<div class="portfolio-investment-cards space-y-2 md:hidden">
+    @foreach ($rows as $row)
+        @php
+            $viewUrl = $isPhoneAccess
+                ? route('phone-access.investments.show', $row['investment_id'])
+                : route('investments.show', $row['investment_id']);
+            $periodStart = \Carbon\Carbon::parse($row['start_date'])->translatedFormat('j M Y');
+            $periodEnd = \Carbon\Carbon::parse($row['end_date'])->translatedFormat('j M Y');
+            $rank = $serialPaginator
+                ? ($serialPaginator->firstItem() + $loop->index)
+                : ($loop->iteration);
+        @endphp
+        <article class="portfolio-investment-card">
+            <div class="flex items-start gap-3">
+                <span class="portfolio-investment-card__rank tabular-nums">{{ $rank }}</span>
+                <div class="min-w-0 flex-1">
+                    <a href="{{ $viewUrl }}" class="ui-text-link text-[0.95rem] font-semibold leading-snug">{{ $row['title'] }}</a>
+                    <p class="mt-1 text-xs text-foreground-muted">
+                        {{ __('Deed') }} {{ $row['deed_no'] }}
+                    </p>
+                    <p class="mt-0.5 text-xs tabular-nums text-foreground-muted">
+                        {{ $periodStart }} – {{ $periodEnd }}
+                        · {{ __('Day :current/:total', ['current' => $row['days_elapsed'], 'total' => $row['plan_days']]) }}
+                    </p>
                 </div>
-                <dl class="phone-access-investment-card__metrics">
-                    <div class="phone-access-investment-card__metric">
-                        <dt>{{ __('Total') }}</dt>
-                        <dd>{{ $showPoolTotals ? $row['pool_total_amount'] : $row['total_amount'] }}</dd>
-                    </div>
-                    <div class="phone-access-investment-card__metric phone-access-investment-card__metric--profit">
-                        <dt>{{ __('Profit') }}</dt>
-                        <dd>{{ $showPoolTotals ? $row['pool_profit_amount'] : $row['profit_amount'] }}</dd>
-                    </div>
-                    <div class="phone-access-investment-card__metric phone-access-investment-card__metric--profit sm:col-span-2">
-                        <dt>{{ __('Profit til today') }}</dt>
-                        <dd>{{ $row['profit_til_today'] }}</dd>
-                    </div>
-                    <div class="phone-access-investment-card__metric sm:col-span-2">
-                        <dt>{{ __('Withdrawn') }}</dt>
-                        <dd>{{ $showPoolTotals ? ($row['pool_withdrawn'] ?? '0.00') : ($row['withdrawn'] ?? '0.00') }}</dd>
-                    </div>
-                </dl>
-            </article>
-        @endforeach
-    </div>
-@endif
+                <a href="{{ $viewUrl }}" class="portfolio-investment-card__link shrink-0">{{ __('View') }}</a>
+            </div>
+            <dl class="portfolio-investment-card__metrics">
+                <div>
+                    <dt>{{ __('Capital') }}</dt>
+                    <dd class="tabular-nums">{{ $showPoolTotals ? $row['pool_total_amount'] : $row['total_amount'] }}</dd>
+                </div>
+                <div>
+                    <dt>{{ __('Profit til today') }}</dt>
+                    <dd class="tabular-nums text-success">{{ $row['profit_til_today'] }}</dd>
+                </div>
+                <div>
+                    <dt>{{ __('Total profit') }}</dt>
+                    <dd class="tabular-nums text-success">{{ $showPoolTotals ? $row['pool_profit_amount'] : $row['profit_amount'] }}</dd>
+                </div>
+                <div>
+                    <dt>{{ __('Withdrawn') }}</dt>
+                    <dd class="tabular-nums">{{ $showPoolTotals ? ($row['pool_withdrawn'] ?? '0.00') : ($row['withdrawn'] ?? '0.00') }}</dd>
+                </div>
+            </dl>
+        </article>
+    @endforeach
+</div>
 
-<div @class(['ui-glass-table-wrap overflow-x-auto', 'hidden md:block' => $isPhoneAccess])>
-    <table class="ui-table min-w-full @if ($isPhoneAccess) min-w-[40rem] @endif">
+<div class="ui-glass-table-wrap hidden overflow-x-auto md:block">
+    <table class="ui-table min-w-full">
         <thead>
             <tr>
                 <x-table-serial-header />

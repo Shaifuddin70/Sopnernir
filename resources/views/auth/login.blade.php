@@ -11,15 +11,15 @@
                     </p>
                 </div>
 
-                <div class="mb-5 grid grid-cols-2 rounded-full border border-white/70 bg-white/70 p-0.5 text-sm shadow-sm backdrop-blur-md">
+                <div class="mb-5 grid grid-cols-2 rounded-full border border-white/70 bg-white/70 p-0.5 text-sm shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/10">
                     <button type="button" @click="tab = 'login'"
                         class="rounded-full px-3 py-1.5 font-medium transition"
-                        :class="tab === 'login' ? 'bg-primary text-on-primary shadow-sm' : 'text-foreground-muted hover:bg-white hover:text-foreground'">
+                        :class="tab === 'login' ? 'bg-primary text-on-primary shadow-sm' : 'text-foreground-muted hover:bg-white hover:text-foreground dark:hover:bg-white/10'">
                         {{ __('Password login') }}
                     </button>
                     <button type="button" @click="tab = 'phone'"
                         class="rounded-full px-3 py-1.5 font-medium transition"
-                        :class="tab === 'phone' ? 'bg-primary text-on-primary shadow-sm' : 'text-foreground-muted hover:bg-white hover:text-foreground'">
+                        :class="tab === 'phone' ? 'bg-primary text-on-primary shadow-sm' : 'text-foreground-muted hover:bg-white hover:text-foreground dark:hover:bg-white/10'">
                         {{ __('Phone access') }}
                     </button>
                 </div>

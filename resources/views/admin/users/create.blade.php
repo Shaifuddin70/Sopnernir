@@ -11,7 +11,7 @@
 
 
     <div>
-        <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+        <div class="ui-card p-4 sm:p-8">
             <form method="post" action="{{ route('admin.users.store') }}" enctype="multipart/form-data"
                 class="max-w-6xl space-y-8">
                 @csrf

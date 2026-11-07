@@ -1,18 +1,5 @@
 @if ($topInvestors->isEmpty())
-    <div class="rounded-xl border border-dashed border-line bg-surface-variant px-4 py-10 text-center">
-        <div
-            class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface-card text-foreground-muted"
-            aria-hidden="true"
-        >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-            </svg>
-        </div>
+    <div class="rounded-xl border border-dashed border-line bg-surface-variant/60 px-4 py-10 text-center">
         <p class="text-sm text-foreground-muted">
             @if (request()->filled('search'))
                 {{ __('No investors match your search.') }}
@@ -22,7 +9,39 @@
         </p>
     </div>
 @else
-    <div class="ui-glass-table-wrap overflow-x-auto">
+    <div class="dashboard-investor-cards space-y-2 sm:hidden">
+        @foreach ($topInvestors as $row)
+            <article @class([
+                'dashboard-investor-card',
+                'dashboard-investor-card--you' => $row->user_id === auth()->id(),
+            ])>
+                <div class="flex min-w-0 items-center gap-3">
+                    <span class="dashboard-investor-card__rank tabular-nums">
+                        {{ $topInvestors->firstItem() + $loop->index }}
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <x-user-identity
+                            :name="$row->name"
+                            :image-url="$row->profile_image_url"
+                            :subtitle="$row->email"
+                        />
+                    </div>
+                </div>
+                <dl class="dashboard-investor-card__metrics">
+                    <div>
+                        <dt>{{ __('Tagged capital') }}</dt>
+                        <dd class="tabular-nums">{{ $row->total_contribution }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ __('Profit til today') }}</dt>
+                        <dd class="tabular-nums text-success">{{ $row->profit_til_today ?? $row->total_profit }}</dd>
+                    </div>
+                </dl>
+            </article>
+        @endforeach
+    </div>
+
+    <div class="ui-glass-table-wrap hidden overflow-x-auto sm:block">
         <table class="ui-table min-w-full">
             <thead>
                 <tr>

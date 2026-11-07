@@ -60,7 +60,7 @@
                 </svg>
             </span>
             <div class="min-w-0">
-                <h3 class="text-lg font-bold text-[#16324f]">{{ __('Edit investment') }}</h3>
+                <h3 class="text-lg font-bold text-foreground">{{ __('Edit investment') }}</h3>
                 <p class="mt-0.5 text-sm text-foreground-muted">{{ __('Update the investment details and plan settings.') }}</p>
             </div>
         </div>
@@ -253,7 +253,7 @@
             </h4>
             <input type="hidden" name="is_active" value="0" />
             <label class="inline-flex cursor-pointer items-start gap-2">
-                <input type="checkbox" name="is_active" value="1" class="mt-0.5 rounded border-line bg-white text-primary shadow-sm focus:ring-primary" @checked(old('is_active', $investment->is_active)) />
+                <input type="checkbox" name="is_active" value="1" class="mt-0.5 rounded border-line bg-surface-card text-primary shadow-sm focus:ring-primary" @checked(old('is_active', $investment->is_active)) />
                 <span class="text-sm text-foreground-muted">{{ __('When off, this pool is hidden from investor portfolios and accruals are paused.') }}</span>
             </label>
         </section>

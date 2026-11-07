@@ -3,7 +3,7 @@
 @endphp
 
 <div {{ $attributes->merge([
-    'class' => 'inline-flex items-center rounded-full border border-white/70 bg-white/70 p-0.5 text-sm shadow-sm backdrop-blur-md',
+    'class' => 'inline-flex items-center rounded-full border border-white/70 bg-white/70 p-0.5 text-sm shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/10',
 ]) }}>
     <form method="POST" action="{{ route('locale.update') }}" class="inline">
         @csrf

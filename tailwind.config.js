@@ -3,6 +3,8 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
+
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
@@ -16,45 +18,45 @@ export default {
             },
             colors: {
                 surface: {
-                    DEFAULT: '#F5F7FA',
-                    secondary: '#FFFFFF',
-                    card: '#FFFFFF',
-                    variant: '#EEF1F6',
+                    DEFAULT: 'rgb(var(--tw-surface) / <alpha-value>)',
+                    secondary: 'rgb(var(--tw-surface-secondary) / <alpha-value>)',
+                    card: 'rgb(var(--tw-surface-card) / <alpha-value>)',
+                    variant: 'rgb(var(--tw-surface-variant) / <alpha-value>)',
                 },
                 primary: {
-                    DEFAULT: '#1976D2',
-                    hover: '#1565C0',
-                    muted: '#E3F2FD',
-                    dark: '#0D47A1',
+                    DEFAULT: 'rgb(var(--tw-primary) / <alpha-value>)',
+                    hover: 'rgb(var(--tw-primary-hover) / <alpha-value>)',
+                    muted: 'rgb(var(--tw-primary-muted) / <alpha-value>)',
+                    dark: 'rgb(var(--tw-primary-dark) / <alpha-value>)',
                 },
                 success: {
-                    DEFAULT: '#2E7D32',
-                    muted: '#E8F5E9',
+                    DEFAULT: 'rgb(var(--tw-success) / <alpha-value>)',
+                    muted: 'rgb(var(--tw-success-muted) / <alpha-value>)',
                 },
                 warning: {
-                    DEFAULT: '#ED6C02',
-                    muted: '#FFF3E0',
+                    DEFAULT: 'rgb(var(--tw-warning) / <alpha-value>)',
+                    muted: 'rgb(var(--tw-warning-muted) / <alpha-value>)',
                 },
                 error: {
-                    DEFAULT: '#D32F2F',
-                    muted: '#FFEBEE',
+                    DEFAULT: 'rgb(var(--tw-error) / <alpha-value>)',
+                    muted: 'rgb(var(--tw-error-muted) / <alpha-value>)',
                 },
                 foreground: {
-                    DEFAULT: '#1A1C1E',
-                    muted: '#5F6368',
+                    DEFAULT: 'rgb(var(--tw-foreground) / <alpha-value>)',
+                    muted: 'rgb(var(--tw-foreground-muted) / <alpha-value>)',
                 },
-                line: '#E0E0E0',
+                line: 'rgb(var(--tw-line) / <alpha-value>)',
                 on: {
-                    primary: '#FFFFFF',
+                    primary: 'rgb(var(--tw-on-primary) / <alpha-value>)',
                 },
             },
             boxShadow: {
-                'elevation-1': '0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.1)',
-                'elevation-2': '0 2px 4px -1px rgb(0 0 0 / 0.06), 0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                'elevation-3': '0 4px 6px -2px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                'elevation-1': 'var(--shadow-elevation-1)',
+                'elevation-2': 'var(--shadow-elevation-2)',
+                'elevation-3': 'var(--shadow-elevation-3)',
             },
             ringOffsetColor: {
-                DEFAULT: '#FFFFFF',
+                DEFAULT: 'rgb(var(--tw-ring-offset) / <alpha-value>)',
             },
         },
     },

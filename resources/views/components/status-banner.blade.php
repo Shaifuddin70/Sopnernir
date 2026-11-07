@@ -23,13 +23,13 @@
         role="status"
         aria-live="polite"
     >
-        <div class="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-foreground shadow-[0_10px_30px_rgb(15_23_42/0.12)] backdrop-blur-xl">
+        <div class="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-foreground shadow-[0_10px_30px_rgb(15_23_42/0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-surface-card/90 dark:shadow-[0_10px_30px_rgb(0_0_0/0.4)]">
             <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-success" aria-hidden="true"></span>
-            <p class="min-w-0 flex-1 font-medium leading-5 text-[#1f8a4c]">{{ $message }}</p>
+            <p class="min-w-0 flex-1 font-medium leading-5 text-success">{{ $message }}</p>
             <button
                 type="button"
                 @click="show = false"
-                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-white hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-white hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 dark:hover:bg-white/10"
                 aria-label="{{ __('Dismiss') }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="h-4 w-4 fill-current" aria-hidden="true">

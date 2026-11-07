@@ -9,6 +9,7 @@
     <title>{{ config('app.name', 'Shopnernir') }}</title>
 
     <x-favicon />
+    <x-theme-init />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +23,8 @@
 <body class="font-sans antialiased">
     <x-status-banner />
     <div class="ui-auth-shell flex min-h-screen flex-col items-center justify-center px-4 py-8 sm:px-6">
-        <div class="mb-6 flex w-full max-w-md justify-end">
+        <div class="mb-6 flex w-full max-w-md items-center justify-end gap-2">
+            <x-theme-toggle />
             <x-language-switcher />
         </div>
         <div class="w-full max-w-md">

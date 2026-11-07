@@ -44,7 +44,7 @@
     </div>
 @else
     <div
-        {{ $attributes->class('ui-paid-toggle inline-flex items-center rounded-full border border-white/70 bg-white/70 p-0.5 shadow-sm backdrop-blur-md') }}
+        {{ $attributes->class('ui-paid-toggle inline-flex items-center rounded-full border border-white/70 bg-white/70 p-0.5 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/10') }}
         data-paid-toggle
         role="group"
         aria-label="{{ __('Paid or unpaid') }}"

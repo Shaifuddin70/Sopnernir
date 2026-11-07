@@ -7,8 +7,8 @@
     'errorKey',
 ])
 
-<div {{ $attributes->merge(['class' => 'min-w-0']) }}>
-    <div class="flex flex-col items-center border-b border-line pb-4 text-center">
+<div {{ $attributes->merge(['class' => 'person-form-column min-w-0']) }}>
+    <div class="person-form-column__photo">
         <label
             class="person-photo-upload group relative block h-20 w-20 cursor-pointer overflow-hidden rounded-full border-2 border-line shadow-elevation-1 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 sm:h-24 sm:w-24"
             aria-label="{{ __('Choose profile photo') }}"
@@ -27,11 +27,11 @@
             @endif
 
             <span
-                class="absolute inset-0 flex items-center justify-center bg-foreground/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                class="person-photo-upload__overlay absolute inset-0 flex items-center justify-center bg-foreground/55 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
                 aria-hidden="true"
             >
-                <span class="px-2 text-center text-sm font-semibold leading-tight text-white sm:text-sm">
-                    {{ __('Choose file') }}
+                <span class="px-2 text-center text-xs font-semibold leading-tight text-white sm:text-sm">
+                    {{ __('Change') }}
                 </span>
             </span>
 
@@ -44,11 +44,14 @@
             />
         </label>
 
-        <h3 class="mt-3 text-sm font-semibold uppercase tracking-wide text-foreground-muted">{{ $title }}</h3>
-        <x-input-error class="mt-1" :messages="$errors->get($errorKey)" />
+        <div class="person-form-column__photo-meta">
+            <h4 class="person-form-column__photo-title">{{ $title }}</h4>
+            <p class="person-form-column__photo-hint">{{ __('Tap to change photo') }}</p>
+            <x-input-error class="mt-1" :messages="$errors->get($errorKey)" />
+        </div>
     </div>
 
-    <div class="mt-4 space-y-3">
+    <div class="person-form-column__fields">
         {{ $slot }}
     </div>
 </div>

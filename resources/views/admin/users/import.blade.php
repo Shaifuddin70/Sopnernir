@@ -26,7 +26,7 @@
             </div>
         @endif
 
-        <div class="bg-white shadow sm:rounded-lg p-4 sm:p-8 space-y-6 max-w-2xl">
+        <div class="ui-card max-w-2xl space-y-6 p-4 sm:p-8">
             <div class="prose prose-sm max-w-none text-foreground-muted">
                 <p>{{ __('Upload a UTF-8 CSV with a header row. Required columns match the template. Each row creates one user and nominee. Passwords must meet the same rules as registration. Emails and NID numbers must be unique.') }}
                 </p>

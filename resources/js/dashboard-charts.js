@@ -44,25 +44,42 @@ const palette = () => ({
     warningMuted: cssVar('--color-warning-muted', '#fff3e0'),
     muted: cssVar('--color-text-muted', '#5f6368'),
     border: cssVar('--color-border', '#e0e0e0'),
+    card: cssVar('--color-card', '#ffffff'),
 });
 
-const baseOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            labels: {
-                boxWidth: 10,
-                boxHeight: 10,
-                color: palette().muted,
-                font: { size: 11 },
+const baseOptions = () => {
+    const colors = palette();
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+            legend: {
+                labels: {
+                    boxWidth: 10,
+                    boxHeight: 10,
+                    color: colors.muted,
+                    font: { size: 11 },
+                },
             },
         },
-    },
+    };
 };
+
+function destroyChart(canvas) {
+    const existing = Chart.getChart(canvas);
+
+    if (existing) {
+        existing.destroy();
+    }
+}
 
 function initProfitTrend(canvas, data) {
     const colors = palette();
+    const options = baseOptions();
+
+    destroyChart(canvas);
 
     return new Chart(canvas, {
         type: 'line',
@@ -88,14 +105,14 @@ function initProfitTrend(canvas, data) {
                 tension: 0.4,
                 pointRadius: 3,
                 pointBackgroundColor: '#1e88e5',
-                pointBorderColor: '#ffffff',
+                pointBorderColor: colors.card,
                 pointBorderWidth: 2,
                 pointHoverRadius: 4,
-                borderWidth: 2.5,
+                borderWidth: 2,
             }],
         },
         options: {
-            ...baseOptions,
+            ...options,
             scales: {
                 x: {
                     grid: { display: false },
@@ -108,7 +125,7 @@ function initProfitTrend(canvas, data) {
                 },
             },
             plugins: {
-                ...baseOptions.plugins,
+                ...options.plugins,
                 legend: { display: false },
             },
         },
@@ -117,9 +134,12 @@ function initProfitTrend(canvas, data) {
 
 function initCapitalVsProfit(canvas, data) {
     const colors = palette();
+    const options = baseOptions();
     const capital = Math.max(0, Number(data.capital) || 0);
     const profit = Math.max(0, Number(data.profit) || 0);
     const empty = capital === 0 && profit === 0;
+
+    destroyChart(canvas);
 
     return new Chart(canvas, {
         type: 'doughnut',
@@ -135,10 +155,10 @@ function initCapitalVsProfit(canvas, data) {
             }],
         },
         options: {
-            ...baseOptions,
+            ...options,
             cutout: '72%',
             plugins: {
-                ...baseOptions.plugins,
+                ...options.plugins,
                 legend: { position: 'bottom' },
             },
         },
@@ -147,6 +167,9 @@ function initCapitalVsProfit(canvas, data) {
 
 function initInvestmentStatus(canvas, data) {
     const colors = palette();
+    const options = baseOptions();
+
+    destroyChart(canvas);
 
     return new Chart(canvas, {
         type: 'bar',
@@ -165,9 +188,9 @@ function initInvestmentStatus(canvas, data) {
             }],
         },
         options: {
-            ...baseOptions,
+            ...options,
             plugins: {
-                ...baseOptions.plugins,
+                ...options.plugins,
                 legend: { display: false },
             },
             scales: {
@@ -187,9 +210,12 @@ function initInvestmentStatus(canvas, data) {
 
 function initMonthlyPayments(canvas, data) {
     const colors = palette();
+    const options = baseOptions();
     const paid = Math.max(0, Number(data.paid) || 0);
     const unpaid = Math.max(0, Number(data.unpaid) || 0);
     const empty = paid === 0 && unpaid === 0;
+
+    destroyChart(canvas);
 
     return new Chart(canvas, {
         type: 'doughnut',
@@ -205,10 +231,10 @@ function initMonthlyPayments(canvas, data) {
             }],
         },
         options: {
-            ...baseOptions,
+            ...options,
             cutout: '72%',
             plugins: {
-                ...baseOptions.plugins,
+                ...options.plugins,
                 legend: { position: 'bottom' },
             },
         },
@@ -217,6 +243,9 @@ function initMonthlyPayments(canvas, data) {
 
 function initPortfolioProfitMonth(canvas, data) {
     const colors = palette();
+    const options = baseOptions();
+
+    destroyChart(canvas);
 
     return new Chart(canvas, {
         type: 'bar',
@@ -232,9 +261,9 @@ function initPortfolioProfitMonth(canvas, data) {
             }],
         },
         options: {
-            ...baseOptions,
+            ...options,
             plugins: {
-                ...baseOptions.plugins,
+                ...options.plugins,
                 legend: { display: false },
             },
             scales: {
@@ -250,7 +279,7 @@ function initPortfolioProfitMonth(canvas, data) {
                 },
                 y: {
                     beginAtZero: true,
-                    grid: { color: '#e8eef5' },
+                    grid: { color: colors.border },
                     ticks: { color: colors.muted, font: { size: 11 } },
                 },
             },
@@ -325,8 +354,31 @@ function initCharts() {
     initPortfolioCharts();
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCharts);
-} else {
+let chartsBootstrapped = false;
+
+function bootstrapCharts() {
+    if (chartsBootstrapped) {
+        return;
+    }
+
+    chartsBootstrapped = true;
     initCharts();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrapCharts, { once: true });
+} else {
+    bootstrapCharts();
+}
+
+window.addEventListener('theme-changed', () => {
+    // Recreate once with fresh theme tokens; destroyChart prevents stacked bold strokes.
+    initCharts();
+});
+
+if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+        document.querySelectorAll('canvas').forEach((canvas) => destroyChart(canvas));
+        chartsBootstrapped = false;
+    });
 }

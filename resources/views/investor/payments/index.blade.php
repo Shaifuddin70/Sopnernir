@@ -99,7 +99,7 @@
             </div>
             <div class="p-3 pt-1">
                 @if ($lines->isEmpty())
-                    <div class="rounded-xl border border-dashed border-[#e3eaf2] bg-white/50 px-3 py-10 text-center">
+                    <div class="rounded-xl border border-dashed border-line bg-surface-variant/50 px-3 py-10 text-center">
                         <p class="text-sm text-foreground-muted">{{ __('No payments yet.') }}</p>
                     </div>
                 @else
@@ -128,7 +128,7 @@
                                                 <span class="ui-badge-muted">{{ __('Monthly') }}</span>
                                             @endif
                                         </td>
-                                        <td class="text-right tabular-nums font-semibold text-[#1f8a4c]">
+                                        <td class="text-right tabular-nums font-semibold text-success">
                                             {{ $line['amount'] !== null ? number_format((float) $line['amount'], 2) : '—' }}
                                         </td>
                                         <td class="whitespace-nowrap tabular-nums text-foreground-muted">{{ $line['paid_at']?->translatedFormat('j M Y') ?? '—' }}</td>

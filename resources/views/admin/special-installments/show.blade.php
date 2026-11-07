@@ -15,7 +15,7 @@
             <div class="flex flex-col gap-4 border-b border-line bg-surface-variant px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div>
                     <p class="text-sm font-medium text-foreground-muted">{{ __('One-time') }}</p>
-                    <p class="mt-1 text-2xl font-bold tabular-nums text-[#1f8a4c]">{{ number_format((float) $specialInstallment->amount, 2) }}</p>
+                    <p class="mt-1 text-2xl font-bold tabular-nums text-success">{{ number_format((float) $specialInstallment->amount, 2) }}</p>
                 </div>
                 <div id="monthly-payments-summary">
                     @include('admin.special-installments.partials.summary', compact(

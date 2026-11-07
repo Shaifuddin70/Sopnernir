@@ -1,5 +1,5 @@
 @if ($profitByMonth->isEmpty())
-    <div class="rounded-lg border border-dashed border-line bg-surface-variant px-3 py-6 text-center">
+    <div class="rounded-xl border border-dashed border-line bg-surface-variant/60 px-3 py-8 text-center">
         <p class="text-sm text-foreground-muted">
             @if (request()->filled('profit_search'))
                 {{ __('No rows match your search.') }}
@@ -9,7 +9,27 @@
         </p>
     </div>
 @else
-    <div class="ui-glass-table-wrap overflow-x-auto">
+    <div class="portfolio-profit-cards space-y-2 sm:hidden">
+        @foreach ($profitByMonth as $row)
+            <article class="portfolio-profit-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
+                            {{ $row->period->month->translatedFormat('M Y') }}
+                        </p>
+                        <a href="{{ route('investments.show', $row->period->investment) }}" class="ui-text-link mt-1 block truncate text-sm font-semibold">
+                            {{ $row->period->investment->title }}
+                        </a>
+                    </div>
+                    <p class="shrink-0 text-base font-bold tabular-nums text-success">
+                        {{ number_format((float) $row->profit_share, 2, '.', '') }}
+                    </p>
+                </div>
+            </article>
+        @endforeach
+    </div>
+
+    <div class="ui-glass-table-wrap hidden overflow-x-auto sm:block">
         <table class="ui-table min-w-full">
             <thead>
                 <tr>

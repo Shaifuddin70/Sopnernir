@@ -6,7 +6,7 @@
 @php
     $base = 'inline-flex h-10 items-center justify-center rounded-full px-4 text-sm font-medium shadow-sm transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50';
     $variantClass = match ($variant) {
-        'secondary' => 'border border-white/70 bg-white/80 text-primary backdrop-blur-md hover:bg-white focus:ring-primary',
+        'secondary' => 'border border-white/70 bg-white/80 text-primary backdrop-blur-md hover:bg-white focus:ring-primary dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15',
         'success' => 'bg-success text-on-primary hover:brightness-110 focus:ring-success',
         'danger' => 'bg-error text-on-primary hover:brightness-110 focus:ring-error',
         default => 'bg-primary text-on-primary hover:bg-primary-hover focus:ring-primary',

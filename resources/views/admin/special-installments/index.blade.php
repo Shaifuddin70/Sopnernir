@@ -40,12 +40,12 @@
             </div>
             <div class="space-y-3 p-4 pt-3 sm:p-5">
                 @if ($installments->isEmpty())
-                    <div class="rounded-2xl border border-dashed border-[#e3eaf2] bg-white/50 px-4 py-14 text-center">
+                    <div class="rounded-2xl border border-dashed border-line bg-surface-variant/50 px-4 py-14 text-center">
                         <p class="text-sm text-foreground-muted">{{ __('No special installments yet.') }}</p>
                     </div>
                 @else
                     @foreach ($installments as $installment)
-                        <article class="flex flex-col gap-3 rounded-2xl border border-white/80 bg-white/75 px-4 py-4 shadow-[0_8px_24px_rgb(15_23_42/0.05)] sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                        <article class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-card/80 px-4 py-4 shadow-elevation-1 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                             <div class="min-w-0">
                                 <h4 class="truncate text-base font-semibold text-foreground">{{ $installment->title }}</h4>
                                 <p class="mt-1 text-sm text-foreground-muted">
@@ -56,7 +56,7 @@
                                 </p>
                             </div>
                             <div class="flex items-center justify-between gap-3 sm:justify-end">
-                                <p class="text-xl font-bold tabular-nums text-[#1f8a4c]">{{ number_format((float) $installment->amount, 2) }}</p>
+                                <p class="text-xl font-bold tabular-nums text-success">{{ number_format((float) $installment->amount, 2) }}</p>
                                 <div class="table-row-actions shrink-0">
                                     <x-action-button :href="route('admin.special-installments.show', $installment)" variant="secondary">
                                         {{ __('Manage') }}

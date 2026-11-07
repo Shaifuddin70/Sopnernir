@@ -12,7 +12,7 @@
     data-label-none="{{ __('No withdrawable profit for the selection.') }}"
 >
     @if ($investments->isEmpty())
-        <div class="rounded-xl border border-dashed border-[#e3eaf2] bg-white/50 px-3 py-10 text-center">
+        <div class="rounded-xl border border-dashed border-line bg-surface-variant/50 px-3 py-10 text-center">
             <p class="text-sm text-foreground-muted">
                 @if (request()->filled('search'))
                     {{ __('No investments match your search.') }}
@@ -23,7 +23,7 @@
         </div>
     @else
         <div
-            class="hidden flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[#d6e6f8] bg-[#eef5ff] px-3 py-3 sm:px-4"
+            class="hidden flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-muted px-3 py-3 sm:px-4"
             data-withdraw-bulk-bar
         >
             <div class="flex flex-wrap items-end gap-3">

@@ -9,6 +9,7 @@
     <title>{{ config('app.name', 'Shopnernir') }}</title>
 
     <x-favicon />
+    <x-theme-init />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

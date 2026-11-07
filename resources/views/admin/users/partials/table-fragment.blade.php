@@ -1,5 +1,5 @@
 @if ($users->isEmpty())
-    <div class="rounded-xl border border-dashed border-[#e3eaf2] bg-white/50 px-3 py-10 text-center">
+    <div class="rounded-xl border border-dashed border-line bg-surface-variant/50 px-3 py-10 text-center">
         <p class="text-sm text-foreground-muted">
             @if (request()->filled('search'))
                 {{ __('No users match your search.') }}

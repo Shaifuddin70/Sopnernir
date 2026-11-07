@@ -3,14 +3,15 @@
 @endphp
 
 <div class="flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
+    <x-theme-toggle class="shrink-0" />
     <div @class(['shrink-0', 'hidden sm:block' => ! $authUser->isAdmin(), 'hidden lg:block' => $authUser->isAdmin()])>
         <x-language-switcher />
     </div>
-    <x-dropdown align="right" width="full" contentClasses="overflow-hidden rounded-2xl border border-[#e6eef8] bg-white py-1.5 shadow-[0_12px_32px_rgb(15_23_42/0.12)]">
+    <x-dropdown align="right" width="full" contentClasses="overflow-hidden rounded-2xl border border-line bg-surface-card py-1.5 shadow-[0_12px_32px_rgb(15_23_42/0.12)] dark:shadow-[0_12px_32px_rgb(0_0_0/0.45)]">
         <x-slot name="trigger">
             <button
                 type="button"
-                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-full border border-white/70 bg-white/80 py-1 ps-1 pe-3 text-sm font-medium leading-4 text-foreground shadow-sm backdrop-blur-md transition duration-150 ease-in-out hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                class="inline-flex h-10 max-w-full min-w-0 items-center gap-2 rounded-full border border-white/70 bg-white/80 py-1 ps-1 pe-3 text-sm font-medium leading-4 text-foreground shadow-sm backdrop-blur-md transition duration-150 ease-in-out hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15"
             >
                 <span class="ui-user-identity__avatar ui-user-identity__avatar--compact">
                     <x-user-avatar :user="$authUser" />
@@ -30,7 +31,7 @@
                     <x-language-switcher />
                 </div>
             @endunless
-            <x-dropdown-link :href="route('profile.edit')">
+            <x-dropdown-link :href="route('profile.show')">
                 {{ __('Profile') }}
             </x-dropdown-link>
 

@@ -13,7 +13,7 @@
         : route('investments.all');
 @endphp
 
-<div class="space-y-4">
+<div class="space-y-3 sm:space-y-4">
     @if ($showPlatform && $platform)
         <section class="dashboard-stat-panel" aria-label="{{ __('Platform overview') }}">
             <div class="dashboard-stat-panel__head">
@@ -48,17 +48,32 @@
         </section>
     @endif
 
-    <section class="dashboard-stat-panel" aria-label="{{ __('Portfolio summary') }}">
+    <section class="dashboard-stat-panel portfolio-summary-panel" aria-label="{{ __('Portfolio summary') }}">
         <div class="dashboard-stat-panel__head">
-            <h3 class="dashboard-stat-panel__title">{{ __('Portfolio summary') }}</h3>
-            <div class="flex flex-wrap items-center gap-1.5">
-                <span class="ui-chip tabular-nums">{{ __('As of :date', ['date' => $asOfLabel]) }}</span>
-                @if ($rowsTotal > 0)
-                    <span class="ui-chip">{{ trans_choice(':count pool|:count pools', $rowsTotal, ['count' => $rowsTotal]) }}</span>
-                @endif
+            <div class="min-w-0">
+                <h3 class="dashboard-stat-panel__title">{{ __('Portfolio summary') }}</h3>
+                <p class="dashboard-stat-panel__meta">
+                    {{ __('As of :date', ['date' => $asOfLabel]) }}
+                    @if ($rowsTotal > 0)
+                        · {{ trans_choice(':count pool|:count pools', $rowsTotal, ['count' => $rowsTotal]) }}
+                    @endif
+                </p>
             </div>
         </div>
-        <dl class="dashboard-stat-grid">
+
+        <div class="dashboard-hero portfolio-hero">
+            <p class="dashboard-hero__label">{{ __('Profit til today') }}</p>
+            <p class="dashboard-hero__value">{{ $summary['profit_til_today'] }}</p>
+            <p class="dashboard-hero__hint">
+                @if ($rowsTotal > 0)
+                    {{ trans_choice(':count pool|:count pools', $rowsTotal, ['count' => $rowsTotal]) }}
+                @else
+                    {{ __('No active pools yet') }}
+                @endif
+            </p>
+        </div>
+
+        <dl class="dashboard-stat-grid portfolio-summary-grid">
             <div class="dashboard-stat portfolio-stat portfolio-stat--capital">
                 <dt class="portfolio-stat__label">
                     <span class="portfolio-stat__icon" aria-hidden="true">
@@ -84,7 +99,7 @@
                 </dt>
                 <dd>{{ $summary['total_projected_profit'] }}</dd>
             </div>
-            <div class="dashboard-stat portfolio-stat portfolio-stat--today">
+            <div class="dashboard-stat portfolio-stat portfolio-stat--today portfolio-stat--desktop-only">
                 <dt class="portfolio-stat__label">
                     <span class="portfolio-stat__icon" aria-hidden="true">
                         <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -119,19 +134,19 @@
     @else
         <section class="dashboard-stat-panel dashboard-stat-panel--scroll min-w-0">
             <div class="dashboard-stat-panel__head">
-                <h3 class="dashboard-stat-panel__title">{{ __('Your investments') }}</h3>
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="min-w-0">
+                    <h3 class="dashboard-stat-panel__title">{{ __('Your investments') }}</h3>
                     @if ($hasMoreInvestments)
-                        <span class="text-sm text-foreground-muted tabular-nums">
+                        <p class="dashboard-stat-panel__meta tabular-nums">
                             {{ __(':shown of :total', ['shown' => $previewRows->count(), 'total' => $rowsTotal]) }}
-                        </span>
-                    @endif
-                    @if ($hasMoreInvestments)
-                        <a href="{{ $viewAllUrl }}" class="text-sm font-semibold text-primary hover:text-primary-hover">
-                            {{ __('View all') }}
-                        </a>
+                        </p>
                     @endif
                 </div>
+                @if ($hasMoreInvestments)
+                    <a href="{{ $viewAllUrl }}" class="text-sm font-semibold text-primary hover:text-primary-hover">
+                        {{ __('View all') }}
+                    </a>
+                @endif
             </div>
             <div class="p-3">
                 @include('investor.investments.partials.daily-profit-rows', [

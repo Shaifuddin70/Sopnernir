@@ -20,13 +20,18 @@
     <x-slot name="header">
         <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ __('Investments') }}</h2>
-            <div class="header-action-scroll">
-                <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
-                    {{ __('Withdrawals') }}
-                </x-action-button>
-                <x-primary-button type="button" @click="$dispatch('open-modal', 'create-investment')">
+            <div class="flex min-w-0 items-center gap-2">
+                <div class="header-action-scroll">
+                    <x-action-button :href="route('admin.profit-withdrawals.index')" variant="secondary" class="text-sm">
+                        {{ __('Withdrawals') }}
+                    </x-action-button>
+                </div>
+                <x-action-button
+                    :href="route('admin.investments.index', ['new' => 1])"
+                    class="shrink-0"
+                >
                     {{ __('New investment') }}
-                </x-primary-button>
+                </x-action-button>
             </div>
         </div>
     </x-slot>
