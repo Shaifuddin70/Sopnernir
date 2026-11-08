@@ -7,7 +7,7 @@
                     <x-action-button
                         :href="route('investments.all')"
                         variant="secondary"
-                        class="portfolio-all-pools-btn hidden shrink-0 sm:inline-flex"
+                        class="portfolio-all-pools-btn shrink-0"
                     >
                         {{ __('All pools') }}
                         <span class="ms-1 tabular-nums">({{ $dailyProfitRowsTotal }})</span>

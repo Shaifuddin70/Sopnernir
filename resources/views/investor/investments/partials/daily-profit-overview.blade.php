@@ -116,7 +116,7 @@
                 </dt>
                 <dd>{{ $summary['total_projected_profit'] }}</dd>
             </div>
-            <div class="dashboard-stat portfolio-stat portfolio-stat--today">
+            <div class="dashboard-stat portfolio-stat portfolio-stat--today portfolio-stat--desktop-only">
                 <dt class="portfolio-stat__label">
                     <span class="portfolio-stat__icon" aria-hidden="true">
                         <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

@@ -56,7 +56,7 @@
                         <dt>{{ __('Total profit') }}</dt>
                         <dd>{{ $personal['total_projected_profit'] }}</dd>
                     </div>
-                    <div class="dashboard-stat dashboard-stat--profit">
+                    <div class="dashboard-stat dashboard-stat--profit dashboard-stat--desktop-only">
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $personal['profit_til_today'] }}</dd>
                     </div>
@@ -79,6 +79,16 @@
                         @endif
                     </div>
                 </div>
+
+                <div class="dashboard-hero">
+                    <p class="dashboard-hero__label">{{ __('Profit til today') }}</p>
+                    <p class="dashboard-hero__value">{{ $platform['profit_til_today'] }}</p>
+                    <p class="dashboard-hero__hint">
+                        {{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}
+                        · {{ __('Active pools: :n', ['n' => $platform['investments_active']]) }}
+                    </p>
+                </div>
+
                 <dl class="dashboard-stat-grid">
                     <div class="dashboard-stat dashboard-stat--capital">
                         <dt>{{ __('Total capital') }}</dt>
@@ -94,7 +104,7 @@
                         <dt>{{ __('Total profit') }}</dt>
                         <dd>{{ $platform['total_projected_profit'] }}</dd>
                     </div>
-                    <div class="dashboard-stat dashboard-stat--profit">
+                    <div class="dashboard-stat dashboard-stat--profit dashboard-stat--desktop-only">
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $platform['profit_til_today'] }}</dd>
                         <p>{{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}</p>
