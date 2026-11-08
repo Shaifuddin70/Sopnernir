@@ -149,6 +149,18 @@
                         <dd class="mt-0.5 font-medium text-foreground">{{ $investment->tagged_payment_month?->translatedFormat('F Y') ?? '—' }}</dd>
                     </div>
                     <div>
+                        <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Tagged from special installment') }}</dt>
+                        <dd class="mt-0.5 font-medium text-foreground">
+                            @if ($investment->specialInstallment)
+                                <a href="{{ route('admin.special-installments.show', $investment->specialInstallment) }}" class="ui-text-link">
+                                    {{ $investment->specialInstallment->title }}
+                                </a>
+                            @else
+                                —
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
                         <dt class="text-sm font-medium uppercase tracking-wide text-foreground-muted">{{ __('Ending date') }}</dt>
                         <dd class="mt-0.5 font-medium text-foreground">
                             {{ $investment->deed_completion_deadline?->translatedFormat('j M Y') ?? '—' }}

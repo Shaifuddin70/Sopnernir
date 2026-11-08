@@ -3,14 +3,27 @@
     if (! is_string($prefillPaymentMonth) || ! preg_match('/^\d{4}-\d{2}$/', $prefillPaymentMonth)) {
         $prefillPaymentMonth = null;
     }
-    $prefillTitle = $prefillPaymentMonth
-        ? \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()->translatedFormat('F Y')
-        : null;
-    $defaultContribution = $prefillPaymentMonth
-        ? app(\App\Services\MonthlyPaymentService::class)->defaultAmountForMonth(
-            \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()
-        )
-        : null;
+
+    $prefillSpecialInstallmentId = request()->query('special_installment');
+    $prefillSpecialInstallment = null;
+    if (is_numeric($prefillSpecialInstallmentId)) {
+        $prefillSpecialInstallment = \App\Models\SpecialInstallment::query()->find((int) $prefillSpecialInstallmentId);
+    }
+    if (old('special_installment_id') && $prefillSpecialInstallment === null) {
+        $prefillSpecialInstallment = \App\Models\SpecialInstallment::query()->find((int) old('special_installment_id'));
+    }
+
+    $prefillTitle = $prefillSpecialInstallment?->title
+        ?? ($prefillPaymentMonth
+            ? \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()->translatedFormat('F Y')
+            : null);
+    $defaultContribution = $prefillSpecialInstallment !== null
+        ? number_format((float) $prefillSpecialInstallment->amount, 2, '.', '')
+        : ($prefillPaymentMonth
+            ? app(\App\Services\MonthlyPaymentService::class)->defaultAmountForMonth(
+                \Carbon\Carbon::createFromFormat('Y-m', $prefillPaymentMonth)->startOfMonth()
+            )
+            : null);
     $openCreateInvestmentModal = request()->boolean('new')
         || (old('_form') === 'create-investment' && $errors->isNotEmpty());
     $openEditInvestmentModal = $editingInvestment !== null;
@@ -51,6 +64,10 @@
                 <div class="dashboard-stat dashboard-stat--capital">
                     <dt>{{ __('Total capital') }}</dt>
                     <dd>{{ $summary['total_capital'] }}</dd>
+                </div>
+                <div class="dashboard-stat dashboard-stat--invested">
+                    <dt>{{ __('Invested capital') }}</dt>
+                    <dd>{{ $summary['invested_capital'] }}</dd>
                 </div>
                 <div class="dashboard-stat dashboard-stat--profit">
                     <dt>{{ __('Total profit') }}</dt>
@@ -112,6 +129,7 @@
                 'defaultPaymentMonth' => $prefillPaymentMonth ?? old('payment_month', now()->format('Y-m')),
                 'defaultTitle' => $prefillTitle,
                 'defaultContribution' => $defaultContribution,
+                'specialInstallmentId' => $prefillSpecialInstallment?->id,
             ])
         </div>
     </x-modal>

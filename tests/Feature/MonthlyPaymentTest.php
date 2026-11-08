@@ -22,7 +22,7 @@ class MonthlyPaymentTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.monthly-payments.index', ['month' => '2026-03']))
             ->assertOk()
-            ->assertSee(__('Monthly payments'), false)
+            ->assertSee(__('Monthly Installment'), false)
             ->assertSee('Paying Investor', false)
             ->assertSee(__('Create investment'), false)
             ->assertSee('payment_month=2026-03', false)

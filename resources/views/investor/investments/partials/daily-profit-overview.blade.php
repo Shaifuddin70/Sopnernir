@@ -24,6 +24,10 @@
                     <dt>{{ __('Total capital') }}</dt>
                     <dd>{{ $platform['total_capital'] }}</dd>
                 </div>
+                <div class="dashboard-stat dashboard-stat--invested">
+                    <dt>{{ __('Invested capital') }}</dt>
+                    <dd>{{ $platform['invested_capital'] }}</dd>
+                </div>
                 <div class="dashboard-stat dashboard-stat--profit">
                     <dt>{{ __('Total profit') }}</dt>
                     <dd>{{ $platform['total_projected_profit'] }}</dd>
@@ -83,9 +87,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4 17 8 4 8-4" />
                         </svg>
                     </span>
-                    {{ __('Your capital') }}
+                    {{ __('Total capital') }}
                 </dt>
                 <dd>{{ $summary['total_capital'] }}</dd>
+            </div>
+            <div class="dashboard-stat portfolio-stat portfolio-stat--invested">
+                <dt class="portfolio-stat__label">
+                    <span class="portfolio-stat__icon" aria-hidden="true">
+                        <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 6h14v12H5z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14h6" />
+                        </svg>
+                    </span>
+                    {{ __('Invested capital') }}
+                </dt>
+                <dd>{{ $summary['invested_capital'] }}</dd>
             </div>
             <div class="dashboard-stat portfolio-stat portfolio-stat--profit">
                 <dt class="portfolio-stat__label">
@@ -99,7 +116,7 @@
                 </dt>
                 <dd>{{ $summary['total_projected_profit'] }}</dd>
             </div>
-            <div class="dashboard-stat portfolio-stat portfolio-stat--today portfolio-stat--desktop-only">
+            <div class="dashboard-stat portfolio-stat portfolio-stat--today">
                 <dt class="portfolio-stat__label">
                     <span class="portfolio-stat__icon" aria-hidden="true">
                         <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -110,19 +127,6 @@
                     {{ __('Profit til today') }}
                 </dt>
                 <dd>{{ $summary['profit_til_today'] }}</dd>
-            </div>
-            <div class="dashboard-stat portfolio-stat portfolio-stat--withdrawn">
-                <dt class="portfolio-stat__label">
-                    <span class="portfolio-stat__icon" aria-hidden="true">
-                        <svg class="h-4 w-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v10" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8 10 4 4 4-4" />
-                            <path stroke-linecap="round" d="M5 19h14" />
-                        </svg>
-                    </span>
-                    {{ __('Withdrawn') }}
-                </dt>
-                <dd>{{ $summary['total_withdrawn'] ?? '0.00' }}</dd>
             </div>
         </dl>
     </section>

@@ -2,9 +2,18 @@
     <x-slot name="header">
         <div class="ui-header-heading flex min-w-0 flex-wrap items-center justify-between gap-3">
             <h2 class="ui-page-header-title">{{ $specialInstallment->title }}</h2>
-            <div class="header-action-scroll">
-                <x-action-button :href="route('admin.special-installments.index')" variant="secondary">
-                    {{ __('Special installments') }}
+            <div class="flex min-w-0 items-center gap-2">
+                <div class="header-action-scroll">
+                    <x-action-button :href="route('admin.special-installments.index')" variant="secondary">
+                        {{ __('Special installments') }}
+                    </x-action-button>
+                </div>
+                <x-action-button
+                    class="shrink-0"
+                    :href="route('admin.investments.index', ['new' => 1, 'special_installment' => $specialInstallment->id])"
+                    :title="__('Create an investment and tag investors who paid for :title', ['title' => $specialInstallment->title])"
+                >
+                    {{ __('Create investment') }}
                 </x-action-button>
             </div>
         </div>

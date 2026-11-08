@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="ui-page-header-title">{{ __('Monthly payments') }}</h2>
+        <h2 class="ui-page-header-title">{{ __('Monthly Installment') }}</h2>
     </x-slot>
 
     <div class="dashboard-page space-y-5 pb-2">

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Investment;
+use App\Models\InvestmentParticipant;
 use App\Models\SpecialInstallment;
 use App\Models\SpecialInstallmentPayment;
 use App\Models\User;
@@ -88,5 +90,42 @@ class SpecialInstallmentService
         }
 
         return $updated;
+    }
+
+    /**
+     * @return Collection<int, int>
+     */
+    public function paidUserIds(SpecialInstallment $installment): Collection
+    {
+        return SpecialInstallmentPayment::query()
+            ->where('special_installment_id', $installment->id)
+            ->whereNotNull('paid_at')
+            ->pluck('user_id');
+    }
+
+    public function tagPaidInvestors(Investment $investment, SpecialInstallment $installment): int
+    {
+        if ($investment->contribution_per_investor === null || (float) $investment->contribution_per_investor <= 0) {
+            return 0;
+        }
+
+        $contribution = number_format((float) $investment->contribution_per_investor, 2, '.', '');
+        $tagged = 0;
+
+        foreach ($this->paidUserIds($installment) as $userId) {
+            InvestmentParticipant::updateOrCreate(
+                [
+                    'investment_id' => $investment->id,
+                    'user_id' => (int) $userId,
+                ],
+                [
+                    'contribution_amount' => $contribution,
+                ]
+            );
+
+            $tagged++;
+        }
+
+        return $tagged;
     }
 }

@@ -24,6 +24,8 @@ class DashboardMetricsService
      * @return array{
      *     investments_total: int,
      *     investments_active: int,
+     *     total_capital: string,
+     *     invested_capital: string,
      *     total_contributions: string,
      *     total_projected_profit: string,
      *     profit_til_today: string,
@@ -44,7 +46,9 @@ class DashboardMetricsService
                 ->where('status', Investment::STATUS_ACTIVE)
                 ->where('is_active', true)
                 ->count(),
-            'total_contributions' => $daily['total_capital'],
+            'total_capital' => $daily['total_capital'],
+            'invested_capital' => $daily['invested_capital'],
+            'total_contributions' => $daily['invested_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
             'total_withdrawn' => $daily['total_withdrawn'],
@@ -61,6 +65,8 @@ class DashboardMetricsService
      *
      * @return array{
      *     investments_count: int,
+     *     total_capital: string,
+     *     invested_capital: string,
      *     total_contribution: string,
      *     total_projected_profit: string,
      *     profit_til_today: string,
@@ -73,19 +79,21 @@ class DashboardMetricsService
     public function personalSummary(User $user): array
     {
         $daily = $this->dailyProfit->portfolioSummaryForUser($user);
-        $contrib = (float) $daily['total_capital'];
+        $invested = (float) $daily['invested_capital'];
         $profitTilToday = (float) $daily['profit_til_today'];
 
         return [
             'investments_count' => $daily['investment_count'],
-            'total_contribution' => $daily['total_capital'],
+            'total_capital' => $daily['total_capital'],
+            'invested_capital' => $daily['invested_capital'],
+            'total_contribution' => $daily['invested_capital'],
             'total_projected_profit' => $daily['total_projected_profit'],
             'profit_til_today' => $daily['profit_til_today'],
             'total_withdrawn' => $daily['total_withdrawn'],
             'total_profit' => $daily['profit_til_today'],
             'total_amount' => $daily['total_til_today'],
-            'return_on_tagged_capital_pct' => $contrib > 0
-                ? number_format(($profitTilToday / $contrib) * 100, 2, '.', '')
+            'return_on_tagged_capital_pct' => $invested > 0
+                ? number_format(($profitTilToday / $invested) * 100, 2, '.', '')
                 : null,
             'as_of_date' => $daily['as_of_date'],
         ];

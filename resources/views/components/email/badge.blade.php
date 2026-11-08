@@ -1,15 +1,15 @@
 @props(['tone' => 'success'])
 
 @php
-    $styles = match ($tone) {
-        'warning' => 'background-color:#F8F1DC;color:#8A6A1F;',
-        'info' => 'background-color:#E3F2FD;color:#0D47A1;',
-        default => 'background-color:#E6F6EC;color:#1F8A4D;',
+    [$class, $styles] = match ($tone) {
+        'warning' => ['em-badge-warning', 'background-color:#fff3e0;color:#ed6c02;'],
+        'info' => ['em-badge-info', 'background-color:#e3f2fd;color:#0d47a1;'],
+        default => ['em-badge-success', 'background-color:#e8f5e9;color:#2e7d32;'],
     };
 @endphp
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px;">
     <tr>
-        <td style="{{ $styles }}border-radius:20px;padding:8px 14px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
+        <td class="{{ $class }}" style="{{ $styles }}border-radius:20px;padding:8px 14px;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;line-height:1;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
             ✓ {{ $slot }}
         </td>
     </tr>

@@ -26,11 +26,11 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="ui-page-header-title">{{ __('Payments') }}</h2>
+        <h2 class="ui-page-header-title">{{ __('My Installments') }}</h2>
     </x-slot>
 
     <div class="payments-page space-y-4 pb-2">
-        <section class="dashboard-stat-panel" aria-label="{{ __('Payments summary') }}">
+        <section class="dashboard-stat-panel" aria-label="{{ __('Installments summary') }}">
             <div class="dashboard-stat-panel__head">
                 <h3 class="dashboard-stat-panel__title">{{ __('Summary') }}</h3>
                 @if ($latestPaidAt)

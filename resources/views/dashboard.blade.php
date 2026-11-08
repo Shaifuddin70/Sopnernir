@@ -8,7 +8,7 @@
                         {{ __('Investments') }}
                     </x-action-button>
                     <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary">
-                        {{ __('Payments') }}
+                        {{ __('Monthly Installment') }}
                     </x-action-button>
                 @endif
                 <x-action-button :href="route('investments.index')" variant="secondary">
@@ -45,18 +45,18 @@
 
                 <dl class="dashboard-stat-grid dashboard-stat-grid--personal">
                     <div class="dashboard-stat dashboard-stat--capital">
-                        <dt>{{ __('Your capital') }}</dt>
-                        <dd>{{ $personal['total_contribution'] }}</dd>
+                        <dt>{{ __('Total capital') }}</dt>
+                        <dd>{{ $personal['total_capital'] }}</dd>
+                    </div>
+                    <div class="dashboard-stat dashboard-stat--invested">
+                        <dt>{{ __('Invested capital') }}</dt>
+                        <dd>{{ $personal['invested_capital'] }}</dd>
                     </div>
                     <div class="dashboard-stat dashboard-stat--profit">
                         <dt>{{ __('Total profit') }}</dt>
                         <dd>{{ $personal['total_projected_profit'] }}</dd>
                     </div>
-                    <div class="dashboard-stat dashboard-stat--muted">
-                        <dt>{{ __('Withdrawn') }}</dt>
-                        <dd>{{ $personal['total_withdrawn'] ?? '0.00' }}</dd>
-                    </div>
-                    <div class="dashboard-stat dashboard-stat--profit dashboard-stat--desktop-only">
+                    <div class="dashboard-stat dashboard-stat--profit">
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $personal['profit_til_today'] }}</dd>
                     </div>
@@ -82,7 +82,12 @@
                 <dl class="dashboard-stat-grid">
                     <div class="dashboard-stat dashboard-stat--capital">
                         <dt>{{ __('Total capital') }}</dt>
-                        <dd>{{ $platform['total_contributions'] }}</dd>
+                        <dd>{{ $platform['total_capital'] }}</dd>
+                        <p>{{ __('From payments') }}</p>
+                    </div>
+                    <div class="dashboard-stat dashboard-stat--invested">
+                        <dt>{{ __('Invested capital') }}</dt>
+                        <dd>{{ $platform['invested_capital'] }}</dd>
                         <p>{{ __('Active pools: :n', ['n' => $platform['investments_active']]) }}</p>
                     </div>
                     <div class="dashboard-stat dashboard-stat--profit">
@@ -92,10 +97,6 @@
                     <div class="dashboard-stat dashboard-stat--profit">
                         <dt>{{ __('Profit til today') }}</dt>
                         <dd>{{ $platform['profit_til_today'] }}</dd>
-                    </div>
-                    <div class="dashboard-stat dashboard-stat--muted">
-                        <dt>{{ __('Withdrawn') }}</dt>
-                        <dd>{{ $platform['total_withdrawn'] ?? '0.00' }}</dd>
                         <p>{{ __(':n members', ['n' => $platform['member_count'] ?? 0]) }}</p>
                     </div>
                 </dl>
@@ -150,7 +151,7 @@
                         data-chart-type="monthly-payments"
                         data-paid-label="{{ __('Paid') }}"
                         data-unpaid-label="{{ __('Unpaid') }}"
-                        aria-label="{{ __('Monthly payments chart') }}"
+                        aria-label="{{ __('Monthly Installment chart') }}"
                         role="img"
                     ></canvas>
                 </div>

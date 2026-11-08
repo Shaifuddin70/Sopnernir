@@ -1,6 +1,14 @@
+@php
+    $specialInstallmentId = $specialInstallmentId ?? null;
+    $fromSpecialInstallment = $specialInstallmentId !== null;
+@endphp
+
 <form method="post" action="{{ route('admin.investments.store') }}">
     @csrf
     <input type="hidden" name="_form" value="create-investment">
+    @if ($fromSpecialInstallment)
+        <input type="hidden" name="special_installment_id" value="{{ $specialInstallmentId }}">
+    @endif
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="sm:col-span-2">
@@ -60,21 +68,31 @@
             <p class="mt-1 text-sm text-foreground-muted">{{ __('Last day of the plan.') }}</p>
             <x-input-error :messages="$errors->get('deed_completion_deadline')" class="mt-2" />
         </div>
-        <div class="sm:col-span-2">
-            <x-input-label for="create_payment_month" :value="__('Payment month for tagging')" />
-            <input
-                id="create_payment_month"
-                name="payment_month"
-                type="month"
-                value="{{ old('payment_month', $defaultPaymentMonth ?? now()->format('Y-m')) }}"
-                class="ui-input mt-1 block w-full"
-                required
-            />
-            <p class="mt-1 text-sm text-foreground-muted">
-                {{ __('Only investors marked paid for this month on Monthly payments will be tagged automatically.') }}
-            </p>
-            <x-input-error :messages="$errors->get('payment_month')" class="mt-2" />
-        </div>
+        @if ($fromSpecialInstallment)
+            <div class="sm:col-span-2 rounded-lg border border-primary/20 bg-primary-muted/40 px-4 py-3">
+                <p class="text-sm font-medium text-foreground">{{ __('From special installment') }}</p>
+                <p class="mt-1 text-sm text-foreground-muted">
+                    {{ __('Investors marked paid on this special installment will be tagged automatically.') }}
+                </p>
+                <x-input-error :messages="$errors->get('special_installment_id')" class="mt-2" />
+            </div>
+        @else
+            <div class="sm:col-span-2">
+                <x-input-label for="create_payment_month" :value="__('Payment month for tagging')" />
+                <input
+                    id="create_payment_month"
+                    name="payment_month"
+                    type="month"
+                    value="{{ old('payment_month', $defaultPaymentMonth ?? now()->format('Y-m')) }}"
+                    class="ui-input mt-1 block w-full"
+                    required
+                />
+                <p class="mt-1 text-sm text-foreground-muted">
+                    {{ __('Only investors marked paid for this month on Monthly Installment will be tagged automatically.') }}
+                </p>
+                <x-input-error :messages="$errors->get('payment_month')" class="mt-2" />
+            </div>
+        @endif
         <div class="sm:col-span-2 rounded-lg border border-line bg-surface-secondary p-4 space-y-2">
             <x-input-label :value="__('Listed for investors')" />
             <input type="hidden" name="is_active" value="0" />

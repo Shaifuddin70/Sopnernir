@@ -23,7 +23,10 @@ class MailThemeTest extends TestCase
         $this->assertStringContainsString(__('Investment pools'), $html);
         $this->assertStringContainsString('alt="'.config('app.name').'"', $html);
         $this->assertTrue(
-            str_contains($html, 'images/logo.png') || str_contains($html, 'data:image/'),
+            str_contains($html, 'images/logo-mail.png')
+                || str_contains($html, 'images/logo.png')
+                || str_contains($html, 'data:image/')
+                || str_contains($html, 'cid:'),
             'Email should include the Shopnernir logo image'
         );
         $this->assertStringContainsString('Reset your password.', $html);

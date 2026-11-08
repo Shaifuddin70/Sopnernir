@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Investment;
 use App\Models\User;
+use App\Models\SpecialInstallment;
 use App\Services\InvestmentAccrualService;
 use App\Services\InvestmentDailyProfitService;
 use App\Services\InvestmentPlanCalculationService;
 use App\Services\InvestorNotificationService;
 use App\Services\MonthlyPaymentService;
+use App\Services\SpecialInstallmentService;
 use App\Support\PaginationPerPage;
 use App\Support\SqlLike;
 use Carbon\Carbon;
@@ -79,19 +81,29 @@ class InvestmentController extends Controller
     {
         $validated = $this->validateInvestment($request);
 
-        $paymentMonthInput = $request->validate([
-            'payment_month' => ['required', 'date_format:Y-m'],
-        ])['payment_month'];
+        $source = $request->validate([
+            'payment_month' => ['nullable', 'required_without:special_installment_id', 'date_format:Y-m'],
+            'special_installment_id' => ['nullable', 'required_without:payment_month', 'exists:special_installments,id'],
+        ]);
 
-        $paymentMonth = Carbon::createFromFormat('Y-m', $paymentMonthInput)->startOfMonth();
+        $specialInstallment = isset($source['special_installment_id'])
+            ? SpecialInstallment::query()->findOrFail($source['special_installment_id'])
+            : null;
+
+        $paymentMonth = isset($source['payment_month'])
+            ? Carbon::createFromFormat('Y-m', $source['payment_month'])->startOfMonth()
+            : null;
 
         $validated['created_by'] = $request->user()->id;
         $validated['is_active'] = $request->boolean('is_active', true);
-        $validated['tagged_payment_month'] = $paymentMonth->toDateString();
+        $validated['tagged_payment_month'] = $paymentMonth?->toDateString();
+        $validated['special_installment_id'] = $specialInstallment?->id;
 
         $investment = Investment::create($validated);
 
-        $tagged = app(MonthlyPaymentService::class)->tagPaidInvestorsForMonth($investment, $paymentMonth);
+        $tagged = $specialInstallment !== null
+            ? app(SpecialInstallmentService::class)->tagPaidInvestors($investment, $specialInstallment)
+            : app(MonthlyPaymentService::class)->tagPaidInvestorsForMonth($investment, $paymentMonth);
 
         app(InvestmentPlanCalculationService::class)->syncStoredTotals($investment->fresh());
 
@@ -112,7 +124,18 @@ class InvestmentController extends Controller
         }
 
         $statusParts = [__('Investment created.')];
-        if ($tagged > 0) {
+        if ($specialInstallment !== null) {
+            if ($tagged > 0) {
+                $statusParts[] = __('Tagged :count investor(s) who paid for :title.', [
+                    'count' => $tagged,
+                    'title' => $specialInstallment->title,
+                ]);
+            } else {
+                $statusParts[] = __('No paid investors for :title — tag investors manually on the pool page.', [
+                    'title' => $specialInstallment->title,
+                ]);
+            }
+        } elseif ($tagged > 0) {
             $statusParts[] = __('Tagged :count investor(s) who paid for :month.', [
                 'count' => $tagged,
                 'month' => $paymentMonth->translatedFormat('F Y'),

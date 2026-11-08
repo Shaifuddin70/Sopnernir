@@ -34,7 +34,9 @@ class SpecialInstallmentTest extends TestCase
             ->get(route('admin.special-installments.show', $installment))
             ->assertOk()
             ->assertSee('Eid collection', false)
-            ->assertSee('1,500.00', false);
+            ->assertSee('1,500.00', false)
+            ->assertSee(__('Create investment'), false)
+            ->assertSee('special_installment='.$installment->id, false);
     }
 
     public function test_paid_special_installment_is_visible_to_the_investor(): void

@@ -37,6 +37,7 @@ class Investment extends Model
         'notes',
         'period_start',
         'tagged_payment_month',
+        'special_installment_id',
         'deed_completion_deadline',
         'default_monthly_rate_pct',
         'total_profit_amount',
@@ -161,6 +162,11 @@ class Investment extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function specialInstallment(): BelongsTo
+    {
+        return $this->belongsTo(SpecialInstallment::class);
     }
 
     public function participants(): HasMany

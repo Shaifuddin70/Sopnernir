@@ -46,7 +46,7 @@ class DashboardController extends Controller
         return [
             'profitTrend' => $metrics->monthlyProfitTrendPlatform(),
             'capitalVsProfit' => [
-                'capital' => (float) ($platform['total_contributions'] ?? 0),
+                'capital' => (float) ($platform['invested_capital'] ?? $platform['total_contributions'] ?? 0),
                 'profit' => (float) ($platform['profit_til_today'] ?? $platform['total_profit_distributed'] ?? 0),
             ],
             'investmentStatus' => $metrics->investmentStatusBreakdown(),

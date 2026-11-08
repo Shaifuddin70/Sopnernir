@@ -69,8 +69,10 @@ class DashboardMetricsTest extends TestCase
             ->assertOk()
             ->assertSee(__('Profit til today'), false)
             ->assertSee($summary['profit_til_today'], false)
-            ->assertSee($summary['total_capital'], false)
-            ->assertSee(__('Return'), false);
+            ->assertSee($summary['invested_capital'], false)
+            ->assertSee(__('Invested capital'), false)
+            ->assertSee(__('Total capital'), false)
+            ->assertSee(__('Total profit'), false);
 
         Carbon::setTestNow();
     }

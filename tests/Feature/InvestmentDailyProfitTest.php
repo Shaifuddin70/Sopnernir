@@ -53,7 +53,7 @@ class InvestmentDailyProfitTest extends TestCase
         $this->assertSame(number_format($expectedTilToday, 2, '.', ''), number_format($pool['profit_til_today'], 2, '.', ''));
 
         $summary = $service->portfolioSummaryForUser($investor);
-        $this->assertSame('160000.00', $summary['total_capital']);
+        $this->assertSame('160000.00', $summary['invested_capital']);
         $this->assertSame('30000.00', $summary['total_projected_profit']);
         $this->assertSame(number_format($expectedTilToday, 2, '.', ''), $summary['profit_til_today']);
 

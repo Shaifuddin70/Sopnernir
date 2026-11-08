@@ -34,7 +34,7 @@
                             <circle cx="12" cy="12" r="2.15" stroke-width="1.8" />
                             <path stroke-linecap="round" stroke-width="1.8" d="M6.25 9.25h.01M17.75 14.75h.01" />
                         </svg>
-                        <span>{{ __('Payments') }}</span>
+                        <span>{{ __('My Installments') }}</span>
                     </span>
                 </x-responsive-nav-link>
                 @if (Auth::user()->isAdmin())
@@ -78,7 +78,7 @@
                                 <path stroke-linecap="round" stroke-width="1.8" d="M4.25 10h15.5" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m9 14.6 1.7 1.7 3.6-3.8" />
                             </svg>
-                            <span>{{ __('Monthly payments') }}</span>
+                            <span>{{ __('Monthly Installment') }}</span>
                         </span>
                     </x-responsive-nav-link>
                 @endif

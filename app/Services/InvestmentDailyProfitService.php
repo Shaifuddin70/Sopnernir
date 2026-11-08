@@ -16,6 +16,7 @@ class InvestmentDailyProfitService
     /**
      * @return array{
      *     total_capital: string,
+     *     invested_capital: string,
      *     total_projected_profit: string,
      *     profit_til_today: string,
      *     total_til_today: string,
@@ -28,17 +29,19 @@ class InvestmentDailyProfitService
         $rows = $this->portfolioRowsForUser($user, $asOf);
         $asOf = ($asOf ?? Carbon::today())->copy()->startOfDay();
 
-        $capital = $rows->sum(fn (array $row) => (float) $row['capital']);
+        $invested = $rows->sum(fn (array $row) => (float) $row['capital']);
         $projected = $rows->sum(fn (array $row) => (float) $row['projected_profit']);
         $tilToday = $rows->sum(fn (array $row) => (float) $row['profit_til_today']);
         $withdrawn = $rows->sum(fn (array $row) => (float) $row['withdrawn']);
+        $collected = app(CollectedCapitalService::class)->forUser($user);
 
         return [
-            'total_capital' => $this->decimal($capital),
+            'total_capital' => $collected['total'],
+            'invested_capital' => $this->decimal($invested),
             'total_projected_profit' => $this->decimal($projected),
             'profit_til_today' => $this->decimal($tilToday),
             'total_withdrawn' => $this->decimal($withdrawn),
-            'total_til_today' => $this->decimal($capital + $tilToday),
+            'total_til_today' => $this->decimal($invested + $tilToday),
             'investment_count' => $rows->count(),
             'as_of_date' => $asOf->toDateString(),
         ];
@@ -47,6 +50,7 @@ class InvestmentDailyProfitService
     /**
      * @return array{
      *     total_capital: string,
+     *     invested_capital: string,
      *     total_projected_profit: string,
      *     profit_til_today: string,
      *     total_til_today: string,
@@ -91,9 +95,11 @@ class InvestmentDailyProfitService
 
         $memberCount = count($memberIds);
         $perPerson = $memberCount > 0 ? $tilToday / $memberCount : 0.0;
+        $collected = app(CollectedCapitalService::class)->platform();
 
         return [
-            'total_capital' => $this->decimal($capital),
+            'total_capital' => $collected['total'],
+            'invested_capital' => $this->decimal($capital),
             'total_projected_profit' => $this->decimal($projected),
             'profit_til_today' => $this->decimal($tilToday),
             'total_withdrawn' => $this->decimal($withdrawn),

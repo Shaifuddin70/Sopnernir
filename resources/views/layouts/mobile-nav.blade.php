@@ -43,7 +43,7 @@
                     <circle cx="12" cy="12" r="2.15" stroke-width="1.8" />
                     <path stroke-linecap="round" stroke-width="1.8" d="M6.25 9.25h.01M17.75 14.75h.01" />
                 </svg>
-                <span>{{ __('Payments') }}</span>
+                <span>{{ __('My Installments') }}</span>
             </a>
                 <a href="{{ route('admin.users.index') }}" class="ui-mobile-more__link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}" @click="moreOpen = false">
                     <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,7 +78,7 @@
                         <path stroke-linecap="round" stroke-width="1.8" d="M4.25 10h15.5" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m9 14.6 1.7 1.7 3.6-3.8" />
                     </svg>
-                    <span>{{ __('Monthly payments') }}</span>
+                    <span>{{ __('Monthly Installment') }}</span>
                 </a>
         </nav>
         <div class="ui-mobile-more__locale">
@@ -111,7 +111,7 @@
                     <circle cx="12" cy="12" r="2.15" stroke-width="1.8" />
                     <path stroke-linecap="round" stroke-width="1.8" d="M6.25 9.25h.01M17.75 14.75h.01" />
                 </svg>
-                <span>{{ __('Payments') }}</span>
+                <span>{{ __('My Installments') }}</span>
             </a>
         @endunless
         <a href="/profile" class="ui-mobile-tab ui-mobile-tab--profile {{ request()->is('profile', 'profile/*') ? 'is-active' : '' }}">

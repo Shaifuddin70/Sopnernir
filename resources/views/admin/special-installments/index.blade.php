@@ -4,7 +4,7 @@
             <h2 class="ui-page-header-title">{{ __('Special installments') }}</h2>
             <div class="header-action-scroll">
                 <x-action-button :href="route('admin.monthly-payments.index')" variant="secondary">
-                    {{ __('Monthly payments') }}
+                    {{ __('Monthly Installment') }}
                 </x-action-button>
             </div>
         </div>
@@ -57,7 +57,13 @@
                             </div>
                             <div class="flex items-center justify-between gap-3 sm:justify-end">
                                 <p class="text-xl font-bold tabular-nums text-success">{{ number_format((float) $installment->amount, 2) }}</p>
-                                <div class="table-row-actions shrink-0">
+                                <div class="table-row-actions flex shrink-0 flex-wrap items-center justify-end gap-2">
+                                    <x-action-button
+                                        :href="route('admin.investments.index', ['new' => 1, 'special_installment' => $installment->id])"
+                                        variant="secondary"
+                                    >
+                                        {{ __('Create investment') }}
+                                    </x-action-button>
                                     <x-action-button :href="route('admin.special-installments.show', $installment)" variant="secondary">
                                         {{ __('Manage') }}
                                     </x-action-button>
