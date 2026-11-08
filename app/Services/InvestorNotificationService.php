@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Investment;
+use App\Models\Notice;
 use App\Models\SpecialInstallment;
 use App\Models\User;
 use App\Notifications\MonthlyPaymentRecordedNotification;
 use App\Notifications\NewInvestmentPlanNotification;
+use App\Notifications\NoticePublishedNotification;
 use App\Notifications\SpecialInstallmentRecordedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
@@ -41,14 +43,7 @@ class InvestorNotificationService
         }
 
         $taggedUserIds = $investment->participants()->pluck('user_id')->map(fn ($id) => (int) $id)->all();
-
-        $users = User::query()
-            ->where('is_active', true)
-            ->whereNotNull('email')
-            ->where('email', '!=', '')
-            ->get()
-            ->filter(fn (User $user) => $this->canEmail($user))
-            ->values();
+        $users = $this->emailableUsers();
 
         if ($users->isEmpty()) {
             return;
@@ -57,8 +52,38 @@ class InvestorNotificationService
         Notification::send($users, new NewInvestmentPlanNotification($investment, $taggedUserIds));
     }
 
+    public function noticePublished(Notice $notice): void
+    {
+        if (! $notice->isPublished()) {
+            return;
+        }
+
+        $users = $this->emailableUsers();
+
+        if ($users->isEmpty()) {
+            return;
+        }
+
+        Notification::send($users, new NoticePublishedNotification($notice));
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, User>
+     */
+    private function emailableUsers()
+    {
+        return User::query()
+            ->where('is_active', true)
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->get()
+            ->filter(fn (User $user) => $this->canEmail($user))
+            ->values();
+    }
+
     private function canEmail(User $user): bool
     {
         return is_string($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL);
     }
 }
+

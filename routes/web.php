@@ -5,11 +5,13 @@ use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController
 use App\Http\Controllers\Admin\InvestmentDocumentController;
 use App\Http\Controllers\Admin\InvestmentParticipantController;
 use App\Http\Controllers\Admin\MonthlyPaymentController;
+use App\Http\Controllers\Admin\NoticeController as AdminNoticeController;
 use App\Http\Controllers\Admin\SpecialInstallmentController;
 use App\Http\Controllers\Admin\ProfitWithdrawalController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Investor\InvestmentController as InvestorInvestmentController;
+use App\Http\Controllers\Investor\NoticeController as InvestorNoticeController;
 use App\Http\Controllers\Investor\PaymentController as InvestorPaymentController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PhoneAccess\InvestmentLookupController as PhoneAccessInvestmentLookupController;
@@ -44,6 +46,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/portfolio/{investment}/documents/{document}/download', [InvestmentDocumentController::class, 'download'])
         ->name('investments.documents.download');
     Route::get('/portfolio/{investment}', [InvestorInvestmentController::class, 'show'])->name('investments.show');
+
+    Route::get('/notices', [InvestorNoticeController::class, 'index'])->name('notices.index');
+    Route::get('/notices/{notice}', [InvestorNoticeController::class, 'show'])->name('notices.show');
+    Route::get('/notices/{notice}/attachments/{attachment}/download', [InvestorNoticeController::class, 'downloadAttachment'])
+        ->name('notices.attachments.download');
 });
 
 Route::middleware(['guest'])->group(function () {
@@ -75,6 +82,20 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('special-installments/{specialInstallment}', [SpecialInstallmentController::class, 'show'])->name('special-installments.show');
     Route::patch('special-installments/{specialInstallment}', [SpecialInstallmentController::class, 'update'])->name('special-installments.update');
     Route::patch('special-installments/{specialInstallment}/bulk', [SpecialInstallmentController::class, 'bulkUpdate'])->name('special-installments.bulk-update');
+
+    Route::get('notices', [AdminNoticeController::class, 'index'])->name('notices.index');
+    Route::get('notices/create', [AdminNoticeController::class, 'create'])->name('notices.create');
+    Route::post('notices', [AdminNoticeController::class, 'store'])->name('notices.store');
+    Route::get('notices/{notice}/edit', [AdminNoticeController::class, 'edit'])->name('notices.edit');
+    Route::put('notices/{notice}', [AdminNoticeController::class, 'update'])->name('notices.update');
+    Route::delete('notices/{notice}', [AdminNoticeController::class, 'destroy'])->name('notices.destroy');
+    Route::post('notices/{notice}/publish', [AdminNoticeController::class, 'publish'])->name('notices.publish');
+    Route::post('notices/{notice}/unpublish', [AdminNoticeController::class, 'unpublish'])->name('notices.unpublish');
+    Route::post('notices/{notice}/resend', [AdminNoticeController::class, 'resend'])->name('notices.resend');
+    Route::delete('notices/{notice}/attachments/{attachment}', [AdminNoticeController::class, 'destroyAttachment'])
+        ->name('notices.attachments.destroy');
+    Route::get('notices/{notice}/attachments/{attachment}/download', [AdminNoticeController::class, 'downloadAttachment'])
+        ->name('notices.attachments.download');
 
     Route::patch('investments/{investment}/active', [AdminInvestmentController::class, 'toggleActive'])->name('investments.active');
     Route::resource('investments', AdminInvestmentController::class)->except(['destroy']);

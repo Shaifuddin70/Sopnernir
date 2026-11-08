@@ -5,7 +5,10 @@ namespace App\Providers;
 use App\Models\Investment;
 use App\Models\InvestmentParticipant;
 use App\Services\InvestmentAccrualService;
+use App\Services\NoticeService;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +28,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::defaultView('vendor.pagination.tailwind');
+
+        View::composer(['layouts.navigation', 'layouts.mobile-nav'], function ($view): void {
+            $user = Auth::user();
+            $view->with(
+                'noticeUnreadCount',
+                $user ? app(NoticeService::class)->unreadCountFor($user) : 0,
+            );
+        });
 
         if (config('app.serve_vite_via_application')) {
             Vite::createAssetPathsUsing(function (string $path, ?bool $secure): string {

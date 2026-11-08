@@ -37,6 +37,20 @@
                         <span>{{ __('My Installments') }}</span>
                     </span>
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('notices.index')" :active="request()->routeIs('notices.*') || request()->routeIs('admin.notices.*')">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.5 4.75h9A1.75 1.75 0 0 1 18.25 6.5v12.1l-3.1-1.85-3.15 1.85-3.15-1.85-3.1 1.85V6.5A1.75 1.75 0 0 1 7.5 4.75Z" />
+                            <path stroke-linecap="round" stroke-width="1.8" d="M9.25 9h5.5M9.25 12h5.5" />
+                        </svg>
+                        <span class="flex min-w-0 items-center gap-2">
+                            <span>{{ __('Notice board') }}</span>
+                            @if (($noticeUnreadCount ?? 0) > 0)
+                                <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold leading-none text-on-primary">{{ $noticeUnreadCount > 9 ? '9+' : $noticeUnreadCount }}</span>
+                            @endif
+                        </span>
+                    </span>
+                </x-responsive-nav-link>
                 @if (Auth::user()->isAdmin())
                     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                         <span class="flex items-center gap-2.5">

@@ -7,6 +7,7 @@
         || request()->routeIs('admin.profit-withdrawals.*')
         || request()->routeIs('admin.monthly-payments.*')
         || request()->routeIs('admin.special-installments.*')
+        || request()->routeIs('admin.notices.*')
     );
 @endphp
 
@@ -80,6 +81,13 @@
                     </svg>
                     <span>{{ __('Monthly Installment') }}</span>
                 </a>
+                <a href="{{ route('admin.notices.index') }}" class="ui-mobile-more__link {{ request()->routeIs('admin.notices.*') ? 'is-active' : '' }}" @click="moreOpen = false">
+                    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.5 4.75h9A1.75 1.75 0 0 1 18.25 6.5v12.1l-3.1-1.85-3.15 1.85-3.15-1.85-3.1 1.85V6.5A1.75 1.75 0 0 1 7.5 4.75Z" />
+                        <path stroke-linecap="round" stroke-width="1.8" d="M9.25 9h5.5M9.25 12h5.5" />
+                    </svg>
+                    <span>{{ __('Manage notices') }}</span>
+                </a>
         </nav>
         <div class="ui-mobile-more__locale">
             <p class="ui-mobile-more__label">{{ __('Language') }}</p>
@@ -103,6 +111,18 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.25 3.9a8.25 8.25 0 0 1 5.85 5.85h-5.85V3.9Z" />
             </svg>
             <span>{{ __('Portfolio') }}</span>
+        </a>
+        <a href="{{ route('notices.index') }}" class="ui-mobile-tab ui-mobile-tab--notices {{ request()->routeIs('notices.*') ? 'is-active' : '' }}">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.5 4.75h9A1.75 1.75 0 0 1 18.25 6.5v12.1l-3.1-1.85-3.15 1.85-3.15-1.85-3.1 1.85V6.5A1.75 1.75 0 0 1 7.5 4.75Z" />
+                <path stroke-linecap="round" stroke-width="1.8" d="M9.25 9h5.5M9.25 12h5.5" />
+            </svg>
+            <span class="relative">
+                {{ __('Notices') }}
+                @if (($noticeUnreadCount ?? 0) > 0)
+                    <span class="absolute -end-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-on-primary">{{ $noticeUnreadCount > 9 ? '9+' : $noticeUnreadCount }}</span>
+                @endif
+            </span>
         </a>
         @unless ($isAdmin)
             <a href="{{ route('payments.index') }}" class="ui-mobile-tab ui-mobile-tab--payments {{ request()->routeIs('payments.*') ? 'is-active' : '' }}">
